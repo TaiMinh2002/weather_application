@@ -63,5 +63,5 @@
 ## 8. Git
 
 - Conventional Commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`.
-- Làm trên `feature/<tên>` → Pull Request vào `main`.
+- Tạo `feature/<tên>` từ `dev` → Pull Request vào `dev`. `dev` merge vào `main` khi ổn định.
 - Commit nhỏ, thường xuyên.

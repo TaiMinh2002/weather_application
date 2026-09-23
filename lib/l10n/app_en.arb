@@ -10,5 +10,24 @@
   "emptyDefault": "Nothing here yet",
   "onboardingTitle": "Weather where you are",
   "onboardingBody": "Skycast uses your location to show local weather. You can also search for cities manually.",
-  "onboardingStart": "Get started"
+  "onboardingStart": "Get started",
+  "conditionClear": "Clear sky",
+  "conditionMainlyClear": "Mainly clear",
+  "conditionPartlyCloudy": "Partly cloudy",
+  "conditionOvercast": "Overcast",
+  "conditionFog": "Fog",
+  "conditionDrizzle": "Drizzle",
+  "conditionRain": "Rain",
+  "conditionShowers": "Rain showers",
+  "conditionSnow": "Snow",
+  "conditionThunderstorm": "Thunderstorm",
+  "conditionUnknown": "Unknown",
+  "feelsLike": "Feels like {temp}",
+  "@feelsLike": {
+    "placeholders": {
+      "temp": {
+        "type": "String"
+      }
+    }
+  }
 }

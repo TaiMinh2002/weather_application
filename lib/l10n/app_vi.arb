@@ -10,5 +10,17 @@
   "emptyDefault": "Chưa có dữ liệu",
   "onboardingTitle": "Thời tiết nơi bạn đứng",
   "onboardingBody": "Skycast dùng vị trí của bạn để hiển thị thời tiết tại chỗ. Bạn cũng có thể tự tìm thành phố.",
-  "onboardingStart": "Bắt đầu"
+  "onboardingStart": "Bắt đầu",
+  "conditionClear": "Trời quang",
+  "conditionMainlyClear": "Ít mây",
+  "conditionPartlyCloudy": "Có mây",
+  "conditionOvercast": "Nhiều mây",
+  "conditionFog": "Sương mù",
+  "conditionDrizzle": "Mưa phùn",
+  "conditionRain": "Mưa",
+  "conditionShowers": "Mưa rào",
+  "conditionSnow": "Tuyết",
+  "conditionThunderstorm": "Dông",
+  "conditionUnknown": "Không xác định",
+  "feelsLike": "Cảm giác như {temp}"
 }

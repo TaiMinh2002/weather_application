@@ -29,7 +29,7 @@ Lint uses `flutter_lints` (see `analysis_options.yaml`; platform folders are exc
 - Only create folders when a real file goes into them. Don't scaffold empty directories.
 - Colors and text styles come from `Theme` / `ThemeExtension`. UI strings come from `context.l10n` (`.arb`, vi + en). Never hard-code either.
 - Every data screen handles loading (skeleton), error (`AppErrorView` with retry), and empty.
-- Conventional Commits. Work on `feature/<name>` branches and open PRs into `main`.
+- Conventional Commits. Branch `feature/<name>` off `dev` and open PRs into `dev` (not `main`); `dev` is merged to `main` when stable.
 
 ## Target architecture (from plan.md §5–6)
 
