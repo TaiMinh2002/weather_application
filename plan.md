@@ -340,10 +340,10 @@ final router = GoRouter(
 
 | Ngày | Việc cần làm |
 |---|---|
-| 1 | Tạo project, cài package, cấu hình lint, dựng cấu trúc thư mục, theme, router |
-| 2 | DioClient, Failure, Result type, gọi thử API Open-Meteo |
-| 3 | Model (freezed), repository, provider thời tiết |
-| 4 | Lấy GPS, xử lý quyền, reverse geocoding |
+| 1 ✅ | Tạo project, cài package, cấu hình lint, dựng cấu trúc thư mục, theme, router |
+| 2 ✅ | DioClient, Failure, Result type, gọi thử API Open-Meteo |
+| 3 ✅ | Model (freezed), repository, provider thời tiết |
+| 4 ✅ | Lấy GPS, xử lý quyền, reverse geocoding |
 | 5–6 | Màn Home: thời tiết hiện tại, theo giờ, 7 ngày, thông số chi tiết |
 | 7 | Cache offline bằng Hive, pull-to-refresh, banner offline |
 | 8 | Màn tìm kiếm thành phố (debounce), lưu thành phố |
@@ -353,6 +353,8 @@ final router = GoRouter(
 | 12 | Nền động, skeleton loading, hoàn thiện UI |
 | 13 | Viết test (mapper, repository, provider), GitHub Actions |
 | 14 | README, chụp ảnh/quay GIF, build APK đưa lên Releases |
+
+✅ = đã xong (merge vào `dev`).
 
 **Sau 2 tuần** (vài ngày thêm): AQI → gợi ý hoạt động → Supabase sync thành phố.
 
@@ -407,27 +409,41 @@ README nên có đủ các mục:
 
 ## 10. Checklist hoàn thành
 
+### Tiến độ (cập nhật 2026-09-24)
+
+Đã merge vào `dev`: **base code** (PR #1), **dữ liệu thời tiết** (PR #2), **vị trí** (PR #3). Tương ứng ngày 1–4 trong lộ trình.
+
+**Tiếp theo:** màn Home thật (ngày 5–6).
+
+**Thay đổi so với kế hoạch ban đầu:**
+- Không dùng `permission_handler`: `geolocator` đã có sẵn kiểm tra quyền, xin quyền và mở Cài đặt.
+- `Failure` không chứa câu thông báo; `AppErrorView` lấy câu theo loại lỗi từ l10n (rule.md cấm hard-code chuỗi). `LocationFailure` mang lý do: GPS tắt, bị từ chối, bị từ chối vĩnh viễn, không lấy được vị trí.
+- Exception, `Failure`, `Result` nằm chung `core/error/errors.dart` thay vì tách 2 file (theo rule 600 dòng).
+- Nhánh: `feature/*` tạo từ `dev`, Pull Request vào `dev` (không vào thẳng `main`).
+- Chưa làm: Hive cache (ngày 7), đổi đơn vị °C/°F (cùng màn Settings), `skeletonizer` (cùng màn Home).
+
+
 ### Nền tảng
-- [ ] Tạo project, cấu hình lint
-- [ ] Cấu trúc thư mục feature-first
-- [ ] Theme sáng/tối
-- [ ] go_router + redirect onboarding
-- [ ] DioClient + try/catch chuyển lỗi
-- [ ] Failure + Result type
-- [ ] Widget dùng chung (error, loading, empty)
-- [ ] Đa ngôn ngữ Việt/Anh
+- [x] Tạo project, cấu hình lint
+- [x] Cấu trúc thư mục feature-first
+- [x] Theme sáng/tối
+- [x] go_router + redirect onboarding
+- [x] DioClient + try/catch chuyển lỗi
+- [x] Failure + Result type
+- [x] Widget dùng chung (error, loading, empty)
+- [x] Đa ngôn ngữ Việt/Anh
 
 ### Tính năng MVP
-- [ ] Thời tiết hiện tại theo GPS
-- [ ] Dự báo theo giờ
-- [ ] Dự báo 7 ngày
-- [ ] Thông số chi tiết
+- [x] Thời tiết hiện tại theo GPS *(màn Home mới là bản tạm)*
+- [ ] Dự báo theo giờ *(đã có dữ liệu `next24Hours`, chưa có UI)*
+- [ ] Dự báo 7 ngày *(đã có dữ liệu, chưa có UI)*
+- [ ] Thông số chi tiết *(đã có dữ liệu, chưa có UI)*
 - [ ] Tìm kiếm thành phố
 - [ ] Lưu / sắp xếp / xóa thành phố
 - [ ] Cài đặt đơn vị, theme, ngôn ngữ
 - [ ] Offline cache
-- [ ] Pull-to-refresh
-- [ ] Xử lý quyền vị trí & lỗi
+- [x] Pull-to-refresh
+- [x] Xử lý quyền vị trí & lỗi
 
 ### Nâng cao
 - [ ] AQI
@@ -438,7 +454,7 @@ README nên có đủ các mục:
 - [ ] Thông báo mỗi sáng
 
 ### Chất lượng & trình bày
-- [ ] Unit test + widget test
+- [ ] Unit test + widget test *(đang làm dần theo từng tính năng, hiện 21 test)*
 - [ ] GitHub Actions
 - [ ] README đầy đủ
 - [ ] APK trên GitHub Releases
