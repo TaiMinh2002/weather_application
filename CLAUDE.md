@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Skycast: a Flutter weather app using the free Open-Meteo API (no API key needed). The repo is still the Flutter template (`lib/main.dart` is the counter app). The design lives in docs, not code:
+Skycast: a Flutter weather app using the free Open-Meteo API (no API key needed). Base code in `lib/core/` is done (Dio, errors/Result, theme, router, l10n, shared widgets); features are not built yet (`HomeScreen` is a placeholder). Generated files (`*.g.dart`, `lib/l10n/app_localizations*.dart`) are gitignored, so run `flutter gen-l10n` + `build_runner` after cloning. The design lives in docs:
 
 - `plan.md`: features, screens, packages, API endpoints, target architecture, and a 2-week roadmap. Read it before building a feature.
 - `rule.md`: coding rules. **Follow it strictly.** The user wrote these rules; they aren't generic advice.

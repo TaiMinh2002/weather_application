@@ -46,3 +46,8 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Generated code (build_runner, gen-l10n)
+*.g.dart
+*.freezed.dart
+lib/l10n/app_localizations*.dart

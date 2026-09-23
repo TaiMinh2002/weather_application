@@ -1,0 +1,14 @@
+{
+  "@@locale": "vi",
+  "appTitle": "Skycast",
+  "retry": "Thử lại",
+  "errorNetwork": "Không có kết nối mạng",
+  "errorServer": "Máy chủ đang gặp sự cố, vui lòng thử lại sau",
+  "errorCache": "Không có dữ liệu lưu sẵn",
+  "errorLocation": "Không lấy được vị trí của bạn",
+  "errorUnknown": "Đã có lỗi xảy ra",
+  "emptyDefault": "Chưa có dữ liệu",
+  "onboardingTitle": "Thời tiết nơi bạn đứng",
+  "onboardingBody": "Skycast dùng vị trí của bạn để hiển thị thời tiết tại chỗ. Bạn cũng có thể tự tìm thành phố.",
+  "onboardingStart": "Bắt đầu"
+}
