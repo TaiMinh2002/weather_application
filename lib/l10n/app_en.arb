@@ -1,0 +1,14 @@
+{
+  "@@locale": "en",
+  "appTitle": "Skycast",
+  "retry": "Retry",
+  "errorNetwork": "No internet connection",
+  "errorServer": "The server is having problems. Please try again later",
+  "errorCache": "No saved data available",
+  "errorLocation": "Unable to get your location",
+  "errorUnknown": "Something went wrong",
+  "emptyDefault": "Nothing here yet",
+  "onboardingTitle": "Weather where you are",
+  "onboardingBody": "Skycast uses your location to show local weather. You can also search for cities manually.",
+  "onboardingStart": "Get started"
+}
