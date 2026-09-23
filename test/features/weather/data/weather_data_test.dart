@@ -42,27 +42,24 @@ void main() {
     });
 
     test('returns Ok with entity on success', () async {
-      when(
-        () => remote.getForecast(any(), any()),
-      ).thenAnswer((_) async => WeatherDto.fromJson(weatherJson()));
+      when(() => remote.getForecast(any(), any()))
+          .thenAnswer((_) async => WeatherDto.fromJson(weatherJson()));
 
       final result = await repo.getWeather(lat: 21, lon: 105);
       expect(result, isA<Ok>());
     });
 
     test('maps NetworkException to NetworkFailure', () async {
-      when(
-        () => remote.getForecast(any(), any()),
-      ).thenThrow(const NetworkException());
+      when(() => remote.getForecast(any(), any()))
+          .thenThrow(const NetworkException());
 
       final result = await repo.getWeather(lat: 21, lon: 105);
       expect((result as Err).failure, isA<NetworkFailure>());
     });
 
     test('maps ServerException to ServerFailure', () async {
-      when(
-        () => remote.getForecast(any(), any()),
-      ).thenThrow(const ServerException(500));
+      when(() => remote.getForecast(any(), any()))
+          .thenThrow(const ServerException(500));
 
       final result = await repo.getWeather(lat: 21, lon: 105);
       expect((result as Err).failure, isA<ServerFailure>());

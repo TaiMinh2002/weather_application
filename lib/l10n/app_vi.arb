@@ -22,5 +22,9 @@
   "conditionSnow": "Tuyết",
   "conditionThunderstorm": "Dông",
   "conditionUnknown": "Không xác định",
-  "feelsLike": "Cảm giác như {temp}"
+  "feelsLike": "Cảm giác như {temp}",
+  "errorLocationDisabled": "Dịch vụ vị trí đang tắt",
+  "errorLocationDenied": "Cần quyền vị trí để hiển thị thời tiết nơi bạn ở",
+  "errorLocationDeniedForever": "Quyền vị trí đã bị chặn, hãy bật lại trong Cài đặt",
+  "openSettings": "Mở cài đặt"
 }
