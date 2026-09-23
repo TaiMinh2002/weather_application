@@ -5,9 +5,7 @@ import 'package:weather_application/core/storage/prefs.dart';
 
 void main() {
   Future<SharedPreferences> prefs({bool? onboarded}) {
-    SharedPreferences.setMockInitialValues({
-      PrefKeys.onboarded: ?onboarded,
-    });
+    SharedPreferences.setMockInitialValues({PrefKeys.onboarded: ?onboarded});
     return SharedPreferences.getInstance();
   }
 

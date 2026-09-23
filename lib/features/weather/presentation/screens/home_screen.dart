@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../../../location/domain/entities/place.dart';
+import '../../../location/presentation/providers/location_provider.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
-
-// ponytail: fixed Hanoi coords until the location feature (plan.md day 4).
-const _lat = 21.03;
-const _lon = 105.85;
 
 // ponytail: minimal view to prove the data layer; real Home UI is day 5–6.
 class HomeScreen extends ConsumerWidget {
@@ -16,21 +14,40 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = weatherProvider(_lat, _lon);
+    final place = ref.watch(currentPlaceProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.appTitle)),
-      body: ref
-          .watch(provider)
-          .when(
-            data: (w) => RefreshIndicator(
-              onRefresh: () => ref.refresh(provider.future),
-              child: _CurrentView(weather: w),
-            ),
-            loading: () => const AppLoading(),
-            error: (e, _) =>
-                AppErrorView(error: e, onRetry: () => ref.invalidate(provider)),
-          ),
+      appBar: AppBar(title: Text(place.value?.name ?? context.l10n.appTitle)),
+      body: place.when(
+        data: (p) => _PlaceWeather(place: p),
+        loading: () => const AppLoading(),
+        error: (e, _) => AppErrorView(
+          error: e,
+          onRetry: () => ref.invalidate(currentPlaceProvider),
+        ),
+      ),
     );
+  }
+}
+
+class _PlaceWeather extends ConsumerWidget {
+  const _PlaceWeather({required this.place});
+
+  final Place place;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = weatherProvider(place.lat, place.lon);
+    return ref
+        .watch(provider)
+        .when(
+          data: (w) => RefreshIndicator(
+            onRefresh: () => ref.refresh(provider.future),
+            child: _CurrentView(weather: w),
+          ),
+          loading: () => const AppLoading(),
+          error: (e, _) =>
+              AppErrorView(error: e, onRetry: () => ref.invalidate(provider)),
+        );
   }
 }
 

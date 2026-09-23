@@ -29,5 +29,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "errorLocationDisabled": "Location services are turned off",
+  "errorLocationDenied": "Location permission is needed to show local weather",
+  "errorLocationDeniedForever": "Location permission is blocked. Enable it in Settings",
+  "openSettings": "Open settings"
 }

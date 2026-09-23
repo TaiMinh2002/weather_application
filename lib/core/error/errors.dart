@@ -17,8 +17,11 @@ class CacheException extends AppException {
   const CacheException();
 }
 
+enum LocationError { serviceDisabled, denied, deniedForever, unavailable }
+
 class LocationException extends AppException {
-  const LocationException();
+  const LocationException(this.reason);
+  final LocationError reason;
 }
 
 /// Messages are resolved via l10n in `AppErrorView`, not stored here.
@@ -39,7 +42,8 @@ class CacheFailure extends Failure {
 }
 
 class LocationFailure extends Failure {
-  const LocationFailure();
+  const LocationFailure(this.reason);
+  final LocationError reason;
 }
 
 class UnknownFailure extends Failure {
@@ -71,7 +75,7 @@ Failure toFailure(Object error) => switch (error) {
   NetworkException() => const NetworkFailure(),
   ServerException() => const ServerFailure(),
   CacheException() => const CacheFailure(),
-  LocationException() => const LocationFailure(),
+  LocationException(:final reason) => LocationFailure(reason),
   _ => UnknownFailure(error),
 };
 

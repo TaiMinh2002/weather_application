@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../error/errors.dart';
 import '../extensions/context_ext.dart';
@@ -24,15 +25,42 @@ class AppErrorView extends StatelessWidget {
       NetworkFailure() => (Icons.wifi_off, l10n.errorNetwork),
       ServerFailure() => (Icons.cloud_off, l10n.errorServer),
       CacheFailure() => (Icons.inventory_2_outlined, l10n.errorCache),
-      LocationFailure() => (Icons.location_off, l10n.errorLocation),
+      LocationFailure(:final reason) => (
+        Icons.location_off,
+        switch (reason) {
+          LocationError.serviceDisabled => l10n.errorLocationDisabled,
+          LocationError.denied => l10n.errorLocationDenied,
+          LocationError.deniedForever => l10n.errorLocationDeniedForever,
+          LocationError.unavailable => l10n.errorLocation,
+        },
+      ),
       _ => (Icons.error_outline, l10n.errorUnknown),
+    };
+    // Retrying can't fix these; the user must change a system setting first.
+    final openSettings = switch (error) {
+      LocationFailure(reason: LocationError.serviceDisabled) =>
+        Geolocator.openLocationSettings,
+      LocationFailure(reason: LocationError.deniedForever) =>
+        Geolocator.openAppSettings,
+      _ => null,
     };
     return _MessageView(
       icon: icon,
       message: message,
-      action: onRetry == null
-          ? null
-          : FilledButton.tonal(onPressed: onRetry, child: Text(l10n.retry)),
+      action: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        alignment: WrapAlignment.center,
+        children: [
+          if (openSettings != null)
+            FilledButton(
+              onPressed: openSettings,
+              child: Text(l10n.openSettings),
+            ),
+          if (onRetry != null)
+            FilledButton.tonal(onPressed: onRetry, child: Text(l10n.retry)),
+        ],
+      ),
     );
   }
 }

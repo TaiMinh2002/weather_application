@@ -37,4 +37,20 @@ void main() {
     expect(find.text('Đã có lỗi xảy ra'), findsOneWidget);
     expect(find.byType(FilledButton), findsNothing);
   });
+
+  testWidgets('blocked location permission offers settings and retry', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        AppErrorView(
+          error: const LocationFailure(LocationError.deniedForever),
+          onRetry: () {},
+        ),
+      ),
+    );
+
+    expect(find.text('Mở cài đặt'), findsOneWidget);
+    expect(find.text('Thử lại'), findsOneWidget);
+  });
 }
