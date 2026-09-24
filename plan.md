@@ -57,28 +57,38 @@
 
 ## 2. Màn hình (UI/UX)
 
-Tổng cộng **6 màn hình chính** (+1 nếu làm bản đồ).
+**Native splash + 5 màn Flutter** (+1 nếu làm bản đồ).
 
-| # | Màn hình | Nội dung |
-|---|---|---|
-| 1 | **Splash / Onboarding** | Logo, giải thích vì sao cần quyền vị trí *trước khi* hệ thống hỏi. Chỉ hiện lần đầu |
-| 2 | **Home** | `PageView` các thành phố. Mỗi trang: header (tên, nhiệt độ lớn, trạng thái), dự báo theo giờ, 7 ngày, grid thông số chi tiết, AQI, gợi ý |
-| 3 | **Chi tiết ngày** | Biểu đồ nhiệt độ theo giờ, mưa, gió, UV của ngày được chọn |
-| 4 | **Tìm kiếm** | Ô tìm kiếm, kết quả gợi ý, lịch sử tìm kiếm gần đây |
-| 5 | **Quản lý thành phố** | Danh sách đã lưu, kéo thả sắp xếp, vuốt để xóa |
-| 6 | **Cài đặt** | Đơn vị, theme, ngôn ngữ, bật/tắt thông báo, giới thiệu app |
-| 7 | *(Nâng cao)* **Bản đồ** | Chọn vị trí bất kỳ trên bản đồ để xem thời tiết |
+| # | Màn hình | Route | Nội dung |
+|---|---|---|---|
+| 0 | **Splash (native)** | – | Không phải màn Flutter. Hiện trong lúc engine khởi động, xem mục bên dưới |
+| 1 | **Onboarding** | `/onboarding` | Giải thích vì sao cần quyền vị trí *trước khi* hệ thống hỏi. Nút "Cho phép vị trí" / "Chọn thành phố". Chỉ hiện lần đầu |
+| 2 | **Home** | `/` | `PageView`: trang 0 là vị trí GPS, sau đó các thành phố đã lưu. Mỗi trang: header (tên, nhiệt độ lớn, trạng thái, cao/thấp, cảm giác như), banner offline, 24 giờ, 7 ngày, grid thông số chi tiết, (AQI, gợi ý) |
+| 3 | **Chi tiết ngày** | `/day/:index?lat=&lon=` | Chip chọn ngày, biểu đồ nhiệt độ theo giờ, % mưa, gió, UV, bình minh/hoàng hôn |
+| 4 | **Thành phố** | `/cities` | Gộp tìm kiếm + quản lý (kiểu app Weather iOS). Ô tìm kiếm trống → danh sách đã lưu (kéo thả sắp xếp, vuốt xóa). Đang gõ → kết quả Geocoding (debounce) |
+| 5 | **Cài đặt** | `/settings` | Đơn vị, theme, ngôn ngữ, giới thiệu app. Công tắc thông báo chỉ thêm khi làm tính năng thông báo |
+| 6 | *(Nâng cao)* **Bản đồ** | `/map` | Chọn vị trí bất kỳ trên bản đồ để xem thời tiết |
+
+> Không làm lịch sử tìm kiếm riêng: danh sách thành phố đã lưu đã đóng vai trò đó.
+
+### Splash native
+
+Làm bằng file native, không có route Flutter: Android `res/drawable/launch_background.xml` + `res/values(-night)/styles.xml` (+ `values-v31` cho Android 12+), iOS `LaunchScreen.storyboard`.
+
+Thiết kế:
+- Nền một màu, trùng màu nền của theme (có bản sáng và tối) để chuyển sang Flutter không bị nháy.
+- Chỉ có logo ở giữa, **không có chữ**. Android 12+ cắt icon trong khung tròn: ảnh 288×288dp, nội dung nằm gọn trong vòng tròn 192dp.
+- Không animation, không chờ cố ý. Splash tắt ngay khi Flutter vẽ frame đầu tiên. `redirect` của router quyết định vào Onboarding hay Home.
 
 ### Sơ đồ điều hướng
 
 ```
-Splash ──(lần đầu)──> Onboarding ──> Home
-   └──(đã onboard)──────────────────> Home
-                                       ├── Chi tiết ngày
-                                       ├── Tìm kiếm
-                                       ├── Quản lý thành phố
-                                       ├── Cài đặt
-                                       └── Bản đồ (nâng cao)
+Splash (native) ──(chưa onboard)──> Onboarding ──> Home
+       └──(đã onboard)──────────────────────────> Home
+                                                    ├── Chi tiết ngày
+                                                    ├── Thành phố (tìm kiếm + quản lý)
+                                                    ├── Cài đặt
+                                                    └── Bản đồ (nâng cao)
 ```
 
 ### Nguyên tắc UX
@@ -364,7 +374,7 @@ String? onboardingRedirect(SharedPreferences prefs, String location) {
   return null;
 }
 
-// routes: '/', '/onboarding'; thêm dần '/search', '/cities', '/settings', '/day/:index'
+// routes: '/', '/onboarding'; thêm dần '/cities', '/settings', '/day/:index?lat=&lon='
 ```
 
 ---
@@ -379,10 +389,10 @@ String? onboardingRedirect(SharedPreferences prefs, String location) {
 | 4 ✅ | Lấy GPS, xử lý quyền, reverse geocoding |
 | 5–6 | Màn Home: thời tiết hiện tại, theo giờ, 7 ngày, thông số chi tiết |
 | 7 | Cache offline bằng Hive, pull-to-refresh, banner offline |
-| 8 | Màn tìm kiếm thành phố (debounce), lưu thành phố |
-| 9 | Màn quản lý thành phố, PageView vuốt giữa các thành phố |
+| 8 | Màn Thành phố: tìm kiếm (debounce), lưu thành phố |
+| 9 | Màn Thành phố: sắp xếp, xóa; PageView vuốt giữa các thành phố |
 | 10 | Màn cài đặt: đơn vị, theme, ngôn ngữ |
-| 11 | Onboarding, màn chi tiết ngày + biểu đồ |
+| 11 | Onboarding, splash native, màn chi tiết ngày + biểu đồ |
 | 12 | Nền động, skeleton loading, hoàn thiện UI |
 | 13 | Viết test (mapper, repository, provider), GitHub Actions |
 | 14 | README, chụp ảnh/quay GIF, build APK đưa lên Releases |

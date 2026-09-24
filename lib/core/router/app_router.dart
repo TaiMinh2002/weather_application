@@ -11,7 +11,7 @@ part 'app_router.g.dart';
 abstract final class Routes {
   static const home = '/';
   static const onboarding = '/onboarding';
-  // Add as screens land: /search, /cities, /settings, /day/:index
+  // Add as screens land: /cities, /settings, /day/:index
 }
 
 /// Pure so it can be unit-tested without a widget tree.
