@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/context_ext.dart';
+import '../../../../core/utils/weather_code_mapper.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../location/domain/entities/place.dart';
 import '../../../location/presentation/providers/location_provider.dart';
@@ -19,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(place.value?.name ?? context.l10n.appTitle)),
       body: place.when(
         data: (p) => _PlaceWeather(place: p),
-        loading: () => const AppLoading(),
+        loading: () => const _HomeSkeleton(),
         error: (e, _) => AppErrorView(
           error: e,
           onRetry: () => ref.invalidate(currentPlaceProvider),
@@ -44,7 +46,7 @@ class _PlaceWeather extends ConsumerWidget {
             onRefresh: () => ref.refresh(provider.future),
             child: _CurrentView(weather: w),
           ),
-          loading: () => const AppLoading(),
+          loading: () => const _HomeSkeleton(),
           error: (e, _) =>
               AppErrorView(error: e, onRetry: () => ref.invalidate(provider)),
         );
@@ -81,4 +83,31 @@ class _CurrentView extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Renders the real layout with fake data so the skeleton matches it.
+class _HomeSkeleton extends StatelessWidget {
+  const _HomeSkeleton();
+
+  static final _placeholder = Weather(
+    current: CurrentWeather(
+      time: DateTime(2000),
+      temperature: 30,
+      apparentTemperature: 30,
+      humidity: 50,
+      isDay: true,
+      condition: WeatherCondition.partlyCloudy,
+      windSpeed: 10,
+      windDirection: 0,
+      pressure: 1010,
+      uvIndex: 5,
+      visibility: 10000,
+    ),
+    hourly: const [],
+    daily: const [],
+  );
+
+  @override
+  Widget build(BuildContext context) =>
+      Skeletonizer(child: _CurrentView(weather: _placeholder));
 }

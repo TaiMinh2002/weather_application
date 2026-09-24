@@ -26,5 +26,7 @@
   "errorLocationDisabled": "Dịch vụ vị trí đang tắt",
   "errorLocationDenied": "Cần quyền vị trí để hiển thị thời tiết nơi bạn ở",
   "errorLocationDeniedForever": "Quyền vị trí đã bị chặn, hãy bật lại trong Cài đặt",
-  "openSettings": "Mở cài đặt"
+  "openSettings": "Mở cài đặt",
+  "now": "Bây giờ",
+  "today": "Hôm nay"
 }
