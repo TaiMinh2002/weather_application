@@ -23,7 +23,7 @@
 | Router | go_router |
 | Network | dio |
 | Model | freezed + json_serializable |
-| Vị trí | geolocator + permission_handler |
+| Vị trí | geolocator + geocoding |
 | Lưu trữ | shared_preferences + hive_ce |
 | Test | flutter_test + mocktail |
 
@@ -47,6 +47,10 @@ lib/
 
 ```bash
 flutter pub get
+```
+
+```bash
+flutter gen-l10n
 ```
 
 ```bash

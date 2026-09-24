@@ -99,7 +99,7 @@ Splash ──(lần đầu)──> Onboarding ──> Home
 | Router | **go_router** | Do team Flutter duy trì, hỗ trợ deep link, `redirect` cho onboarding |
 | Gọi API | **dio** | Timeout, query params gọn. **Không tự viết interceptor** (xem mục 6.1) |
 | Model | **freezed** + **json_serializable** | Model bất biến, `copyWith`, sealed class cho lỗi |
-| Vị trí | **geolocator** + **permission_handler** | Lấy GPS, xử lý quyền |
+| Vị trí | **geolocator** | Lấy GPS, kiểm tra/xin quyền, mở Cài đặt (không cần `permission_handler`) |
 | Tên địa điểm từ tọa độ | **geocoding** (dịch vụ có sẵn trên máy, free) hoặc Nominatim API | Hiện "Hà Nội" thay vì tọa độ |
 | Lưu trữ local | **shared_preferences** (cài đặt) + **hive_ce** (cache thời tiết, thành phố) | Nhẹ, nhanh, không cần SQL |
 | Kiểm tra mạng | **connectivity_plus** | Hiện banner "Đang offline" |
@@ -131,9 +131,9 @@ Miễn phí, **không cần API key**, giới hạn khoảng 10.000 request/ngà
 ```
 GET https://api.open-meteo.com/v1/forecast
   ?latitude=21.03&longitude=105.85
-  &current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,pressure_msl
-  &hourly=temperature_2m,weather_code,precipitation_probability,visibility
-  &daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max
+  &current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl,uv_index,visibility
+  &hourly=temperature_2m,weather_code,precipitation_probability,is_day
+  &daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max
   &timezone=auto
   &forecast_days=7
 ```
@@ -178,28 +178,28 @@ lib/
 ├── app.dart                      # MaterialApp.router, theme, locale
 ├── core/
 │   ├── constants/                # api_constants.dart, app_constants.dart
-│   ├── network/                  # dio_client.dart
-│   ├── error/                    # failure.dart, exceptions.dart
-│   ├── router/                   # app_router.dart, route_names.dart
-│   ├── theme/                    # app_theme.dart, app_colors.dart, text_styles.dart
-│   ├── storage/                  # hive_service.dart, prefs_service.dart
-│   ├── utils/                    # weather_code_mapper.dart, date_formatter.dart, unit_converter.dart
-│   ├── extensions/               # context_ext.dart, datetime_ext.dart
-│   └── widgets/                  # app_error_view.dart, app_loading.dart, empty_view.dart
+│   ├── network/                  # dio_client.dart (Dio provider + DioException → AppException)
+│   ├── error/                    # errors.dart (AppException, Failure, Result, guard)
+│   ├── router/                   # app_router.dart (route + Routes + redirect)
+│   ├── theme/                    # app_theme.dart (ThemeData sáng/tối + ThemeExtension màu)
+│   ├── storage/                  # prefs.dart; thêm Hive khi làm cache (ngày 7)
+│   ├── utils/                    # weather_code_mapper.dart; sau: date_formatter, unit_converter
+│   ├── extensions/               # context_ext.dart
+│   └── widgets/                  # state_views.dart (AppLoading, AppErrorView, EmptyView)
 ├── features/
 │   ├── weather/
 │   │   ├── data/
 │   │   │   ├── datasources/      # weather_remote_ds.dart, weather_local_ds.dart
-│   │   │   ├── models/           # weather_response_dto.dart (freezed + json)
+│   │   │   ├── models/           # weather_dto.dart (freezed + json, có toEntity())
 │   │   │   └── repositories/     # weather_repository_impl.dart
 │   │   ├── domain/
-│   │   │   ├── entities/         # weather.dart, hourly.dart, daily.dart
+│   │   │   ├── entities/         # weather.dart (Weather, CurrentWeather, hourly, daily)
 │   │   │   └── repositories/     # weather_repository.dart (abstract)
 │   │   └── presentation/
 │   │       ├── providers/        # weather_provider.dart
 │   │       ├── screens/          # home_screen.dart, day_detail_screen.dart
-│   │       └── widgets/          # current_weather_card.dart, hourly_list.dart, daily_list.dart...
-│   ├── location/                 # lấy GPS, xử lý quyền
+│   │       └── widgets/          # chỉ tạo khi widget được dùng lại ở nhiều màn (rule.md mục 1)
+│   ├── location/                 # lấy GPS, xử lý quyền, reverse geocoding
 │   ├── city_search/              # tìm kiếm thành phố
 │   ├── saved_cities/             # quản lý thành phố
 │   ├── settings/                 # cài đặt
@@ -208,6 +208,8 @@ lib/
 
 test/                             # cấu trúc giống lib/
 ```
+
+> Cây thư mục trên là đích đến. Thư mục chỉ được tạo khi có file thật đặt vào (rule.md mục 2).
 
 ### Luồng dữ liệu
 
@@ -234,13 +236,13 @@ Repository (quyết định nguồn dữ liệu)
 
 "Bộ khung" sẽ copy sang các dự án sau, cần đầu tư kỹ:
 
-1. **DioClient**: `baseUrl`, timeout. Không tự viết interceptor.
-2. **Xử lý lỗi thống nhất**: `sealed class Failure` gồm `NetworkFailure`, `ServerFailure`, `CacheFailure`, `LocationFailure`.
-3. **Result type**: repository trả `Result<T>` (thành công / thất bại) thay vì ném exception lung tung.
+1. **Dio provider**: `baseUrl`, timeout. Không tự viết interceptor.
+2. **Xử lý lỗi thống nhất**: `sealed class Failure` gồm `NetworkFailure`, `ServerFailure`, `CacheFailure`, `LocationFailure`, `UnknownFailure`.
+3. **Result type**: repository trả `Result<T>` (`Ok` / `Err`) qua hàm `guard()`, thay vì ném exception lung tung.
 4. **Theme**: `AppTheme.light` / `AppTheme.dark`, màu và text style tập trung một chỗ.
 5. **Router**: route khai báo tập trung, `redirect` đưa người dùng mới vào onboarding.
 6. **Widget dùng chung**: `AppErrorView(onRetry)`, `AppLoading`, `EmptyView`.
-7. **Extension tiện ích**: `context.theme`, `context.l10n`, `DateTime.toHourString()`...
+7. **Extension tiện ích**: `context.l10n`, `context.textTheme`, `context.colors`...
 
 ### 6.1. Quyết định về network: không dùng interceptor tự viết
 
@@ -254,10 +256,11 @@ Interceptor thường dùng cho 3 việc:
 
 Các dự án sau dùng Supabase/Firebase, SDK tự lo authen và token, không đi qua Dio. Khi nào thực sự cần (gọi API riêng có token) thì thêm interceptor lúc đó.
 
-### 6.2. DioClient
+### 6.2. Dio provider (`core/network/dio_client.dart`)
 
 ```dart
-Dio createDio() {
+@Riverpod(keepAlive: true)
+Dio dio(Ref ref) {
   final dio = Dio(BaseOptions(
     baseUrl: ApiConstants.forecastBaseUrl,
     connectTimeout: const Duration(seconds: 10),
@@ -266,6 +269,16 @@ Dio createDio() {
   if (kDebugMode) dio.interceptors.add(LogInterceptor(responseBody: true));
   return dio;
 }
+
+extension DioExceptionX on DioException {
+  AppException toAppException() => switch (type) {
+    DioExceptionType.connectionError ||
+    DioExceptionType.connectionTimeout ||
+    DioExceptionType.sendTimeout ||
+    DioExceptionType.receiveTimeout => const NetworkException(),
+    _ => ServerException(response?.statusCode),
+  };
+}
 ```
 
 ### 6.3. Chuyển lỗi trong datasource
@@ -273,41 +286,59 @@ Dio createDio() {
 ```dart
 Future<WeatherDto> getForecast(double lat, double lon) async {
   try {
-    final res = await _dio.get('/forecast', queryParameters: {
+    final res = await _dio.get<Map<String, dynamic>>('/forecast', queryParameters: {
       'latitude': lat,
       'longitude': lon,
       // current, hourly, daily, timezone, forecast_days...
     });
-    return WeatherDto.fromJson(res.data);
+    return WeatherDto.fromJson(res.data!);
   } on DioException catch (e) {
-    throw e.type == DioExceptionType.connectionError
-        ? NetworkException()
-        : ServerException(e.response?.statusCode);
+    throw e.toAppException();
   }
 }
 ```
 
-### 6.4. Failure
+### 6.4. Failure và Result (`core/error/errors.dart`)
+
+`Failure` **không chứa câu thông báo**: `AppErrorView` chọn icon + câu theo loại lỗi từ l10n (rule.md cấm hard-code chuỗi).
 
 ```dart
-sealed class Failure {
-  const Failure(this.message);
-  final String message;
-}
+sealed class Failure { const Failure(); }
 
-class NetworkFailure extends Failure { const NetworkFailure() : super('Không có kết nối mạng'); }
-class ServerFailure extends Failure { const ServerFailure() : super('Máy chủ đang gặp sự cố'); }
-class CacheFailure extends Failure { const CacheFailure() : super('Không có dữ liệu lưu sẵn'); }
-class LocationFailure extends Failure { const LocationFailure(super.message); }
+class NetworkFailure extends Failure { const NetworkFailure(); }
+class ServerFailure extends Failure { const ServerFailure(); }
+class CacheFailure extends Failure { const CacheFailure(); }
+class LocationFailure extends Failure {
+  const LocationFailure(this.reason);
+  final LocationError reason; // serviceDisabled, denied, deniedForever, unavailable
+}
+class UnknownFailure extends Failure { const UnknownFailure(this.error); final Object error; }
+
+sealed class Result<T> {
+  T getOrThrow(); // Ok → data, Err → throw failure (để Riverpod đưa vào AsyncValue.error)
+}
+final class Ok<T> extends Result<T> { ... }
+final class Err<T> extends Result<T> { ... }
+
+/// Repository bọc thân hàm: bắt mọi exception → Err(toFailure(e)).
+Future<Result<T>> guard<T>(Future<T> Function() body);
 ```
+
+Thêm loại `Failure` / `LocationError` mới thì cập nhật cả `toFailure` và `AppErrorView`.
 
 ### 6.5. Provider (Riverpod codegen)
 
 ```dart
+// Repository: provider đặt cuối file impl.
+@Riverpod(keepAlive: true)
+WeatherRepository weatherRepository(Ref ref) =>
+    WeatherRepositoryImpl(ref.watch(weatherRemoteDataSourceProvider));
+
+// Presentation: repo trả Result, nên gọi getOrThrow().
 @riverpod
-Future<Weather> weather(Ref ref, double lat, double lon) {
-  final repo = ref.watch(weatherRepositoryProvider);
-  return repo.getWeather(lat: lat, lon: lon);
+Future<Weather> weather(Ref ref, double lat, double lon) async {
+  final result = await ref.watch(weatherRepositoryProvider).getWeather(lat: lat, lon: lon);
+  return result.getOrThrow();
 }
 ```
 
@@ -315,7 +346,7 @@ Future<Weather> weather(Ref ref, double lat, double lon) {
 
 ```dart
 ref.watch(weatherProvider(lat, lon)).when(
-  data: (w) => CurrentWeatherCard(weather: w),
+  data: (w) => _CurrentView(weather: w),
   loading: () => const AppLoading(),
   error: (e, _) => AppErrorView(error: e, onRetry: () => ref.invalidate(weatherProvider(lat, lon))),
 );
@@ -323,15 +354,17 @@ ref.watch(weatherProvider(lat, lon)).when(
 
 ### 6.6. Router với redirect onboarding
 
+Redirect là hàm thuần để unit test không cần widget tree. `SharedPreferences` được load trong `main()` rồi inject qua `sharedPreferencesProvider.overrideWithValue(prefs)`.
+
 ```dart
-final router = GoRouter(
-  initialLocation: '/',
-  redirect: (context, state) {
-    final done = prefs.getBool('onboarded') ?? false;
-    return (!done && state.matchedLocation != '/onboarding') ? '/onboarding' : null;
-  },
-  routes: [ /* '/', '/onboarding', '/search', '/cities', '/settings', '/day/:index' */ ],
-);
+String? onboardingRedirect(SharedPreferences prefs, String location) {
+  final done = prefs.getBool(PrefKeys.onboarded) ?? false;
+  if (!done && location != Routes.onboarding) return Routes.onboarding;
+  if (done && location == Routes.onboarding) return Routes.home;
+  return null;
+}
+
+// routes: '/', '/onboarding'; thêm dần '/search', '/cities', '/settings', '/day/:index'
 ```
 
 ---
@@ -370,10 +403,10 @@ final router = GoRouter(
 
 ### 8.2. GitHub Actions
 
-File `.github/workflows/ci.yml`, chạy mỗi khi push / mở Pull Request:
+File `.github/workflows/ci.yml`, chạy khi push lên `dev` / `main` và khi mở Pull Request vào `dev` / `main`:
 
 1. `flutter pub get`
-2. `dart run build_runner build --delete-conflicting-outputs`
+2. `flutter gen-l10n` + `dart run build_runner build --delete-conflicting-outputs` (file sinh ra bị gitignore)
 3. `flutter analyze`
 4. `flutter test`
 5. `flutter build apk --release` (upload artifact)
@@ -383,7 +416,8 @@ Gắn badge "build passing" lên README.
 ### 8.3. Quy ước Git
 
 - **Conventional Commits**: `feat: add hourly forecast`, `fix: handle location denied`, `refactor: extract weather card`, `test: add mapper tests`, `docs: update readme`.
-- **Branch**: làm trên `feature/<tên>` → tạo Pull Request vào `main`, dù làm một mình.
+- **Branch**: tạo `feature/<tên>` từ `dev` → Pull Request vào **`dev`**, dù làm một mình. Không PR thẳng vào `main`.
+- `dev` merge vào `main` khi ổn định (ví dụ hết một mốc lộ trình hoặc trước khi build APK lên Releases).
 - Commit đều đặn, không dồn một commit lớn cuối dự án.
 - **Không commit** file sinh ra nếu không cần, cấu hình `.gitignore` đúng.
 
