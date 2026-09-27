@@ -156,5 +156,14 @@
         "type": "String"
       }
     }
+  },
+  "tipsTitle": "Today's tips",
+  "weatherTip": "{tip, select, storm{Thunderstorms in the next 12 hours, limit time outside} umbrella{Rain is likely, bring an umbrella or raincoat} mask{The air is poor, consider wearing a mask} hydrate{It's hot, drink water and avoid the midday sun} sunscreen{High UV, wear sunscreen outdoors} jacket{It's cold, bring a warm layer} wind{Strong wind, take care on two wheels} other{Nice weather for going out}}",
+  "@weatherTip": {
+    "placeholders": {
+      "tip": {
+        "type": "String"
+      }
+    }
   }
 }

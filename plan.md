@@ -492,7 +492,7 @@ README nên có đủ các mục:
 
 ### Nâng cao
 - [x] AQI *(card cuối Home: US AQI + mức, thang màu EPA, PM2.5/PM10; không cache, offline thì ẩn)*
-- [ ] Gợi ý hoạt động
+- [x] Gợi ý hoạt động *(`tipsFor` trong `weather.dart`: 7 quy tắc + "thời tiết đẹp", tối đa 3 gợi ý, card dưới dự báo 24 giờ)*
 - [x] Nền động *(bản nhẹ: `AnimatedContainer` + `AnimatedSwitcher`; Lottie/hạt mưa để sau nếu cần)*
 - [ ] Đồng bộ Supabase
 - [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*

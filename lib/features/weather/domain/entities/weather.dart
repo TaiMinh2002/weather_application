@@ -180,3 +180,42 @@ enum AqiLevel {
     _ => hazardous,
   };
 }
+
+/// Rule-based advice for the day, most important first.
+enum WeatherTip {
+  storm,
+  umbrella,
+  mask,
+  hydrate,
+  sunscreen,
+  jacket,
+  wind,
+
+  /// Shown alone when no other rule fires.
+  niceDay,
+}
+
+/// Up to [max] tips from the next 12 hours, current conditions and [air].
+List<WeatherTip> tipsFor(Weather weather, AirQuality? air, {int max = 3}) {
+  final c = weather.current;
+  final next = weather.next24Hours.take(12);
+  const wet = {
+    WeatherCondition.drizzle,
+    WeatherCondition.rain,
+    WeatherCondition.showers,
+  };
+  final today = weather.daily.firstOrNull;
+  final tips = [
+    if (next.any((h) => h.condition == WeatherCondition.thunderstorm))
+      WeatherTip.storm,
+    if (wet.contains(c.condition) ||
+        next.any((h) => h.precipitationProbability >= 50))
+      WeatherTip.umbrella,
+    if (air != null && air.usAqi > 100) WeatherTip.mask,
+    if (c.apparentTemperature >= 35) WeatherTip.hydrate,
+    if (c.isDay && (today?.uvIndexMax ?? c.uvIndex) >= 6) WeatherTip.sunscreen,
+    if (c.apparentTemperature <= 12) WeatherTip.jacket,
+    if (c.windSpeed >= 40) WeatherTip.wind,
+  ];
+  return tips.isEmpty ? const [WeatherTip.niceDay] : tips.take(max).toList();
+}

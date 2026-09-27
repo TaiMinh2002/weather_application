@@ -61,8 +61,23 @@ void main() {
     expect(find.text('30°'), findsWidgets);
     expect(find.text('C:32° T:25°'), findsOneWidget);
     expect(find.text('Dự báo 24 giờ'), findsOneWidget);
-    expect(find.text('Hôm nay'), findsOneWidget);
     expect(find.text('Bây giờ'), findsOneWidget);
+    expect(
+      find.text('Trời nóng, uống đủ nước và tránh nắng gắt'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('UV cao, bôi kem chống nắng khi ra ngoài'),
+      findsOneWidget,
+    );
+    // The daily card sits below the 800×600 test viewport.
+    await tester.scrollUntilVisible(
+      find.text('Hôm nay'),
+      200,
+      scrollable: find.byWidgetPredicate(
+        (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+      ),
+    );
   });
 
   testWidgets('air quality card shows the AQI and its level', (tester) async {
@@ -78,6 +93,9 @@ void main() {
     );
     await tester.pump();
     await tester.pump();
+    // Air quality starts loading only once the forecast has rendered.
+    await tester.pump();
+    expect(find.text('Không khí kém, nên đeo khẩu trang'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('174'),
       300,

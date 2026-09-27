@@ -26,6 +26,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 - **Thời tiết hiện tại theo GPS**: nhiệt độ, cảm giác như, cao/thấp, nền gradient đổi theo thời tiết và ngày/đêm
 - **Dự báo 24 giờ và 7 ngày**, kèm % khả năng mưa
 - **Thông số chi tiết**: độ ẩm và điểm sương, gió và hướng gió, UV, áp suất, tầm nhìn, bình minh/hoàng hôn
+- **Gợi ý hôm nay**: mang ô, kem chống nắng, khẩu trang, áo ấm… theo 12 giờ tới, UV và AQI (quy tắc tự viết, có unit test)
 - **Chất lượng không khí**: chỉ số US AQI kèm mức (Tốt → Nguy hại), thang màu EPA, PM2.5 và PM10
 - **Chi tiết ngày**: biểu đồ nhiệt độ theo giờ, biểu đồ % mưa, gió và UV tối đa
 - **Nhiều thành phố**: tìm kiếm (debounce), lưu, kéo thả sắp xếp, vuốt để xóa (có hoàn tác), vuốt ngang giữa các thành phố ở Home
@@ -34,7 +35,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 - **Đủ trạng thái**: skeleton khi tải, lỗi mạng/máy chủ có nút thử lại, từ chối quyền vị trí, GPS tắt
 - Onboarding giải thích quyền vị trí trước khi hệ thống hỏi, splash native, dark mode từ đầu
 
-**Hướng phát triển tiếp:** gợi ý hoạt động theo thời tiết, đồng bộ thành phố lên Supabase, thông báo dự báo mỗi sáng.
+**Hướng phát triển tiếp:** đồng bộ thành phố lên Supabase, thông báo dự báo mỗi sáng.
 
 ## Công nghệ
 

@@ -18,6 +18,7 @@ import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/forecast_cards.dart';
+import '../widgets/insight_cards.dart';
 
 /// Page 0 is the GPS location, then one page per saved city.
 class HomeScreen extends ConsumerStatefulWidget {
@@ -399,6 +400,8 @@ class _WeatherBody extends StatelessWidget {
       _Header(name: name, weather: weather, showPin: showPin),
       const SizedBox(height: 20),
       HourlyCard(hours: weather.next24Hours),
+      const SizedBox(height: 20),
+      TipsCard(weather: weather, place: place),
       const SizedBox(height: 20),
       DailyCard(days: weather.daily, onDayTap: onDayTap),
       const SizedBox(height: 20),
