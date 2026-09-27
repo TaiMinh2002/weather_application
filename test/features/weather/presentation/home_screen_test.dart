@@ -51,6 +51,24 @@ void main() {
     expect(find.text('Bây giờ'), findsOneWidget);
   });
 
+  testWidgets('cached data shows the offline banner', (tester) async {
+    final weather = WeatherDto.fromJson(weatherJson())
+        .toEntity(cachedAt: DateTime.now().copyWith(hour: 8, minute: 15));
+    await tester.pumpWidget(
+      _app([
+        currentPlaceProvider.overrideWith((ref) async => _place),
+        weatherProvider(
+          _place.lat,
+          _place.lon,
+        ).overrideWith((ref) async => weather),
+      ]),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Đang offline · cập nhật lúc 8:15'), findsOneWidget);
+  });
+
   testWidgets('location failure shows the error view with retry', (
     tester,
   ) async {

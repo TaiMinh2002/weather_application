@@ -24,7 +24,7 @@
 | Network | dio |
 | Model | freezed + json_serializable |
 | Vị trí | geolocator + geocoding |
-| Lưu trữ | shared_preferences + hive_ce |
+| Lưu trữ | shared_preferences (cài đặt + cache offline) |
 | Test | flutter_test + mocktail |
 
 ## Kiến trúc
@@ -33,7 +33,7 @@ Clean Architecture theo feature (`data` / `domain` / `presentation`), không có
 
 ```
 UI ──ref.watch──> Provider ──> Repository ──┬──> RemoteDataSource (Dio → Open-Meteo)
-                                            └──> LocalDataSource  (Hive cache)
+                                            └──> LocalDataSource  (cache JSON)
 ```
 
 ```

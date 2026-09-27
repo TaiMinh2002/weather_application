@@ -1,14 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_application/core/error/errors.dart';
 import 'package:weather_application/core/utils/weather_code_mapper.dart';
+import 'package:weather_application/features/weather/data/datasources/weather_local_ds.dart';
 import 'package:weather_application/features/weather/data/datasources/weather_remote_ds.dart';
 import 'package:weather_application/features/weather/data/models/weather_dto.dart';
 import 'package:weather_application/features/weather/data/repositories/weather_repository_impl.dart';
+import 'package:weather_application/features/weather/domain/entities/weather.dart';
 
 import 'weather_fixture.dart';
 
 class _MockRemote extends Mock implements WeatherRemoteDataSource {}
+
+class _MockLocal extends Mock implements WeatherLocalDataSource {}
 
 void main() {
   group('WeatherDto.toEntity', () {
@@ -34,35 +39,90 @@ void main() {
 
   group('WeatherRepositoryImpl', () {
     late _MockRemote remote;
+    late _MockLocal local;
     late WeatherRepositoryImpl repo;
+    final dto = WeatherDto.fromJson(weatherJson());
+    final savedAt = DateTime(2026, 9, 24, 8, 15);
+
+    setUpAll(() {
+      registerFallbackValue(dto);
+      registerFallbackValue(savedAt);
+    });
 
     setUp(() {
       remote = _MockRemote();
-      repo = WeatherRepositoryImpl(remote);
+      local = _MockLocal();
+      repo = WeatherRepositoryImpl(remote, local);
+      when(() => local.save(any(), any(), any(), any()))
+          .thenAnswer((_) async {});
     });
 
-    test('returns Ok with entity on success', () async {
-      when(() => remote.getForecast(any(), any()))
-          .thenAnswer((_) async => WeatherDto.fromJson(weatherJson()));
+    test('online: returns fresh data and caches it', () async {
+      when(() => remote.getForecast(any(), any())).thenAnswer((_) async => dto);
 
       final result = await repo.getWeather(lat: 21, lon: 105);
-      expect(result, isA<Ok>());
+
+      expect((result as Ok<Weather>).data.cachedAt, isNull);
+      verify(() => local.save(21, 105, dto, any())).called(1);
     });
 
-    test('maps NetworkException to NetworkFailure', () async {
+    test('offline with cache: returns cached data with its time', () async {
       when(() => remote.getForecast(any(), any()))
           .thenThrow(const NetworkException());
+      when(() => local.read(any(), any())).thenReturn((dto, savedAt));
+
+      final result = await repo.getWeather(lat: 21, lon: 105);
+
+      expect((result as Ok<Weather>).data.cachedAt, savedAt);
+    });
+
+    test('offline without cache: NetworkFailure', () async {
+      when(() => remote.getForecast(any(), any()))
+          .thenThrow(const NetworkException());
+      when(() => local.read(any(), any())).thenReturn(null);
 
       final result = await repo.getWeather(lat: 21, lon: 105);
       expect((result as Err).failure, isA<NetworkFailure>());
     });
 
-    test('maps ServerException to ServerFailure', () async {
+    test('server error: ServerFailure, cache not used', () async {
       when(() => remote.getForecast(any(), any()))
           .thenThrow(const ServerException(500));
 
       final result = await repo.getWeather(lat: 21, lon: 105);
+
       expect((result as Err).failure, isA<ServerFailure>());
+      verifyNever(() => local.read(any(), any()));
+    });
+  });
+
+  group('WeatherLocalDataSource', () {
+    Future<WeatherLocalDataSource> create(Map<String, Object> values) async {
+      SharedPreferences.setMockInitialValues(values);
+      return WeatherLocalDataSource(await SharedPreferences.getInstance());
+    }
+
+    test(
+      'round-trips a forecast, rounding nearby coordinates together',
+      () async {
+        final ds = await create({});
+        final savedAt = DateTime(2026, 9, 24, 8, 15);
+        await ds.save(
+          21.0285,
+          105.8542,
+          WeatherDto.fromJson(weatherJson()),
+          savedAt,
+        );
+
+        final (dto, time) = ds.read(21.0301, 105.8512)!;
+        expect(time, savedAt);
+        expect(dto.toEntity().current.temperature, 30.4);
+      },
+    );
+
+    test('unreadable entry reads as missing', () async {
+      final ds = await create({'weather:21.03,105.85': '{"old":"shape"}'});
+      expect(ds.read(21.03, 105.85), isNull);
     });
   });
 }

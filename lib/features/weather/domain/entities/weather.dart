@@ -7,6 +7,7 @@ class Weather {
     required this.current,
     required this.hourly,
     required this.daily,
+    this.cachedAt,
   });
 
   final CurrentWeather current;
@@ -14,6 +15,9 @@ class Weather {
   /// All hours for the forecast range (7 days); see [next24Hours].
   final List<HourlyForecast> hourly;
   final List<DailyForecast> daily;
+
+  /// Set when the network failed and this came from the offline cache.
+  final DateTime? cachedAt;
 
   List<HourlyForecast> get next24Hours {
     final from = DateTime(
