@@ -43,7 +43,12 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
-      - run: flutter build apk --release
+      # Cloud backup keys come from repo secrets; without them the APK still
+      # builds and simply has sync turned off.
+      - run: >-
+          flutter build apk --release
+          --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
 
       - uses: actions/upload-artifact@v4
         with:

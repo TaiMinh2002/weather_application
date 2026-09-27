@@ -7,4 +7,8 @@ abstract interface class CitiesRepository {
   List<City> savedCities();
 
   Future<void> saveCities(List<City> cities);
+
+  /// Once per launch: restores the cloud backup when this device has no
+  /// saved cities (returns them), otherwise backs up the local list (null).
+  Future<List<City>?> syncOnStart();
 }
