@@ -46,6 +46,8 @@ dependencies:
   json_annotation: ^4.12.0
   geolocator: ^14.0.3
   geocoding: ^5.0.0
+  material_symbols_icons: ^4.2960.0
+  skeletonizer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +76,18 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   generate: true
+
+  fonts:
+    - family: BeVietnamPro
+      fonts:
+        - asset: assets/fonts/BeVietnamPro-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/BeVietnamPro-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/BeVietnamPro-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/BeVietnamPro-SemiBold.ttf
+          weight: 600
 
   # To add assets to your application, add an assets section, like this:
   # assets:

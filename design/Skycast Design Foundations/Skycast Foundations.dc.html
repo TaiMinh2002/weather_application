@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-d69d6157-183e-41f3-8401-3b4ea8faa8bd/styles.css">
+<script src="_ds/broadsheet-d69d6157-183e-41f3-8401-3b4ea8faa8bd/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@200;400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=block">
+<style>body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}.ms{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga';font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block}</style>
+</helmet>
+<div style="max-width:1320px;margin:0 auto;padding:var(--space-8) var(--space-8) 120px;box-sizing:border-box">
+
+<header style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:96px">
+<div style="height:3px;background:var(--color-text)"></div>
+<div style="height:1px;background:var(--color-text);margin-top:-10px"></div>
+<div style="display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-6);font-size:14px;color:var(--color-neutral-700)"><span>Skycast · Design system</span><span>Flutter · Material 3</span><span>Tiếng Việt / English</span><span>Base 390×844 · checked at 375×667</span></div>
+<div style="height:1px;background:var(--color-text)"></div>
+<h1 style="font-family:var(--font-heading);font-weight:600;font-size:88px;line-height:1;letter-spacing:-0.02em;margin:var(--space-6) 0 0">Foundations</h1>
+<p style="font-size:21px;line-height:1.5;max-width:640px;margin:0;text-wrap:pretty">Every token below maps 1:1 to a Flutter name — <em>ColorScheme</em>, the <em>AppColors</em> theme extension, <em>TextTheme</em> — so what ships in code is exactly what's specified here.</p>
+</header>
+
+<section style="margin-bottom:120px">
+<div style="font-size:14px;color:var(--color-accent-2-700);margin-bottom:var(--space-2)">01</div>
+<h2 style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.1;margin:0 0 var(--space-3)">Color</h2>
+<p style="font-size:17px;line-height:1.55;max-width:620px;margin:0 0 var(--space-8);color:var(--color-neutral-800)">Collection <em>Color</em>, modes <em>Light</em> and <em>Dark</em>.</p>
+
+<sc-for list="{{ tokenGroups }}" as="g" hint-placeholder-count="2">
+<div style="margin-bottom:72px">
+<div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:var(--space-4);align-items:end;margin-bottom:var(--space-4)">
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0">{{ g.name }}</h3>
+<div style="font-size:14px;color:var(--color-neutral-700)">Light</div>
+<div style="font-size:14px;color:var(--color-neutral-700)">Dark</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:var(--space-4)">
+<sc-for list="{{ g.tokens }}" as="t" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:var(--space-4);align-items:center">
+<div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:19px;font-weight:600">{{ t.name }}</span><span style="font-size:15px;color:var(--color-neutral-700)">{{ t.role }}</span></div>
+<div style="display:flex;align-items:center;gap:var(--space-3);min-width:0"><div style="width:72px;height:48px;flex:none;border-radius:8px;background:{{ t.lightSwatch }};box-shadow:inset 0 0 0 1px rgba(32,30,29,.12)"></div><span style="font-size:15px;font-variant-numeric:tabular-nums">{{ t.lightHex }}</span></div>
+<div style="display:flex;align-items:center;gap:var(--space-3);min-width:0"><div style="width:72px;height:48px;flex:none;border-radius:8px;background:{{ t.darkSwatch }};box-shadow:inset 0 0 0 1px rgba(32,30,29,.12)"></div><span style="font-size:15px;font-variant-numeric:tabular-nums">{{ t.darkHex }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0 0 var(--space-2)">Contrast audit</h3>
+<p style="font-size:17px;line-height:1.55;max-width:640px;margin:0 0 var(--space-6);color:var(--color-neutral-800)">Computed live from the tokens. Body text needs 4.5:1; accent-only UI (icons, bars) needs 3:1.</p>
+<div style="display:flex;flex-direction:column;gap:var(--space-3)">
+<sc-for list="{{ pairs }}" as="p" hint-placeholder-count="12">
+<div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:var(--space-4);align-items:center">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:17px"><strong>{{ p.fg }}</strong> on <strong>{{ p.bg }}</strong></span><span style="font-size:14px;color:var(--color-neutral-700)">{{ p.use }} · needs {{ p.minLabel }}</span></div>
+<div style="display:flex;align-items:center;gap:var(--space-3)"><span style="padding:6px 12px;border-radius:8px;background:{{ p.l.bg }};color:{{ p.l.fg }};font-family:'Be Vietnam Pro';font-size:14px;font-weight:500;box-shadow:inset 0 0 0 1px rgba(32,30,29,.1)">Hà Nội 31°</span><span style="font-size:15px;font-variant-numeric:tabular-nums">{{ p.l.ratio }}</span><span style="font-size:13px;padding:2px 8px;border-radius:2px;background:{{ p.l.badgeBg }};color:{{ p.l.badgeFg }}">{{ p.l.verdict }}</span></div>
+<div style="display:flex;align-items:center;gap:var(--space-3)"><span style="padding:6px 12px;border-radius:8px;background:{{ p.d.bg }};color:{{ p.d.fg }};font-family:'Be Vietnam Pro';font-size:14px;font-weight:500">Hà Nội 31°</span><span style="font-size:15px;font-variant-numeric:tabular-nums">{{ p.d.ratio }}</span><span style="font-size:13px;padding:2px 8px;border-radius:2px;background:{{ p.d.badgeBg }};color:{{ p.d.badgeFg }}">{{ p.d.verdict }}</span></div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ hasFails }}" hint-placeholder-val="{{ true }}">
+<div style="margin-top:var(--space-8);max-width:720px;display:flex;flex-direction:column;gap:var(--space-3)">
+<h4 style="font-family:var(--font-heading);font-weight:600;font-size:20px;margin:0;color:var(--color-accent-2-700)">Two pairs miss AA — recommended rules</h4>
+<sc-for list="{{ fails }}" as="f" hint-placeholder-count="2">
+<p style="font-size:17px;line-height:1.55;margin:0;text-wrap:pretty"><strong>{{ f.title }}.</strong> {{ f.fix }}</p>
+</sc-for>
+</div>
+</sc-if>
+</section>
+
+<section style="margin-bottom:120px">
+<div style="font-size:14px;color:var(--color-accent-2-700);margin-bottom:var(--space-2)">02</div>
+<h2 style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.1;margin:0 0 var(--space-3)">Weather gradients</h2>
+<p style="font-size:17px;line-height:1.55;max-width:660px;margin:0 0 var(--space-8);color:var(--color-neutral-800);text-wrap:pretty">Vertical, two stops, identical in both app themes. Top stop is the lighter sky and carries the big temperature; bottom stop is deeper because it sits under the glass cards — white text must still clear 4.5:1 through 16% white glass.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:64px var(--space-8)">
+<sc-for list="{{ gradients }}" as="g" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:column;gap:var(--space-3)">
+<div style="display:flex;align-items:baseline;gap:var(--space-3)"><h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0">{{ g.name }}</h3><span style="font-size:14px;color:var(--color-neutral-700)">codes {{ g.codes }}</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">
+<sc-for list="{{ g.variants }}" as="v" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:var(--space-2)">
+<div style="height:230px;border-radius:20px;background:{{ v.css }};color:#FFFFFF;font-family:'Be Vietnam Pro';padding:16px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:24px">{{ v.icon }}</span><span style="font-size:48px;line-height:1;font-weight:200;font-variant-numeric:tabular-nums">{{ v.temp }}</span></div>
+<div style="background:rgba(255,255,255,.16);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;line-height:20px;font-weight:400">{{ v.label }}</span><span style="font-size:12px;line-height:16px;font-weight:500;font-variant-numeric:tabular-nums">Độ ẩm 78% · Gió 12 km/h</span></div>
+</div>
+<div style="font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums"><strong>{{ v.token }}</strong><br>{{ v.top }} → {{ v.bot }}<br><span style="color:{{ v.okColor }}">{{ v.ratios }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="margin-bottom:120px">
+<div style="font-size:14px;color:var(--color-accent-2-700);margin-bottom:var(--space-2)">03</div>
+<h2 style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.1;margin:0 0 var(--space-3)">Typography</h2>
+<p style="font-size:17px;line-height:1.55;max-width:660px;margin:0 0 var(--space-6);color:var(--color-neutral-800);text-wrap:pretty">Be Vietnam Pro — drawn for Vietnamese, so stacked diacritics (ặ ẫ ỡ ự) stay inside the line box without clipping. All numerals use tabular figures (<em>FontFeature.tabularFigures()</em>) so temperatures don't jitter as they update.</p>
+<div style="font-family:'Be Vietnam Pro';font-size:40px;line-height:56px;font-weight:400;margin-bottom:var(--space-8);letter-spacing:.02em">Ặ Ẫ Ỡ Ự Ỹ Ổ Ứ Đ · ặ ẫ ỡ ự ỹ ổ ứ đ · <span style="font-variant-numeric:tabular-nums">0123456789°</span></div>
+<div style="display:flex;flex-direction:column;gap:var(--space-8)">
+<sc-for list="{{ typeStyles }}" as="s" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:minmax(180px,240px) minmax(0,1fr);gap:var(--space-6);align-items:baseline">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:19px;font-weight:600">{{ s.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ s.spec }}</span><span style="font-size:14px;color:var(--color-neutral-700)">{{ s.use }}</span></div>
+<div style="font-family:'Be Vietnam Pro';font-size:{{ s.size }}px;line-height:{{ s.line }}px;font-weight:{{ s.weight }};font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere">{{ s.sample }}</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="margin-bottom:120px">
+<div style="font-size:14px;color:var(--color-accent-2-700);margin-bottom:var(--space-2)">04</div>
+<h2 style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.1;margin:0 0 var(--space-8)">Spacing, radius, elevation</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:72px var(--space-8)">
+<div style="display:flex;flex-direction:column;gap:var(--space-4)">
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0">Space</h3>
+<sc-for list="{{ spaces }}" as="s" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:110px 40px 1fr;gap:var(--space-3);align-items:center"><span style="font-size:17px;font-weight:600">{{ s.name }}</span><span style="font-size:15px;font-variant-numeric:tabular-nums;color:var(--color-neutral-700)">{{ s.v }}</span><div style="height:16px;width:{{ s.v }}px;background:var(--color-accent)"></div></div>
+</sc-for>
+<p style="font-size:15px;line-height:1.5;margin:var(--space-2) 0 0;color:var(--color-neutral-800)"><strong>screenPadding</strong> = space16 on both 390 and 375 widths.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:var(--space-4)">
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0">Radius</h3>
+<div style="display:flex;flex-wrap:wrap;gap:var(--space-4)">
+<sc-for list="{{ radii }}" as="r" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:var(--space-2)"><div style="width:96px;height:72px;background:#DBEAFE;border:2px solid #2563EB;border-radius:{{ r.v }}px;box-sizing:border-box"></div><span style="font-size:17px;font-weight:600">{{ r.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ r.v }} · {{ r.use }}</span></div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:var(--space-4)">
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0">Elevation</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">
+<div style="background:#F8FAFC;padding:24px 16px;border-radius:12px;display:flex;flex-direction:column;gap:8px"><div style="height:72px;background:#FFFFFF;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.06)"></div><span style="font-family:'Be Vietnam Pro';font-size:12px;line-height:16px;font-weight:500;color:#64748B">Light · y2 blur8 #0F172A 6%</span></div>
+<div style="background:#0F172A;padding:24px 16px;border-radius:12px;display:flex;flex-direction:column;gap:8px"><div style="height:72px;background:#1E293B;border-radius:12px"></div><span style="font-family:'Be Vietnam Pro';font-size:12px;line-height:16px;font-weight:500;color:#94A3B8">Dark · no shadow, tone only</span></div>
+</div>
+<p style="font-size:15px;line-height:1.5;margin:0;color:var(--color-neutral-800)">One shadow level, Light only. Dark separates layers by surface → surfaceContainer tone. Glass cards on gradients never take a shadow.</p>
+</div>
+</div>
+</section>
+
+<section style="margin-bottom:120px">
+<div style="font-size:14px;color:var(--color-accent-2-700);margin-bottom:var(--space-2)">05</div>
+<h2 style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.1;margin:0 0 var(--space-3)">Icons</h2>
+<p style="font-size:17px;line-height:1.55;max-width:660px;margin:0 0 var(--space-8);color:var(--color-neutral-800)">Material Symbols Rounded, outline (FILL 0, wght 400). 24 default · 20 in list rows · 64 for state illustrations. Flutter: <em>material_symbols_icons</em> → <em>Symbols.name</em>.</p>
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0 0 var(--space-6)">Weather</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--space-8) var(--space-6);margin-bottom:72px">
+<sc-for list="{{ weatherIcons }}" as="i" hint-placeholder-count="10">
+<div style="display:flex;flex-direction:column;gap:var(--space-2)">
+<div style="display:flex;align-items:flex-end;gap:var(--space-4);height:64px;color:{{ i.color }}"><span class="ms" style="font-size:64px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48">{{ i.id }}</span><span class="ms" style="font-size:24px">{{ i.id }}</span></div>
+<span style="font-size:16px;font-weight:600">{{ i.label }}</span><span style="font-size:14px;color:var(--color-neutral-700)">{{ i.id }}</span>
+</div>
+</sc-for>
+</div>
+<h3 style="font-family:var(--font-heading);font-weight:600;font-size:24px;margin:0 0 var(--space-6)">Interface</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--space-6)">
+<sc-for list="{{ uiIcons }}" as="i" hint-placeholder-count="18">
+<div style="display:flex;flex-direction:column;gap:var(--space-2)">
+<div style="display:flex;align-items:center;gap:var(--space-3);color:#0F172A"><span class="ms" style="font-size:24px">{{ i.id }}</span><span class="ms" style="font-size:20px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20">{{ i.id }}</span></div>
+<span style="font-size:16px;font-weight:600">{{ i.label }}</span><span style="font-size:14px;color:var(--color-neutral-700)">{{ i.id }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section>
+<div style="font-size:14px;color:var(--color-accent-2-700);margin-bottom:var(--space-2)">06</div>
+<h2 style="font-family:var(--font-heading);font-weight:600;font-size:48px;line-height:1.1;margin:0 0 var(--space-3)">Layout check</h2>
+<p style="font-size:17px;line-height:1.55;max-width:660px;margin:0 0 var(--space-8);color:var(--color-neutral-800);text-wrap:pretty">The foundations composed at both frame sizes. Home is scrollable — on 375×667 the hourly strip lands at the fold. Switch weather, day/night and language in Tweaks.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start">
+<sc-for list="{{ homeFrames }}" as="fr" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:var(--space-3)">
+<span style="font-size:15px;color:var(--color-neutral-700)">{{ fr.label }}</span>
+<div style="width:{{ fr.w }}px;height:{{ fr.h }}px;border-radius:40px;overflow:hidden;background:{{ home.bg }};color:#FFFFFF;font-family:'Be Vietnam Pro';font-variant-numeric:tabular-nums;box-shadow:0 0 0 10px #201e1d">
+<div style="height:100%;overflow-y:auto;scrollbar-width:none;padding:0 16px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 12px 0;font-size:15px;font-weight:600"><span>9:41</span><span class="ms" style="font-size:18px">signal_cellular_alt</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:-8px"><span class="ms" style="font-size:24px;padding:12px;margin-left:-12px">list</span><div style="display:flex"><span class="ms" style="font-size:24px;padding:12px">search</span><span class="ms" style="font-size:24px;padding:12px;margin-right:-12px">settings</span></div></div>
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px">
+<div style="display:flex;align-items:center;gap:4px"><span class="ms" style="font-size:20px">location_on</span><span style="font-size:28px;line-height:36px;font-weight:600">{{ home.city }}</span></div>
+<span style="font-size:96px;line-height:100px;font-weight:200;letter-spacing:-0.02em">{{ home.temp }}</span>
+<span style="font-size:16px;line-height:24px">{{ home.cond }}</span>
+<span style="font-size:14px;line-height:20px">{{ home.hiLo }}</span>
+</div>
+<div style="background:rgba(255,255,255,.16);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+<span style="font-size:16px;line-height:24px;font-weight:600">{{ home.hourlyTitle }}</span>
+<div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px">
+<sc-for list="{{ home.hourly }}" as="h" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px"><span style="font-size:12px;line-height:16px;font-weight:500">{{ h.t }}</span><span class="ms" style="font-size:24px">{{ h.icon }}</span><span style="font-size:16px;line-height:24px">{{ h.temp }}</span><span style="font-size:12px;line-height:16px;font-weight:500">{{ h.rain }}</span></div>
+</sc-for>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<sc-for list="{{ home.details }}" as="d" hint-placeholder-count="4">
+<div style="background:rgba(255,255,255,.16);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:20px;transform:rotate({{ d.rot }}deg)">{{ d.icon }}</span><span style="font-size:12px;line-height:16px;font-weight:500">{{ d.label }}</span></div>
+<span style="font-size:22px;line-height:28px;font-weight:600">{{ d.value }}</span>
+<span style="font-size:14px;line-height:20px">{{ d.note }}</span>
+</div>
+</sc-for>
+</div>
+<div style="background:rgba(255,255,255,.16);border-radius:20px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:20px">wb_twilight</span><span style="font-size:12px;line-height:16px;font-weight:500">{{ home.sunriseLabel }}</span></div><span style="font-size:22px;line-height:28px;font-weight:600">05:31</span></div>
+<div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:20px">{{ sunsetIcon }}</span><span style="font-size:12px;line-height:16px;font-weight:500">{{ home.sunsetLabel }}</span></div><span style="font-size:22px;line-height:28px;font-weight:600">18:24</span></div>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:var(--space-3)">
+<span style="font-size:15px;color:var(--color-neutral-700)">{{ th.label }}</span>
+<div style="width:390px;height:844px;border-radius:40px;overflow:hidden;background:{{ th.c.surface }};color:{{ th.c.onSurface }};font-family:'Be Vietnam Pro';font-variant-numeric:tabular-nums;box-shadow:0 0 0 10px #201e1d;display:flex;flex-direction:column">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;font-size:15px;font-weight:600"><span>9:41</span><span class="ms" style="font-size:18px">signal_cellular_alt</span></div>
+<div style="display:flex;align-items:center;gap:4px;padding:8px 4px 8px 4px"><span class="ms" style="font-size:24px;padding:12px">arrow_back</span><span style="font-size:22px;line-height:28px;font-weight:600;flex:1">{{ copy.locTitle }}</span><span class="ms" style="font-size:24px;padding:12px;color:{{ th.c.primary }}">add</span></div>
+<div style="padding:0 16px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px;height:48px;padding:0 16px;border-radius:12px;background:{{ th.c.surfaceContainer }};border:1px solid {{ th.c.outline }};color:{{ th.c.textMuted }}"><span class="ms" style="font-size:20px">search</span><span style="font-size:16px;line-height:24px">{{ copy.searchHint }}</span></div>
+<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:{{ th.c.primaryContainer }};color:{{ th.c.onPrimaryContainer }}"><span class="ms" style="font-size:20px">wifi_off</span><span style="font-size:14px;line-height:20px;flex:1">{{ copy.offline }}</span><span class="ms" style="font-size:20px">refresh</span></div>
+<span style="font-size:16px;line-height:24px;font-weight:600;margin-top:8px">{{ copy.saved }}</span>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ th.rows }}" as="r" hint-placeholder-count="5">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 8px 12px 16px;border-radius:12px;background:{{ th.c.card }}">
+<span class="ms" style="font-size:20px;color:{{ r.iconColor }}">{{ r.icon }}</span>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:16px;line-height:24px">{{ r.city }}</span><span style="font-size:14px;line-height:20px;color:{{ th.c.textMuted }}">{{ r.sub }}</span></div>
+<span style="font-size:22px;line-height:28px;font-weight:600">{{ r.temp }}</span>
+<span class="ms" style="font-size:20px;padding:12px 4px;color:{{ th.c.textMuted }}">drag_handle</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:12px 8px 12px 16px;border-radius:12px;background:{{ th.c.error }};color:{{ th.c.onError }}"><span class="ms" style="font-size:20px">delete</span><span style="font-size:14px;line-height:20px;font-weight:500;flex:1">{{ copy.swipeDelete }}</span></div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;weather&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clear&quot;,&quot;cloudy&quot;,&quot;fog&quot;,&quot;rain&quot;,&quot;snow&quot;,&quot;thunderstorm&quot;],&quot;default&quot;:&quot;clear&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout check&quot;},&quot;night&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout check&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vi&quot;,&quot;en&quot;],&quot;default&quot;:&quot;vi&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout check&quot;}}">
+const HEX = s => { const h = s.replace('#',''); return [0,2,4].map(i => parseInt(h.slice(i,i+2),16)); };
+const lin = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+const lum = rgb => 0.2126*lin(rgb[0]) + 0.7152*lin(rgb[1]) + 0.0722*lin(rgb[2]);
+const ratio = (a,b) => { const [x,y] = [lum(a),lum(b)].sort((m,n)=>n-m); return (x+0.05)/(y+0.05); };
+const over = (fg,a,bg) => fg.map((c,i)=> c*a + bg[i]*(1-a));
+const WHITE = [255,255,255];
+
+const TOKENS = {
+  scheme: [
+    ['primary','#2563EB','#60A5FA','Primary actions, links, selection'],
+    ['onPrimary','#FFFFFF','#0B1220','Text and icons on primary'],
+    ['primaryContainer','#DBEAFE','#1E3A8A','Tonal fills, banners, selected rows'],
+    ['onPrimaryContainer','#1E3A8A','#DBEAFE','Text on primaryContainer'],
+    ['surface','#F8FAFC','#0F172A','Page background'],
+    ['onSurface','#0F172A','#F1F5F9','Main text'],
+    ['surfaceContainer','#FFFFFF','#1E293B','Inputs, sheets, app bars'],
+    ['outline','#E2E8F0','#334155','Dividers, borders'],
+    ['error','#DC2626','#F87171','Errors, destructive actions'],
+    ['onError','#FFFFFF','#0B1220','Text on error'],
+  ],
+  app: [
+    ['textMuted','#64748B','#94A3B8','Secondary text'],
+    ['card','#F1F5F9','#1E293B','List and detail cards'],
+    ['sunny','#F59E0B','#FBBF24','UV, sun accents'],
+    ['rainy','#3B82F6','#60A5FA','Rain %, rain accents'],
+    ['onWeather','#FFFFFF','#FFFFFF','Text and icons on weather gradients'],
+    ['glass','#FFFFFF','#FFFFFF','Translucent cards on gradients — 16% white'],
+  ],
+};
+const ALL = [...TOKENS.scheme, ...TOKENS.app];
+const MODE = i => Object.fromEntries(ALL.map(t => [t[0], t[i]]));
+const LIGHT = MODE(1), DARK = MODE(2);
+
+const GRADS = [
+  ['clear','0, 1',        ['#2272D6','#0F4DA8'], ['#1E2A5E','#0B1026'], 'sunny','clear_night', '32°','27°'],
+  ['cloudy','2, 3',       ['#5A7390','#3A4F66'], ['#2E3A52','#151B28'], 'partly_cloudy_day','partly_cloudy_night','29°','26°'],
+  ['fog','45, 48',        ['#6B7784','#4A5561'], ['#343C4C','#181C25'], 'foggy','foggy','24°','21°'],
+  ['rain','51–57 · 61–67 · 80–82', ['#3A6A94','#1D3F63'], ['#1B3350','#0A1424'], 'water_drop','water_drop','26°','24°'],
+  ['snow','71–86',        ['#4A78A6','#2A5584'], ['#2A3766','#10162E'], 'ac_unit','ac_unit','−2°','−5°'],
+  ['thunderstorm','95–99',['#4A4468','#24223A'], ['#231B3D','#09081A'], 'thunderstorm','thunderstorm','27°','25°'],
+];
+const COND = {
+  vi: { clear:'Trời quang', cloudy:'Nhiều mây', fog:'Sương mù', rain:'Mưa rào', snow:'Tuyết rơi', thunderstorm:'Dông bão' },
+  en: { clear:'Clear sky', cloudy:'Mostly cloudy', fog:'Fog', rain:'Rain showers', snow:'Snow', thunderstorm:'Thunderstorm' },
+};
+const COPY = {
+  vi: { hourlyTitle:'Dự báo theo giờ', now:'Bây giờ', hum:'Độ ẩm', wind:'Gió', uv:'Chỉ số UV', pres:'Áp suất', humN:'Điểm sương 24°', windN:'Hướng Đông Nam', uvN:'Cao', presN:'Ổn định', sunriseLabel:'Bình minh', sunsetLabel:'Hoàng hôn', hi:'C', lo:'T', feels:'Cảm giác như',
+        locTitle:'Địa điểm', searchHint:'Tìm thành phố…', offline:'Không có kết nối. Đang hiển thị dữ liệu lúc 08:15.', saved:'Đã lưu', swipeDelete:'Vuốt để xoá · Huế', updated:'Cập nhật' },
+  en: { hourlyTitle:'Hourly forecast', now:'Now', hum:'Humidity', wind:'Wind', uv:'UV index', pres:'Pressure', humN:'Dew point 24°', windN:'From south-east', uvN:'High', presN:'Steady', sunriseLabel:'Sunrise', sunsetLabel:'Sunset', hi:'H', lo:'L', feels:'Feels like',
+        locTitle:'Locations', searchHint:'Search for a city…', offline:'No connection. Showing data from 08:15.', saved:'Saved', swipeDelete:'Swipe to delete · Huế', updated:'Updated' },
+};
+
+class Component extends DCLogic {
+  swatch(t, mode) {
+    const hex = mode === 'l' ? t[1] : t[2];
+    if (t[0] === 'glass') return { sw: 'linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)), linear-gradient(180deg,#2272D6,#0F4DA8)', hex: '#FFFFFF · 16% (#29FFFFFF)' };
+    return { sw: hex, hex };
+  }
+  renderVals() {
+    const weather = this.props.weather ?? 'clear';
+    const night = this.props.night ?? false;
+    const lang = this.props.lang ?? 'vi';
+    const C = COPY[lang];
+
+    const tokenGroups = [['Material ColorScheme', TOKENS.scheme], ['App extension · AppColors', TOKENS.app]].map(([name, list]) => ({
+      name,
+      tokens: list.map(t => { const l = this.swatch(t,'l'), d = this.swatch(t,'d'); return { name: t[0], role: t[3], lightSwatch: l.sw, lightHex: l.hex, darkSwatch: d.sw, darkHex: d.hex }; }),
+    }));
+
+    const PAIRS = [
+      ['onSurface','surface','Body text',4.5], ['onSurface','surfaceContainer','Body text',4.5], ['onSurface','card','Body text',4.5],
+      ['textMuted','surface','Secondary text',4.5], ['textMuted','surfaceContainer','Secondary text',4.5], ['textMuted','card','Secondary text',4.5],
+      ['onPrimary','primary','Button labels',4.5], ['onPrimaryContainer','primaryContainer','Banner text',4.5], ['onError','error','Destructive labels',4.5],
+      ['primary','surface','Text links',4.5], ['error','surface','Error messages',4.5],
+      ['rainy','surface','Rain % as text',4.5], ['sunny','surface','Sun icons, UV bar',3],
+    ];
+    const cell = (M, fg, bg, min) => {
+      const r = ratio(HEX(M[fg]), HEX(M[bg])), ok = r >= min;
+      return { fg: M[fg], bg: M[bg], ratio: r.toFixed(2) + ':1', ok, verdict: ok ? 'Pass' : 'Fail',
+        badgeBg: ok ? 'var(--color-accent-100)' : 'var(--color-accent-2-100)', badgeFg: ok ? 'var(--color-accent-800)' : 'var(--color-accent-2-800)' };
+    };
+    const pairs = PAIRS.map(([fg,bg,use,min]) => ({ fg, bg, use, minLabel: min + ':1', l: cell(LIGHT,fg,bg,min), d: cell(DARK,fg,bg,min) }));
+    const fix = {
+      'textMuted/card': `Light textMuted on card is ${pairs[5].l.ratio}. Either keep textMuted off card in Light, or shift Light textMuted to #475569 (${ratio(HEX('#475569'),HEX('#F1F5F9')).toFixed(2)}:1 on card, ${ratio(HEX('#475569'),HEX('#F8FAFC')).toFixed(2)}:1 on surface).`,
+      'rainy/surface': `Light rainy on surface is ${pairs[11].l.ratio} — fine for drop icons and precipitation bars (3:1), not for the rain % figure. Set rain % text in primary (${pairs[9].l.ratio}) or onSurface, with a rainy icon beside it.`,
+    };
+    const fails = pairs.filter(p => !p.l.ok || !p.d.ok).map(p => { const k = p.fg + '/' + p.bg; return { title: `${p.fg} on ${p.bg}`, fix: fix[k] || `Use ${p.fg} on ${p.bg} for non-text UI only.` }; });
+
+    const gradients = GRADS.map(([name, codes, day, nt, iconD, iconN, tD, tN]) => ({
+      name, codes,
+      variants: [['Day', day, iconD, tD], ['Night', nt, iconN, tN]].map(([label, [top, bot], icon, temp]) => {
+        const rt = ratio(WHITE, HEX(top)), rg = ratio(WHITE, over(WHITE, 0.16, HEX(bot)));
+        return { label: `${COND.vi[name]} · ${label === 'Day' ? 'Ngày' : 'Đêm'}`, token: `${name}${label}`, top, bot, icon, temp,
+          css: `linear-gradient(180deg, ${top}, ${bot})`,
+          ratios: `white ${rt.toFixed(1)}:1 · on glass ${rg.toFixed(1)}:1`,
+          okColor: rt >= 4.5 && rg >= 4.5 ? 'var(--color-accent-700)' : 'var(--color-accent-2-700)' };
+      }),
+    }));
+
+    const typeStyles = [
+      ['displayLarge',96,100,200,'Current temperature','31°'],
+      ['headlineMedium',28,36,600,'City name','Thành phố Hồ Chí Minh'],
+      ['titleLarge',22,28,600,'Screen titles','Cài đặt · Settings'],
+      ['titleMedium',16,24,600,'Section headers, card titles','Dự báo 7 ngày · 7-day forecast'],
+      ['bodyLarge',16,24,400,'Primary body text','Trời nắng gián đoạn, có lúc có mưa rào và dông vào chiều tối.'],
+      ['bodyMedium',14,20,400,'Secondary body, list subtitles','Cảm giác như 34° · Độ ẩm 78% · Gió Đông Nam 12 km/h'],
+      ['labelLarge',14,20,500,'Buttons','Thêm địa điểm · Thử lại'],
+      ['labelMedium',12,16,500,'Hourly time, captions','Bây giờ  13:00  14:00  15:00  16:00'],
+    ].map(([name,size,line,weight,use,sample]) => ({ name, size, line, weight, use, sample, spec: `${size}/${line} · ${weight}` }));
+
+    const spaces = [4,8,12,16,24,32].map(v => ({ name: 'space' + v, v }));
+    const radii = [['radiusSm',8,'chips, inputs'],['radiusMd',12,'rows, banners'],['radiusLg',20,'cards'],['radiusFull',999,'pills']].map(([name,v,use]) => ({ name, v, use }));
+
+    const weatherIcons = [
+      ['sunny','Sunny','#F59E0B'],['clear_night','Clear night','#1E3A8A'],['partly_cloudy_day','Partly cloudy · day','#0F172A'],['partly_cloudy_night','Partly cloudy · night','#0F172A'],
+      ['cloud','Cloud','#0F172A'],['foggy','Fog','#0F172A'],['water_drop','Rain','#3B82F6'],['ac_unit','Snow','#0F172A'],['thunderstorm','Thunderstorm','#0F172A'],['help','Unknown','#64748B'],
+    ].map(([id,label,color]) => ({ id, label, color }));
+    const uiIcons = [
+      ['location_on','Location'],['search','Search'],['settings','Settings'],['list','List'],['add','Add'],['delete','Delete'],['drag_handle','Drag handle'],['refresh','Refresh'],['wifi_off','Offline'],
+      ['arrow_back','Back'],['humidity_percentage','Humidity'],['air','Wind'],['navigation','Wind direction'],['light_mode','UV'],['speed','Pressure'],['visibility','Visibility'],['wb_twilight','Sunrise'],['bedtime','Sunset'],
+    ].map(([id,label]) => ({ id, label }));
+
+    const g = GRADS.find(x => x[0] === weather) || GRADS[0];
+    const [top, bot] = night ? g[3] : g[2];
+    const baseT = parseInt(String(night ? g[7] : g[6]).replace('−','-'));
+    const icon = night ? g[5] : g[4];
+    const deg = n => (n < 0 ? '−' + Math.abs(n) : n) + '°';
+    const rainP = { clear:0, cloudy:10, fog:5, rain:80, snow:40, thunderstorm:90 }[weather];
+    const home = {
+      bg: `linear-gradient(180deg, ${top}, ${bot})`,
+      city: weather === 'snow' ? 'Sa Pa' : 'Hà Nội',
+      temp: deg(baseT), cond: `${COND[lang][weather]} · ${C.feels} ${deg(baseT + 2)}`,
+      hiLo: `${C.hi}:${deg(baseT + 3)}  ${C.lo}:${deg(baseT - 5)}`,
+      hourlyTitle: C.hourlyTitle, sunriseLabel: C.sunriseLabel, sunsetLabel: C.sunsetLabel,
+      hourly: [C.now,'13:00','14:00','15:00','16:00','17:00'].map((t,i) => ({ t, icon, temp: deg(baseT + [0,1,1,0,-1,-2][i]), rain: Math.min(99, rainP + i*3) + '%' })),
+      details: [
+        { icon:'humidity_percentage', label:C.hum, value:'78%', note:C.humN, rot:0 },
+        { icon:'navigation', label:C.wind, value:'12 km/h', note:C.windN, rot:135 },
+        { icon:'light_mode', label:C.uv, value: night ? '0' : '8', note: night ? '—' : C.uvN, rot:0 },
+        { icon:'speed', label:C.pres, value:'1012 hPa', note:C.presN, rot:0 },
+      ],
+    };
+    const homeFrames = [{ w:390, h:844, label:'Home · 390×844 (iPhone 15)' }, { w:375, h:667, label:'Home · 375×667 (iPhone SE)' }];
+
+    const CITIES = [
+      ['Hà Nội','31°','sunny','sunny', lang==='vi'?'Trời quang · C:34° T:26°':'Clear · H:34° L:26°'],
+      ['Thành phố Hồ Chí Minh','33°','partly_cloudy_day',null, lang==='vi'?'Nhiều mây · C:35° T:27°':'Cloudy · H:35° L:27°'],
+      ['Đà Nẵng','29°','water_drop','rainy', lang==='vi'?'Mưa rào 80% · C:30° T:25°':'Showers 80% · H:30° L:25°'],
+      ['Huế','27°','thunderstorm',null, lang==='vi'?'Dông · C:29° T:24°':'Thunderstorm · H:29° L:24°'],
+      ['London','14°','foggy',null, lang==='vi'?'Sương mù · C:16° T:9°':'Fog · H:16° L:9°'],
+    ];
+    const themes = [['Locations · Light', LIGHT], ['Locations · Dark', DARK]].map(([label, c]) => ({
+      label, c,
+      rows: CITIES.map(([city,temp,ic,accent,sub]) => ({ city, temp, icon: ic, sub, iconColor: accent ? c[accent] : c.onSurface })),
+    }));
+
+    return { tokenGroups, pairs, fails, hasFails: fails.length > 0, gradients, typeStyles, spaces, radii, weatherIcons, uiIcons, home, homeFrames, themes, copy: C, sunsetIcon: 'bedtime' };
+  }
+}
+</script>
+</body>
+</html>

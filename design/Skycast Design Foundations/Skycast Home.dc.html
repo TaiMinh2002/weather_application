@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>
+body{margin:0;background:#EDEDED;font-family:'Be Vietnam Pro',sans-serif}
+.ms{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.shim{background-size:200% 100%;animation:shim 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@200;400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block"></helmet>
+<div style="display:flex;gap:56px;padding:56px;flex-wrap:wrap;align-items:flex-start">
+<sc-for list="{{ frames }}" as="f" hint-placeholder-count="10">
+<div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+<span style="font-size:14px;font-weight:600;color:#334155">{{ f.label }}</span>
+<div style="width:{{ f.w }}px;height:{{ f.h }}px;border-radius:44px;overflow:{{ f.overflow }};box-shadow:0 0 0 8px #111;position:relative;background:{{ f.bg }};font-variant-numeric:tabular-nums;color:{{ f.topText }}">
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 4px">
+<span class="ms" style="font-size:24px;width:44px;height:44px;display:flex;align-items:center;justify-content:center">list</span>
+<div style="display:flex;align-items:center;gap:6px">
+<span class="ms" style="font-size:13px">navigation</span>
+<sc-for list="{{ f.dots }}" as="dot" hint-placeholder-count="2"><div style="width:6px;height:6px;border-radius:999px;background:{{ f.topText }};opacity:{{ dot.op }}"></div></sc-for>
+</div>
+<span class="ms" style="font-size:24px;width:44px;height:44px;display:flex;align-items:center;justify-content:center">settings</span>
+</div>
+
+<sc-if value="{{ f.showRefresh }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;justify-content:center;padding:6px 0"><span class="ms spin" style="font-size:22px;color:{{ f.topText }}">progress_activity</span></div>
+</sc-if>
+
+<sc-if value="{{ f.stateView }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:40px 28px;margin-top:80px">
+<span class="ms" style="font-size:64px;color:{{ f.topText }};opacity:.85;font-variation-settings:'FILL' 0,'wght' 300,'opsz' 48">{{ f.stateView.icon }}</span>
+<div style="font-size:16px;line-height:24px;color:{{ f.topText }};max-width:280px">{{ f.stateView.msg }}</div>
+<button style="margin-top:8px;height:48px;padding:0 24px;border:none;border-radius:999px;background:{{ f.stateView.btnBg }};color:{{ f.stateView.btnFg }};font:600 14px/20px 'Be Vietnam Pro'">{{ f.stateView.btn }}</button>
+<sc-if value="{{ f.stateView.btn2 }}" hint-placeholder-val="{{ false }}"><button style="height:48px;padding:0 24px;border:none;background:transparent;color:{{ f.stateView.btn2Color }};font:600 14px/20px 'Be Vietnam Pro'">{{ f.stateView.btn2 }}</button></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ f.populated }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 16px 40px;display:flex;flex-direction:column;gap:20px">
+
+<sc-if value="{{ f.showOffline }}" hint-placeholder-val="{{ false }}">
+<div style="height:36px;border-radius:999px;background:rgba(255,255,255,.16);display:flex;align-items:center;gap:8px;padding:0 14px;color:#FFFFFF"><span class="ms" style="font-size:18px">wifi_off</span><span style="font-size:12px;line-height:16px;font-weight:500">Đang offline · cập nhật lúc {{ f.offlineTime }}</span></div>
+</sc-if>
+
+<sc-if value="{{ f.skeleton }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center;margin-top:20px">
+<div class="shim" style="width:140px;height:22px;border-radius:8px;background:{{ f.shimBg }}"></div>
+<div class="shim" style="width:96px;height:60px;border-radius:12px;background:{{ f.shimBg }}"></div>
+</div>
+<div style="display:flex;gap:8px">
+<sc-for list="{{ skelN }}" as="_" hint-placeholder-count="5"><div class="shim" style="flex:1;height:88px;border-radius:12px;background:{{ f.shimBg }}"></div></sc-for>
+</div>
+<div class="shim" style="height:220px;border-radius:20px;background:{{ f.shimBg }}"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<sc-for list="{{ skelN }}" as="_" hint-placeholder-count="6"><div class="shim" style="height:96px;border-radius:20px;background:{{ f.shimBg }}"></div></sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ f.hasData }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;color:#FFFFFF;margin-top:14px">
+<div style="display:flex;align-items:center;gap:4px"><span class="ms" style="font-size:20px">location_on</span><span style="font-size:28px;line-height:36px;font-weight:600">{{ f.city }}</span></div>
+<span style="font-size:{{ f.tempSize }}px;line-height:{{ f.tempSize }}px;font-weight:200;margin:4px 0">{{ f.temp }}</span>
+<span style="font-size:16px;line-height:24px">{{ f.cond }}</span>
+<span style="font-size:14px;line-height:20px">{{ f.hilo }}</span>
+<span style="font-size:14px;line-height:20px;opacity:.85">Cảm giác như {{ f.feels }}</span>
+</div>
+
+<div style="background:rgba(255,255,255,.16);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+<span style="font-size:16px;line-height:24px;font-weight:600;color:#FFFFFF">Dự báo 24 giờ</span>
+<div style="display:flex;gap:6px;overflow:hidden">
+<sc-for list="{{ f.hourly }}" as="h" hint-placeholder-count="8">
+<div style="width:52px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0;border-radius:12px;background:{{ h.hl }}">
+<span style="font-size:12px;line-height:16px;font-weight:500;color:#FFFFFF">{{ h.t }}</span>
+<span class="ms" style="font-size:22px;color:#FFFFFF">{{ h.icon }}</span>
+<span style="font-size:16px;line-height:24px;color:#FFFFFF">{{ h.temp }}</span>
+<sc-if value="{{ h.showRain }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;line-height:16px;font-weight:600;color:{{ f.rainy }}">{{ h.rain }}</span></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="background:rgba(255,255,255,.16);border-radius:20px;padding:8px 16px;display:flex;flex-direction:column">
+<span style="font-size:16px;line-height:24px;font-weight:600;color:#FFFFFF;padding:8px 0">7 ngày</span>
+<sc-for list="{{ f.daily }}" as="d" hint-placeholder-count="7">
+<div style="display:flex;align-items:center;gap:10px;padding:12px 4px;border-top:1px solid rgba(255,255,255,.16);border-radius:8px;background:{{ d.press }}">
+<span style="width:64px;flex:none;font-size:14px;line-height:20px;color:#FFFFFF;font-weight:{{ d.wt }}">{{ d.label }}</span>
+<span class="ms" style="font-size:22px;color:#FFFFFF;flex:none">{{ d.icon }}</span>
+<span style="width:32px;flex:none;font-size:11px;line-height:16px;color:{{ f.rainy }};text-align:right">{{ d.rainLabel }}</span>
+<span style="width:28px;flex:none;font-size:14px;line-height:20px;color:rgba(255,255,255,.7);text-align:right">{{ d.min }}</span>
+<div style="flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.25);position:relative"><div style="position:absolute;top:0;height:4px;border-radius:999px;left:{{ d.barLeft }}%;width:{{ d.barWidth }}%;background:linear-gradient(90deg,{{ f.rainy }},{{ f.sunny }})"></div></div>
+<span style="width:28px;flex:none;font-size:14px;line-height:20px;color:#FFFFFF">{{ d.max }}</span>
+<span class="ms" style="font-size:16px;color:rgba(255,255,255,.6)">chevron_right</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<sc-for list="{{ f.tiles }}" as="dt" hint-placeholder-count="6">
+<div style="background:rgba(255,255,255,.16);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;color:#FFFFFF">
+<div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:20px;transform:rotate({{ dt.rot }}deg)">{{ dt.icon }}</span><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:.03em;text-transform:uppercase">{{ dt.label }}</span></div>
+<sc-if value="{{ dt.dual }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:16px">wb_twilight</span><span style="font-size:16px;line-height:22px;font-weight:600">{{ dt.value }}</span></div>
+<div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:16px">bedtime</span><span style="font-size:16px;line-height:22px;font-weight:600">{{ dt.caption }}</span></div>
+</div>
+</sc-if>
+<sc-if value="{{ dt.notDual }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:22px;line-height:28px;font-weight:600">{{ dt.value }}</span>
+<sc-if value="{{ dt.isUv }}" hint-placeholder-val="{{ false }}"><div style="height:4px;border-radius:999px;background:rgba(255,255,255,.25);position:relative;margin:2px 0"><div style="position:absolute;left:0;top:0;height:4px;width:{{ dt.uvPct }}%;border-radius:999px;background:{{ f.sunny }}"></div></div></sc-if>
+<span style="font-size:14px;line-height:20px;color:rgba(255,255,255,.75)">{{ dt.caption }}</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const GRAD = {
+  clearDay:['#2A80DE','#0F4DA8'], clearNight:['#1E2A5E','#0B1026'],
+  rainNight:['#1B3350','#0A1424'], thunderDay:['#4A4468','#24223A'],
+  neutral:['#4B5A72','#2B3648'],
+};
+const RAINY = { light:'#3B82F6', dark:'#60A5FA' }, SUNNY = { light:'#F59E0B', dark:'#FBBF24' };
+const LIGHT = { primary:'#2563EB', onPrimary:'#FFFFFF', surface:'#F8FAFC', onSurface:'#0F172A', textMuted:'#64748B' };
+const DARK = { primary:'#60A5FA', onPrimary:'#0B1220', surface:'#0F172A', onSurface:'#F1F5F9', textMuted:'#94A3B8' };
+
+function hourly(count, baseTemp, icon, rainBase, rainy) {
+  const labels = ['Bây giờ','13:00','14:00','15:00','16:00','17:00','18:00','19:00'].slice(0, count);
+  return labels.map((t,i) => { const rain = Math.max(0, rainBase + i*6 - (rainBase===0?0:0)); return {
+    t, icon, temp: (baseTemp - Math.round(i*0.6)) + '°', hl: i===0 ? 'rgba(255,255,255,.16)' : 'transparent',
+    showRain: rain > 0, rain: Math.min(95,rain) + '%',
+  };});
+}
+function daily(icon, rainy, pressIdx) {
+  const days = [
+    { label:'Hôm nay', wt:600, icon, min:26, max:34, rain:0 },
+    { label:'T6', wt:400, icon:'partly_cloudy_day', min:25, max:33, rain:10 },
+    { label:'T7', wt:400, icon:'water_drop', min:24, max:29, rain:70 },
+    { label:'CN', wt:400, icon:'water_drop', min:23, max:27, rain:85 },
+    { label:'T2', wt:400, icon:'cloud', min:24, max:30, rain:20 },
+    { label:'T3', wt:400, icon:'sunny', min:25, max:32, rain:0 },
+    { label:'T4', wt:400, icon:'thunderstorm', min:24, max:28, rain:60 },
+  ];
+  const wmin = Math.min(...days.map(d=>d.min)), wmax = Math.max(...days.map(d=>d.max)), span = wmax-wmin;
+  return days.map((d,i) => ({ label:d.label, wt:d.wt, icon:d.icon, min:d.min+'°', max:d.max+'°',
+    rainLabel: d.rain>0 ? d.rain+'%' : '', barLeft: ((d.min-wmin)/span*100).toFixed(1), barWidth: (((d.max-d.min)/span)*100).toFixed(1),
+    press: i===pressIdx ? 'rgba(255,255,255,.12)' : 'transparent' }));
+}
+function tiles(theme) {
+  return [
+    { icon:'humidity_percentage', label:'Độ ẩm', value:'78%', caption:'Điểm sương 24°', rot:0, notDual:true },
+    { icon:'navigation', label:'Gió', value:'12 km/h', caption:'Hướng Đông Nam', rot:135, notDual:true },
+    { icon:'light_mode', label:'UV', value:'8', caption:'Rất cao', rot:0, notDual:true, isUv:true, uvPct:(8/11*100).toFixed(1) },
+    { icon:'speed', label:'Áp suất', value:'1012 hPa', caption:'Ổn định', rot:0, notDual:true },
+    { icon:'visibility', label:'Tầm nhìn', value:'10 km', caption:'Trong', rot:0, notDual:true },
+    { icon:'wb_twilight', label:'Bình minh · Hoàng hôn', value:'05:41', caption:'17:52', rot:0, dual:true },
+  ];
+}
+function css([top,bot]) { return `linear-gradient(180deg,${top},${bot})`; }
+
+class Component extends DCLogic {
+  populated(opts) {
+    const { rainy, sunny, tempSize=96 } = opts;
+    return { populated:true, hasData:true, skeleton:false, rainy, sunny, tempSize, tiles: tiles(),
+      hourly: hourly(opts.hourN||8, opts.baseTemp, opts.icon, opts.rainBase, rainy),
+      daily: daily(opts.dayIcon||opts.icon, rainy, opts.pressIdx ?? -1),
+      city: opts.city||'Hà Nội', temp: opts.temp, cond: opts.cond, hilo: opts.hilo, feels: opts.feels,
+      showOffline: !!opts.offline, offlineTime: opts.offlineTime||'14:05', showRefresh: !!opts.refresh,
+    };
+  }
+  renderVals() {
+    const dots = [{op:1},{op:.4},{op:.4}];
+    const frames = [
+      { label:'1 · Clear day — Light (844 viewport)', w:390, h:844, overflow:'hidden', bg:css(GRAD.clearDay), topText:'#FFFFFF', dots,
+        ...this.populated({ rainy:RAINY.light, sunny:SUNNY.light, icon:'sunny', dayIcon:'sunny', baseTemp:31, rainBase:0, temp:'31°', cond:'Có mây', hilo:'C:34° T:26°', feels:'35°' }) },
+      { label:'1b · Clear day — full scroll', w:390, h:1500, overflow:'visible', bg:css(GRAD.clearDay), topText:'#FFFFFF', dots,
+        ...this.populated({ rainy:RAINY.light, sunny:SUNNY.light, icon:'sunny', dayIcon:'sunny', baseTemp:31, rainBase:0, temp:'31°', cond:'Có mây', hilo:'C:34° T:26°', feels:'35°' }) },
+      { label:'2 · Rain night — Dark', w:390, h:844, overflow:'hidden', bg:css(GRAD.rainNight), topText:'#FFFFFF', dots,
+        ...this.populated({ rainy:RAINY.dark, sunny:SUNNY.dark, icon:'water_drop', dayIcon:'water_drop', baseTemp:24, rainBase:55, temp:'24°', cond:'Mưa rào', hilo:'C:26° T:22°', feels:'25°' }) },
+      { label:'3 · Thunderstorm day + offline', w:390, h:844, overflow:'hidden', bg:css(GRAD.thunderDay), topText:'#FFFFFF', dots,
+        ...this.populated({ rainy:RAINY.light, sunny:SUNNY.light, icon:'thunderstorm', dayIcon:'thunderstorm', baseTemp:27, rainBase:40, temp:'27°', cond:'Dông bão', hilo:'C:29° T:24°', feels:'28°', offline:true }) },
+      { label:'4 · Loading skeleton', w:390, h:844, overflow:'hidden', bg:css(GRAD.neutral), topText:'#FFFFFF', dots,
+        populated:true, hasData:false, skeleton:true, shimBg:'linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.24),rgba(255,255,255,.12))' },
+      { label:'5 · Error · network', w:390, h:844, overflow:'hidden', bg:LIGHT.surface, topText:LIGHT.onSurface, dots,
+        stateView:{ icon:'wifi_off', msg:'Không có kết nối mạng. Kiểm tra Wi-Fi hoặc dữ liệu di động.', btn:'Thử lại', btnBg:LIGHT.primary, btnFg:LIGHT.onPrimary } },
+      { label:'6 · Location denied (page 1)', w:390, h:844, overflow:'hidden', bg:LIGHT.surface, topText:LIGHT.onSurface, dots,
+        stateView:{ icon:'location_off', msg:'Skycast cần quyền truy cập vị trí để hiển thị thời tiết gần bạn.', btn:'Mở cài đặt', btnBg:LIGHT.primary, btnFg:LIGHT.onPrimary, btn2:'Chọn thành phố', btn2Color:LIGHT.primary } },
+      { label:'7 · Empty — no location, no cities', w:390, h:844, overflow:'hidden', bg:DARK.surface, topText:DARK.onSurface, dots,
+        stateView:{ icon:'location_city', msg:'Chưa có địa điểm nào', btn:'Tìm thành phố', btnBg:DARK.primary, btnFg:DARK.onPrimary } },
+      { label:'8 · Pull-to-refresh', w:390, h:844, overflow:'hidden', bg:css(GRAD.clearDay), topText:'#FFFFFF', dots, refresh:true,
+        ...this.populated({ rainy:RAINY.light, sunny:SUNNY.light, icon:'sunny', dayIcon:'sunny', baseTemp:31, rainBase:0, temp:'31°', cond:'Có mây', hilo:'C:34° T:26°', feels:'35°', refresh:true }) },
+      { label:'9 · iPhone SE 375×667', w:375, h:667, overflow:'hidden', bg:css(GRAD.clearDay), topText:'#FFFFFF', dots,
+        ...this.populated({ rainy:RAINY.light, sunny:SUNNY.light, icon:'sunny', dayIcon:'sunny', baseTemp:31, rainBase:0, temp:'31°', cond:'Có mây', hilo:'C:34° T:26°', feels:'35°', tempSize:80, hourN:6 }) },
+    ];
+    return { frames, skelN:[0,1,2,3,4,5] };
+  }
+}
+</script>
+</body>
+</html>

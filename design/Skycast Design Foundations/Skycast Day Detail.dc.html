@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0;background:#EDEDED;font-family:'Be Vietnam Pro',sans-serif}.ms{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1}@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}.shim{background-size:200% 100%;animation:shim 1.6s linear infinite}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block"></helmet>
+<div style="display:flex;gap:56px;padding:56px;flex-wrap:wrap;align-items:flex-start">
+<sc-for list="{{ frames }}" as="f" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+<span style="font-size:14px;font-weight:600;color:#334155">{{ f.label }}</span>
+<div style="width:{{ f.w }}px;height:{{ f.h }}px;border-radius:44px;overflow:{{ f.overflow }};box-shadow:0 0 0 8px #111;position:relative;background:{{ f.c.surface }};font-variant-numeric:tabular-nums">
+
+<div style="display:flex;align-items:center;gap:4px;padding:8px 8px 0">
+<span class="ms" style="font-size:24px;color:{{ f.c.onSurface }};width:44px;height:44px;display:flex;align-items:center;justify-content:center">arrow_back</span>
+<div style="display:flex;flex-direction:column">
+<span style="font-size:22px;line-height:28px;font-weight:600;color:{{ f.c.onSurface }}">{{ f.dateTitle }}</span>
+<span style="font-size:14px;line-height:20px;color:{{ f.c.textMuted }}">{{ f.city }}</span>
+</div>
+</div>
+
+<sc-if value="{{ f.errorMode }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:60px 28px">
+<span class="ms" style="font-size:64px;color:{{ f.c.textMuted }};font-variation-settings:'FILL' 0,'wght' 300,'opsz' 48">wifi_off</span>
+<div style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }};max-width:280px">Không có kết nối mạng. Kiểm tra Wi-Fi hoặc dữ liệu di động.</div>
+<button style="height:48px;padding:0 24px;border:none;border-radius:999px;background:{{ f.c.primary }};color:{{ f.c.onPrimary }};font:600 14px/20px 'Be Vietnam Pro'">Thử lại</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ f.body }}" hint-placeholder-val="{{ false }}">
+<div style="padding:8px 16px 40px;display:flex;flex-direction:column;gap:20px">
+
+<div style="display:flex;gap:8px;overflow:hidden">
+<sc-for list="{{ f.chips }}" as="ch" hint-placeholder-count="7">
+<div style="min-width:56px;flex:none;height:48px;padding:0 14px;border-radius:999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:{{ ch.bg }};color:{{ ch.fg }}">
+<span style="font-size:12px;line-height:16px;font-weight:500">{{ ch.wd }}</span><span style="font-size:14px;line-height:16px;font-weight:600">{{ ch.date }}</span>
+</div>
+</sc-for>
+</div>
+
+<sc-if value="{{ f.skeleton }}" hint-placeholder-val="{{ false }}">
+<div class="shim" style="height:120px;border-radius:20px;background:{{ f.shimBg }}"></div>
+<div class="shim" style="height:220px;border-radius:20px;background:{{ f.shimBg }}"></div>
+<div class="shim" style="height:180px;border-radius:20px;background:{{ f.shimBg }}"></div>
+</sc-if>
+
+<sc-if value="{{ f.hasData }}" hint-placeholder-val="{{ false }}">
+<div style="background:{{ f.c.surfaceContainer }};border-radius:20px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+<span class="ms" style="font-size:48px;color:{{ f.c.onSurface }}">{{ f.icon }}</span>
+<span style="font-size:16px;line-height:24px;font-weight:600;color:{{ f.c.onSurface }}">{{ f.cond }}</span>
+<span style="font-size:22px;line-height:28px;font-weight:600;color:{{ f.c.onSurface }}">{{ f.range }}</span>
+<span style="font-size:14px;line-height:20px;color:{{ f.c.textMuted }}">Khả năng mưa {{ f.rainChance }}%</span>
+</div>
+
+<div style="background:{{ f.c.surfaceContainer }};border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:16px;line-height:24px;font-weight:600;color:{{ f.c.onSurface }}">Nhiệt độ</span>
+<svg width="{{ f.chartW }}" height="170" viewBox="0 0 {{ f.chartW }} 170">
+<sc-for list="{{ f.gridYs }}" as="gy" hint-placeholder-count="3"><line x1="0" y1="{{ gy.y }}" x2="{{ f.chartW }}" y2="{{ gy.y }}" stroke="{{ f.c.outline }}" stroke-width="1"></line></sc-for>
+<defs><linearGradient id="{{ f.gradId }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="{{ f.c.primary }}" stop-opacity="0.35"></stop><stop offset="100%" stop-color="{{ f.c.primary }}" stop-opacity="0"></stop></linearGradient></defs>
+<path d="{{ f.areaPath }}" fill="url(#{{ f.gradId }})"></path>
+<path d="{{ f.linePath }}" fill="none" stroke="{{ f.c.primary }}" stroke-width="3" stroke-linecap="round"></path>
+<sc-for list="{{ f.tempLabels }}" as="tl" hint-placeholder-count="4"><text x="{{ tl.x }}" y="{{ tl.y }}" font-size="12" font-weight="600" fill="{{ f.c.onSurface }}" text-anchor="middle">{{ tl.text }}</text></sc-for>
+<sc-if value="{{ f.showNow }}" hint-placeholder-val="{{ false }}"><line x1="{{ f.nowX }}" y1="10" x2="{{ f.nowX }}" y2="150" stroke="{{ f.c.primary }}" stroke-width="1.5" stroke-dasharray="3 3"></line></sc-if>
+</svg>
+<div style="display:flex;justify-content:space-between;padding:0 2px">
+<sc-for list="{{ f.xLabels }}" as="xl" hint-placeholder-count="8"><span style="font-size:11px;color:{{ f.c.textMuted }}">{{ xl }}</span></sc-for>
+</div>
+</div>
+
+<div style="background:{{ f.c.surfaceContainer }};border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:16px;line-height:24px;font-weight:600;color:{{ f.c.onSurface }}">Khả năng mưa</span>
+<svg width="{{ f.chartW }}" height="120" viewBox="0 0 {{ f.chartW }} 120">
+<sc-for list="{{ f.bars }}" as="b" hint-placeholder-count="24">
+<rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="3" fill="{{ f.c.rainy }}"></rect>
+<sc-if value="{{ b.showLabel }}" hint-placeholder-val="{{ false }}"><text x="{{ b.tx }}" y="{{ b.ty }}" font-size="10" font-weight="600" fill="{{ f.c.onSurface }}" text-anchor="middle">{{ b.pct }}%</text></sc-if>
+</sc-for>
+</svg>
+<div style="display:flex;justify-content:space-between;padding:0 2px">
+<sc-for list="{{ f.xLabels }}" as="xl" hint-placeholder-count="8"><span style="font-size:11px;color:{{ f.c.textMuted }}">{{ xl }}</span></sc-for>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<sc-for list="{{ f.stats }}" as="st" hint-placeholder-count="4">
+<div style="background:{{ f.c.card }};border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:20px;color:{{ f.c.onSurface }}">{{ st.icon }}</span><span style="font-size:12px;line-height:16px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:{{ f.c.textMuted }}">{{ st.label }}</span></div>
+<span style="font-size:22px;line-height:28px;font-weight:600;color:{{ f.c.onSurface }}">{{ st.value }}</span>
+<span style="font-size:14px;line-height:20px;color:{{ f.c.textMuted }}">{{ st.caption }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LIGHT = { primary:'#2563EB', onPrimary:'#FFFFFF', surface:'#F8FAFC', onSurface:'#0F172A', surfaceContainer:'#FFFFFF', outline:'#E2E8F0', textMuted:'#64748B', card:'#F1F5F9', rainy:'#3B82F6' };
+const DARK = { primary:'#60A5FA', onPrimary:'#0B1220', surface:'#0F172A', onSurface:'#F1F5F9', surfaceContainer:'#1E293B', outline:'#334155', textMuted:'#94A3B8', card:'#1E293B', rainy:'#60A5FA' };
+
+function chart(chartW, temps, rains, todayHour) {
+  const H = 170, PAD = 14, xstep = chartW / 23;
+  const tmin = Math.min(...temps) - 1, tmax = Math.max(...temps) + 1, tspan = tmax - tmin;
+  const pts = temps.map((t,i) => ({ x: i*xstep, y: PAD + (1 - (t-tmin)/tspan) * (H-2*PAD) }));
+  let linePath = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i=1;i<pts.length;i++){ const p0=pts[i-1],p1=pts[i]; const cx=((p0.x+p1.x)/2).toFixed(1); linePath += ` Q ${cx} ${p0.y.toFixed(1)} ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}`; }
+  const areaPath = linePath + ` L ${pts[pts.length-1].x.toFixed(1)} ${H} L 0 ${H} Z`;
+  const tempLabels = [0,6,12,18,23].map(i => ({ x: pts[i].x, y: pts[i].y - 12, text: temps[i]+'°' }));
+  const gridYs = [0.25,0.5,0.75].map(f => ({ y: PAD + f*(H-2*PAD) }));
+  const bars = rains.map((r,i) => { const bw = xstep*0.55, bh = r/100*90, bx = i*xstep + (xstep-bw)/2, by = 110-bh;
+    return { x: bx.toFixed(1), y: by.toFixed(1), w: bw.toFixed(1), h: bh.toFixed(1), pct:r, showLabel: r>=30, tx:(bx+bw/2).toFixed(1), ty:(by-6).toFixed(1) }; });
+  return { linePath, areaPath, tempLabels, gridYs, bars, showNow: todayHour!=null, nowX: todayHour!=null ? (todayHour*xstep).toFixed(1) : 0 };
+}
+function chips(selIdx, c) {
+  return ['T5 25','T6 26','T7 27','CN 28','T2 29','T3 30','T4 01'].map((s,i) => { const [wd,date]=s.split(' '); const sel=i===selIdx;
+    return { wd, date, bg: sel ? c.primary : c.card, fg: sel ? c.onPrimary : c.onSurface }; });
+}
+function stats() { return [
+  { icon:'navigation', label:'Gió tối đa', value:'18 km/h', caption:'Hướng Đông Nam' },
+  { icon:'light_mode', label:'UV tối đa', value:'9', caption:'Rất cao' },
+  { icon:'wb_twilight', label:'Bình minh', value:'05:41', caption:'' },
+  { icon:'bedtime', label:'Hoàng hôn', value:'17:52', caption:'' },
+]; }
+
+class Component extends DCLogic {
+  renderVals() {
+    const xLabels8 = ['00','03','06','09','12','15','18','21'];
+    const xLabels4 = ['00','06','12','18'];
+    const temps24 = [24,23,23,22,22,23,25,27,29,30,30,29,28,27,27,26,26,25,25,24,24,23,23,24];
+    const rains24 = [10,10,15,20,25,35,45,60,70,80,75,60,45,30,20,15,10,10,5,5,5,10,10,10];
+    const chartW = 342;
+    const frames = [
+      { label:'1 · Today — Light (viewport)', w:390, h:844, overflow:'hidden', c:LIGHT, body:true, hasData:true,
+        dateTitle:'Thứ Sáu, 26/09', city:'Hà Nội', chips:chips(1,LIGHT), icon:'water_drop', cond:'Mưa rào', range:'25° – 30°', rainChance:80,
+        chartW, ...chart(chartW, temps24, rains24, 15), xLabels:xLabels8 },
+      { label:'1b · Today — full scroll', w:390, h:1180, overflow:'visible', c:LIGHT, body:true, hasData:true,
+        dateTitle:'Thứ Sáu, 26/09', city:'Hà Nội', chips:chips(1,LIGHT), icon:'water_drop', cond:'Mưa rào', range:'25° – 30°', rainChance:80,
+        chartW, ...chart(chartW, temps24, rains24, 15), xLabels:xLabels8 },
+      { label:'2 · Future day — Dark (no marker)', w:390, h:844, overflow:'hidden', c:DARK, body:true, hasData:true,
+        dateTitle:'Thứ Ba, 30/09', city:'Hà Nội', chips:chips(5,DARK), icon:'sunny', cond:'Trời quang', range:'25° – 32°', rainChance:0,
+        chartW, ...chart(chartW, [26,25,25,24,24,25,27,29,31,32,32,31,30,29,29,28,27,27,26,26,25,25,24,25], [0,0,0,0,0,0,0,5,5,10,10,5,0,0,0,0,0,0,0,0,0,0,0,0], null), xLabels:xLabels8 },
+      { label:'3 · Loading skeleton', w:390, h:844, overflow:'hidden', c:LIGHT, body:true, skeleton:true, shimBg:'linear-gradient(90deg,#F1F5F9,#E2E8F0,#F1F5F9)', chips:chips(1,LIGHT).map(c=>({...c,bg:'#F1F5F9',fg:'#F1F5F9'})), dateTitle:'Thứ Sáu, 26/09', city:'Hà Nội' },
+      { label:'4 · Error · network', w:390, h:844, overflow:'hidden', c:LIGHT, errorMode:true, dateTitle:'Thứ Sáu, 26/09', city:'Hà Nội' },
+      { label:'5 · iPhone SE 375×667', w:375, h:667, overflow:'hidden', c:LIGHT, body:true, hasData:true,
+        dateTitle:'Thứ Sáu, 26/09', city:'Hà Nội', chips:chips(1,LIGHT), icon:'water_drop', cond:'Mưa rào', range:'25° – 30°', rainChance:80,
+        chartW:327, ...chart(327, temps24, rains24, 15), xLabels:xLabels4 },
+    ];
+    frames.forEach(f => { f.gradId = 'g' + Math.random().toString(36).slice(2,8); f.stats = f.hasData ? stats() : []; });
+    return { frames };
+  }
+}
+</script>
+</body>
+</html>

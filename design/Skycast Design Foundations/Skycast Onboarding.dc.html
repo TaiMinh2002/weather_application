@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0;background:#EDEDED;font-family:'Be Vietnam Pro',sans-serif}@keyframes spin{to{transform:rotate(360deg)}}.spinner{animation:spin .8s linear infinite}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;display=block"></helmet>
+<div style="display:flex;gap:56px;padding:56px;flex-wrap:wrap;align-items:flex-start">
+<sc-for list="{{ frames }}" as="f" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+<span style="font-size:14px;font-weight:600;color:#334155">{{ f.label }}</span>
+<div style="width:{{ f.w }}px;height:{{ f.h }}px;border-radius:44px;overflow:hidden;box-shadow:0 0 0 8px #111;position:relative;background:{{ f.c.surface }};display:flex;flex-direction:column;box-sizing:border-box">
+
+<div style="height:{{ f.illoH }}px;flex:none;display:flex;align-items:center;justify-content:center">
+<div style="width:{{ f.illo }}px;height:{{ f.illo }}px;border-radius:50%;background:{{ f.c.primaryContainer }};position:relative;display:flex;align-items:center;justify-content:center">
+<div style="width:{{ f.pin }}px;height:{{ f.pin }}px;border-radius:50% 50% 50% 0;background:{{ f.c.primary }};transform:rotate(-45deg);position:relative;display:flex;align-items:center;justify-content:center">
+<div style="width:{{ f.pinHole }}px;height:{{ f.pinHole }}px;border-radius:50%;background:{{ f.c.primaryContainer }};transform:rotate(45deg)"></div>
+</div>
+<div style="position:absolute;top:{{ f.sunTop }}px;right:{{ f.sunRight }}px;width:{{ f.sun }}px;height:{{ f.sun }}px;border-radius:50%;background:{{ f.c.sunny }}"></div>
+<div style="position:absolute;bottom:{{ f.cloudBot }}px;left:{{ f.cloudLeft }}px;width:{{ f.cloud }}px;height:{{ f.cloudH }}px;border-radius:999px;background:{{ f.c.rainy }}"></div>
+</div>
+</div>
+
+<div style="padding:0 32px;display:flex;flex-direction:column;align-items:center;gap:12px">
+<div style="font-size:22px;line-height:28px;font-weight:600;color:{{ f.c.onSurface }};text-align:center">{{ f.title }}</div>
+<div style="font-size:16px;line-height:24px;font-weight:400;color:{{ f.c.textMuted }};text-align:center;max-width:320px">{{ f.body }}</div>
+</div>
+
+<div style="margin-top:auto;padding:0 16px 34px;display:flex;flex-direction:column;gap:8px">
+<button style="height:48px;border:none;border-radius:999px;background:{{ f.c.primary }};color:{{ f.c.onPrimary }};font:600 14px/20px 'Be Vietnam Pro';display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer">
+<sc-if value="{{ f.loading }}" hint-placeholder-val="{{ false }}"><span class="spinner" style="width:16px;height:16px;border-radius:50%;border:2px solid {{ f.c.onPrimary }};border-top-color:transparent;display:inline-block"></span></sc-if>
+<span>{{ f.cta }}</span>
+</button>
+<button style="height:48px;border:none;background:transparent;color:{{ f.c.primary }};font:600 14px/20px 'Be Vietnam Pro';cursor:pointer">{{ f.secondary }}</button>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LIGHT = { primary:'#2563EB', onPrimary:'#FFFFFF', primaryContainer:'#DBEAFE', surface:'#F8FAFC', onSurface:'#0F172A', textMuted:'#64748B', sunny:'#F59E0B', rainy:'#3B82F6' };
+const DARK = { primary:'#60A5FA', onPrimary:'#0B1220', primaryContainer:'#1E3A8A', surface:'#0F172A', onSurface:'#F1F5F9', textMuted:'#94A3B8', sunny:'#FBBF24', rainy:'#60A5FA' };
+const VI = { title:'Thời tiết ngay nơi bạn đứng', body:'Skycast dùng vị trí để hiện thời tiết chính xác nơi bạn ở. Vị trí chỉ dùng trên máy, không gửi đi đâu khác.', cta:'Cho phép vị trí', secondary:'Chọn thành phố thủ công' };
+const EN = { title:'Weather right where you are', body:'Skycast uses your location to show accurate local weather. It stays on your device.', cta:'Allow location', secondary:'Choose a city instead' };
+
+class Component extends DCLogic {
+  illo(size) {
+    const pin = size * 0.46, pinHole = pin * 0.33, sun = size * 0.2, cloud = size * 0.28, cloudH = cloud * 0.6;
+    return { illo: size, pin, pinHole, sun, cloud, cloudH, sunTop: size*0.06, sunRight: size*0.02, cloudBot: size*0.1, cloudLeft: -cloud*0.15 };
+  }
+  renderVals() {
+    const base = { w:390, h:844, illoH: Math.round(844*0.55) };
+    const se = { w:375, h:667, illoH: Math.round(667*0.55) };
+    const frames = [
+      { label:'Light · vi', ...base, c:LIGHT, ...VI, ...this.illo(240), loading:false },
+      { label:'Dark · vi', ...base, c:DARK, ...VI, ...this.illo(240), loading:false },
+      { label:'Loading (permission dialog open)', ...base, c:LIGHT, ...VI, ...this.illo(240), loading:true },
+      { label:'iPhone SE · 375×667', ...se, c:LIGHT, ...VI, ...this.illo(190), loading:false },
+      { label:'English locale', ...base, c:LIGHT, ...EN, ...this.illo(240), loading:false },
+    ];
+    return { frames };
+  }
+}
+</script>
+</body>
+</html>

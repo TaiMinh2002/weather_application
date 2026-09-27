@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0;background:#EDEDED;font-family:'Be Vietnam Pro',sans-serif}.ms{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1}@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}.shim{background-size:200% 100%;animation:shim 1.6s linear infinite}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block"></helmet>
+<div style="display:flex;gap:56px;padding:56px;flex-wrap:wrap;align-items:flex-start">
+<sc-for list="{{ frames }}" as="f" hint-placeholder-count="8">
+<div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+<span style="font-size:14px;font-weight:600;color:#334155">{{ f.label }}</span>
+<div style="width:390px;height:844px;border-radius:44px;overflow:hidden;box-shadow:0 0 0 8px #111;position:relative;background:{{ f.c.surface }};font-variant-numeric:tabular-nums;display:flex;flex-direction:column">
+
+<div style="display:flex;align-items:center;gap:4px;padding:8px 8px 0;flex:none">
+<span class="ms" style="font-size:24px;color:{{ f.c.onSurface }};width:44px;height:44px;display:flex;align-items:center;justify-content:center">arrow_back</span>
+<span style="font-size:22px;line-height:28px;font-weight:600;color:{{ f.c.onSurface }}">Thành phố</span>
+</div>
+
+<div style="padding:12px 16px;flex:none">
+<div style="height:48px;border-radius:999px;background:{{ f.c.surfaceContainer }};border:1px solid {{ f.c.outline }};display:flex;align-items:center;gap:10px;padding:0 8px 0 16px">
+<span class="ms" style="font-size:20px;color:{{ f.c.textMuted }}">search</span>
+<sc-if value="{{ f.query }}" hint-placeholder-val="{{ false }}"><span style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }};flex:1">{{ f.query }}</span><span class="ms" style="font-size:20px;color:{{ f.c.textMuted }};width:32px;height:32px;display:flex;align-items:center;justify-content:center">close</span></sc-if>
+<sc-if value="{{ f.emptyQuery }}" hint-placeholder-val="{{ false }}"><span style="font-size:16px;line-height:24px;color:{{ f.c.textMuted }};flex:1">Tìm thành phố…</span></sc-if>
+</div>
+</div>
+
+<div style="flex:1;overflow:hidden;padding:0 16px 16px;display:flex;flex-direction:column;gap:8px">
+
+<sc-if value="{{ f.savedMode }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:{{ f.c.card }}">
+<span class="ms" style="font-size:20px;color:{{ f.c.primary }}">my_location</span>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }}">Vị trí hiện tại</span><span style="font-size:14px;line-height:20px;color:{{ f.c.textMuted }}">Hà Nội</span></div>
+<span style="font-size:22px;line-height:28px;font-weight:600;color:{{ f.c.onSurface }}">31°</span>
+</div>
+<sc-for list="{{ f.cities }}" as="ct" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 8px 12px 16px;border-radius:12px;background:{{ ct.bg }};transform:{{ ct.transform }};box-shadow:{{ ct.shadow }};opacity:{{ ct.opacity }}">
+<sc-if value="{{ ct.deleting }}" hint-placeholder-val="{{ false }}"><span class="ms" style="font-size:20px;color:{{ f.c.onError }};position:absolute;right:24px">delete</span></sc-if>
+<span class="ms" style="font-size:20px;color:{{ f.c.textMuted }}">drag_handle</span>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:16px;line-height:24px;color:{{ ct.fg }}">{{ ct.name }}</span><span style="font-size:14px;line-height:20px;color:{{ ct.subFg }}">{{ ct.sub }}</span></div>
+<sc-if value="{{ ct.showTemp }}" hint-placeholder-val="{{ false }}"><span style="font-size:22px;line-height:28px;font-weight:600;color:{{ ct.fg }}">{{ ct.temp }}</span></sc-if>
+<sc-if value="{{ ct.tempLoading }}" hint-placeholder-val="{{ false }}"><div class="shim" style="width:34px;height:22px;border-radius:6px;background:{{ f.shimBg }}"></div></sc-if>
+</div>
+<sc-if value="{{ ct.ghost }}" hint-placeholder-val="{{ false }}"><div style="height:60px;border-radius:12px;border:2px dashed {{ f.c.outline }}"></div></sc-if>
+</sc-for>
+<sc-if value="{{ f.footnote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;line-height:16px;font-weight:500;color:{{ f.c.textMuted }};padding:8px 4px">Giữ và kéo để sắp xếp · Vuốt sang trái để xóa</span></sc-if>
+</sc-if>
+
+<sc-if value="{{ f.searchLoading }}" hint-placeholder-val="{{ false }}">
+<sc-for list="{{ n4 }}" as="_" hint-placeholder-count="4"><div class="shim" style="height:56px;border-radius:12px;background:{{ f.shimBg }}"></div></sc-for>
+</sc-if>
+
+<sc-if value="{{ f.searchResults }}" hint-placeholder-val="{{ false }}">
+<sc-for list="{{ f.results }}" as="r" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:48px">
+<div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }}">{{ r.name }}</span><span style="font-size:14px;line-height:20px;color:{{ f.c.textMuted }}">{{ r.sub }}</span></div>
+<sc-if value="{{ r.saved }}" hint-placeholder-val="{{ false }}"><span class="ms" style="font-size:20px;color:{{ f.c.primary }}">check</span></sc-if>
+</div>
+</sc-for>
+</sc-if>
+
+<sc-if value="{{ f.searchEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:60px 24px">
+<span class="ms" style="font-size:64px;color:{{ f.c.textMuted }};font-variation-settings:'FILL' 0,'wght' 300,'opsz' 48">search_off</span>
+<span style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }}">Không tìm thấy "xyz"</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ f.searchError }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:60px 24px">
+<span class="ms" style="font-size:64px;color:{{ f.c.textMuted }};font-variation-settings:'FILL' 0,'wght' 300,'opsz' 48">wifi_off</span>
+<span style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }};max-width:260px">Không có kết nối mạng. Kiểm tra Wi-Fi hoặc dữ liệu di động.</span>
+<button style="margin-top:6px;height:48px;padding:0 24px;border:none;border-radius:999px;background:{{ f.c.primary }};color:{{ f.c.onPrimary }};font:600 14px/20px 'Be Vietnam Pro'">Thử lại</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ f.savedEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:60px 24px">
+<span class="ms" style="font-size:64px;color:{{ f.c.textMuted }};font-variation-settings:'FILL' 0,'wght' 300,'opsz' 48">location_city</span>
+<span style="font-size:16px;line-height:24px;color:{{ f.c.onSurface }}">Chưa lưu thành phố nào</span>
+<span style="font-size:14px;line-height:20px;color:{{ f.c.textMuted }};max-width:260px">Dùng ô tìm kiếm ở trên để thêm thành phố</span>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ f.snackbar }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:16px;right:16px;bottom:24px;display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:12px;background:{{ f.c.surfaceContainer }};border:1px solid {{ f.c.outline }};box-shadow:0 4px 16px rgba(15,23,42,.15)">
+<span style="font-size:14px;line-height:20px;color:{{ f.c.onSurface }};flex:1">Đã xóa Đà Nẵng</span>
+<span style="font-size:14px;line-height:20px;font-weight:600;color:{{ f.c.primary }}">Hoàn tác</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ f.keyboard }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:0;right:0;bottom:0;height:230px;background:{{ f.c.surfaceContainer }};border-top:1px solid {{ f.c.outline }};display:flex;align-items:center;justify-content:center">
+<span style="font-size:12px;color:{{ f.c.textMuted }}">⌨ bàn phím</span>
+</div>
+</sc-if>
+
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LIGHT = { primary:'#2563EB', onPrimary:'#FFFFFF', surface:'#F8FAFC', onSurface:'#0F172A', surfaceContainer:'#FFFFFF', outline:'#E2E8F0', error:'#DC2626', onError:'#FFFFFF', textMuted:'#64748B', card:'#F1F5F9' };
+const DARK = { primary:'#60A5FA', onPrimary:'#0B1220', surface:'#0F172A', onSurface:'#F1F5F9', surfaceContainer:'#1E293B', outline:'#334155', error:'#F87171', onError:'#0B1220', textMuted:'#94A3B8', card:'#1E293B' };
+const SHIM_L = 'linear-gradient(90deg,#F1F5F9,#E2E8F0,#F1F5F9)', SHIM_D = 'linear-gradient(90deg,#1E293B,#334155,#1E293B)';
+
+function savedCities(c, opts={}) {
+  const list = [['Đà Nẵng','Việt Nam','29°'],['TP. Hồ Chí Minh','Việt Nam','33°'],['Huế','Việt Nam','27°'],['Đà Lạt','Việt Nam','19°']];
+  return list.map(([name,sub,temp],i) => {
+    const dragging = opts.dragIdx === i, deleting = opts.deleteIdx === i, loading = opts.loadingIdx === i;
+    return { name, sub, showTemp: !deleting && !loading, tempLoading: loading, temp,
+      bg: deleting ? c.error : dragging ? c.surfaceContainer : c.card,
+      fg: deleting ? c.onError : c.onSurface, subFg: deleting ? c.onError : c.textMuted,
+      transform: dragging ? 'scale(1.03) translateY(-2px)' : deleting ? 'translateX(-40%)' : 'none',
+      shadow: dragging ? '0 8px 20px rgba(15,23,42,.25)' : 'none', opacity: 1, deleting, ghost: opts.ghostAfter === i };
+  });
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const frames = [
+      { label:'1 · Saved list — Light', c:LIGHT, savedMode:true, emptyQuery:true, footnote:true, cities: savedCities(LIGHT), shimBg:SHIM_L },
+      { label:'2 · Saved list — Dark (row lifted mid-drag)', c:DARK, savedMode:true, emptyQuery:true, footnote:true, cities: savedCities(DARK, { dragIdx:1, ghostAfter:1 }), shimBg:SHIM_D },
+      { label:'3 · Swiped to delete + snackbar', c:LIGHT, savedMode:true, emptyQuery:true, footnote:true, cities: savedCities(LIGHT, { deleteIdx:0 }), snackbar:true, shimBg:SHIM_L },
+      { label:'4 · Typing "hu"', c:LIGHT, query:'hu', keyboard:true, searchResults:true, shimBg:SHIM_L,
+        results:[ { name:'Huế', sub:'Thừa Thiên Huế, Việt Nam', saved:true }, { name:'Hưng Yên', sub:'Hưng Yên, Việt Nam', saved:false }, { name:'Hue', sub:'Wisconsin, United States', saved:false } ] },
+      { label:'5 · Search loading', c:LIGHT, query:'nha', searchLoading:true, keyboard:true, shimBg:SHIM_L },
+      { label:'6 · Search empty', c:LIGHT, query:'xyz', searchEmpty:true, keyboard:true, shimBg:SHIM_L },
+      { label:'7 · Search error', c:DARK, query:'da nang', searchError:true, keyboard:true, shimBg:SHIM_D },
+      { label:'8 · Saved list empty (GPS denied)', c:LIGHT, savedEmpty:true, emptyQuery:true, shimBg:SHIM_L },
+    ];
+    return { frames, n4:[0,1,2,3] };
+  }
+}
+</script>
+</body>
+</html>
