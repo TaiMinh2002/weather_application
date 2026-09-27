@@ -14,10 +14,18 @@ class AppLoading extends StatelessWidget {
 }
 
 class AppErrorView extends StatelessWidget {
-  const AppErrorView({super.key, required this.error, this.onRetry});
+  const AppErrorView({
+    super.key,
+    required this.error,
+    this.onRetry,
+    this.extraAction,
+  });
 
   final Object error;
   final VoidCallback? onRetry;
+
+  /// Shown after the built-in buttons, e.g. "Choose a city" on Home.
+  final Widget? extraAction;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +70,7 @@ class AppErrorView extends StatelessWidget {
               onPressed: openSettings,
               child: Text(l10n.openSettings),
             ),
+          ?extraAction,
         ],
       ),
     );
@@ -73,12 +82,16 @@ class EmptyView extends StatelessWidget {
     super.key,
     this.message,
     this.icon = Symbols.inbox_rounded,
+    this.hint,
     this.actionLabel,
     this.onAction,
   });
 
   final String? message;
   final IconData icon;
+
+  /// Secondary line under [message], in textMuted.
+  final String? hint;
   final String? actionLabel;
   final VoidCallback? onAction;
 
@@ -86,6 +99,7 @@ class EmptyView extends StatelessWidget {
   Widget build(BuildContext context) => _MessageView(
     icon: icon,
     message: message ?? context.l10n.emptyDefault,
+    hint: hint,
     action: actionLabel == null
         ? null
         : FilledButton(onPressed: onAction, child: Text(actionLabel!)),
@@ -93,10 +107,16 @@ class EmptyView extends StatelessWidget {
 }
 
 class _MessageView extends StatelessWidget {
-  const _MessageView({required this.icon, required this.message, this.action});
+  const _MessageView({
+    required this.icon,
+    required this.message,
+    this.hint,
+    this.action,
+  });
 
   final IconData icon;
   final String message;
+  final String? hint;
   final Widget? action;
 
   @override
@@ -113,6 +133,16 @@ class _MessageView extends StatelessWidget {
             textAlign: TextAlign.center,
             style: context.textTheme.bodyLarge,
           ),
+          if (hint != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              hint!,
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.textMuted,
+              ),
+            ),
+          ],
           if (action != null) ...[const SizedBox(height: 20), action!],
         ],
       ),

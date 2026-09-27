@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/context_ext.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/weather_code_mapper.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../../../cities/presentation/providers/cities_provider.dart';
 import '../../../location/domain/entities/place.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../domain/entities/weather.dart';
@@ -16,46 +19,94 @@ import '../providers/weather_provider.dart';
 import '../widgets/forecast_cards.dart';
 
 // ponytail: units fixed to °C, km/h, hPa, km until Settings (plan.md day 10).
-class HomeScreen extends StatelessWidget {
+/// Page 0 is the GPS location, then one page per saved city.
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
-  // ponytail: GPS page only; saved-city pages join the PageView on day 9.
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: PageView(children: const [_GpsPage(pageIndex: 0, pageCount: 1)]),
-  );
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _GpsPage extends ConsumerWidget {
-  const _GpsPage({required this.pageIndex, required this.pageCount});
-
-  final int pageIndex;
-  final int pageCount;
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final _pages = PageController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final topBar = _TopBar(pageIndex: pageIndex, pageCount: pageCount);
-    return ref
-        .watch(currentPlaceProvider)
-        .when(
-          data: (place) => _PlaceWeather(place: place, topBar: topBar),
-          loading: () => _WeatherSkeleton(topBar: topBar),
-          error: (e, _) => _SurfacePage(
-            topBar: topBar,
-            child: AppErrorView(
-              error: e,
-              onRetry: () => ref.invalidate(currentPlaceProvider),
+  void dispose() {
+    _pages.dispose();
+    super.dispose();
+  }
+
+  /// Cities returns the page to show: 0 for GPS, i + 1 for saved city i.
+  Future<void> _openCities() async {
+    final page = await context.push<int>(Routes.cities);
+    if (page == null) return;
+    // The saved list may have just grown; jump once the new page is built.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_pages.hasClients) _pages.jumpToPage(page);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cities = ref.watch(savedCitiesProvider);
+    final count = cities.length + 1;
+    Widget topBar(int page) =>
+        _TopBar(pageIndex: page, pageCount: count, onCities: _openCities);
+    return Scaffold(
+      body: PageView(
+        controller: _pages,
+        children: [
+          _GpsPage(topBar: topBar(0), onChooseCity: _openCities),
+          for (final (i, city) in cities.indexed)
+            _PlaceWeather(
+              key: ValueKey(city.id),
+              place: city.place,
+              topBar: topBar(i + 1),
             ),
-          ),
-        );
+        ],
+      ),
+    );
   }
 }
 
+class _GpsPage extends ConsumerWidget {
+  const _GpsPage({required this.topBar, required this.onChooseCity});
+
+  final Widget topBar;
+  final VoidCallback onChooseCity;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(currentPlaceProvider)
+      .when(
+        data: (place) =>
+            _PlaceWeather(place: place, topBar: topBar, isGps: true),
+        loading: () => _WeatherSkeleton(topBar: topBar),
+        error: (e, _) => _SurfacePage(
+          topBar: topBar,
+          child: AppErrorView(
+            error: e,
+            onRetry: () => ref.invalidate(currentPlaceProvider),
+            extraAction: TextButton(
+              onPressed: onChooseCity,
+              child: Text(context.l10n.chooseCity),
+            ),
+          ),
+        ),
+      );
+}
+
 class _PlaceWeather extends ConsumerWidget {
-  const _PlaceWeather({required this.place, required this.topBar});
+  const _PlaceWeather({
+    super.key,
+    required this.place,
+    required this.topBar,
+    this.isGps = false,
+  });
 
   final Place place;
   final Widget topBar;
+  final bool isGps;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -77,6 +128,7 @@ class _PlaceWeather extends ConsumerWidget {
                 elevation: 0,
                 child: _WeatherBody(
                   name: place.name ?? context.l10n.currentLocation,
+                  showPin: isGps,
                   weather: weather,
                 ),
               ),
@@ -161,22 +213,28 @@ class _SurfacePage extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.pageIndex, required this.pageCount});
+  const _TopBar({
+    required this.pageIndex,
+    required this.pageCount,
+    required this.onCities,
+  });
 
   final int pageIndex;
   final int pageCount;
+  final VoidCallback onCities;
 
   @override
   Widget build(BuildContext context) {
     final color = IconTheme.of(context).color ?? context.colorScheme.onSurface;
     final disabled = color.withValues(alpha: 0.38);
-    // ponytail: no-op buttons until /cities (day 8) and /settings (day 10).
+    // ponytail: settings button is a no-op until /settings (day 10).
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
           IconButton(
-            onPressed: null,
+            onPressed: onCities,
+            color: color,
             tooltip: context.l10n.cities,
             disabledColor: disabled,
             icon: const Icon(Symbols.list_rounded),
@@ -290,9 +348,14 @@ Weather _placeholderWeather() {
 }
 
 class _WeatherBody extends StatelessWidget {
-  const _WeatherBody({required this.name, required this.weather});
+  const _WeatherBody({
+    required this.name,
+    required this.weather,
+    this.showPin = true,
+  });
 
   final String name;
+  final bool showPin;
   final Weather weather;
 
   @override
@@ -309,7 +372,7 @@ class _WeatherBody extends StatelessWidget {
         _OfflineBanner(cachedAt: cachedAt),
         const SizedBox(height: 20),
       ],
-      _Header(name: name, weather: weather),
+      _Header(name: name, weather: weather, showPin: showPin),
       const SizedBox(height: 20),
       HourlyCard(hours: weather.next24Hours),
       const SizedBox(height: 20),
@@ -358,9 +421,14 @@ class _OfflineBanner extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.name, required this.weather});
+  const _Header({
+    required this.name,
+    required this.weather,
+    required this.showPin,
+  });
 
   final String name;
+  final bool showPin;
   final Weather weather;
 
   @override
@@ -379,7 +447,7 @@ class _Header extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 4,
           children: [
-            const Icon(Symbols.location_on_rounded, size: 20),
+            if (showPin) const Icon(Symbols.location_on_rounded, size: 20),
             Flexible(
               child: Text(
                 name,

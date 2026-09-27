@@ -243,7 +243,11 @@ abstract final class AppTheme {
         hintStyle: TextStyle(color: colors.textMuted),
         prefixIconColor: colors.textMuted,
         suffixIconColor: colors.textMuted,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(999),
           borderSide: BorderSide(color: scheme.outline),

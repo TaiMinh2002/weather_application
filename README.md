@@ -39,7 +39,7 @@ UI ──ref.watch──> Provider ──> Repository ──┬──> RemoteDat
 ```
 lib/
 ├── core/        # network, error, router, theme, storage, utils, widgets dùng chung
-├── features/    # weather, location, city_search, saved_cities, settings, onboarding
+├── features/    # weather, location, cities, settings, onboarding
 └── l10n/        # app_vi.arb, app_en.arb
 ```
 

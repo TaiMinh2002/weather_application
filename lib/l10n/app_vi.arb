@@ -45,5 +45,15 @@
   "pressure": "Áp suất",
   "visibility": "Tầm nhìn",
   "sunriseSunset": "Bình minh · Hoàng hôn",
-  "offlineUpdatedAt": "Đang offline · cập nhật lúc {time}"
+  "offlineUpdatedAt": "Đang offline · cập nhật lúc {time}",
+  "searchCityHint": "Tìm thành phố…",
+  "clearSearch": "Xóa",
+  "savedCitiesHint": "Giữ và kéo để sắp xếp · Vuốt sang trái để xóa",
+  "savedCitiesEmpty": "Chưa lưu thành phố nào",
+  "savedCitiesEmptyHint": "Dùng ô tìm kiếm ở trên để thêm thành phố",
+  "searchNoResults": "Không tìm thấy \"{query}\"",
+  "cityDeleted": "Đã xóa {name}",
+  "undo": "Hoàn tác",
+  "delete": "Xóa",
+  "chooseCity": "Chọn thành phố"
 }

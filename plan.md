@@ -210,8 +210,7 @@ lib/
 │   │       ├── screens/          # home_screen.dart, day_detail_screen.dart
 │   │       └── widgets/          # chỉ tạo khi widget được dùng lại ở nhiều màn (rule.md mục 1)
 │   ├── location/                 # lấy GPS, xử lý quyền, reverse geocoding
-│   ├── city_search/              # tìm kiếm thành phố
-│   ├── saved_cities/             # quản lý thành phố
+│   ├── cities/                   # tìm kiếm + lưu/sắp xếp/xóa thành phố (một màn nên gộp một feature)
 │   ├── settings/                 # cài đặt
 │   └── onboarding/
 └── l10n/                         # app_vi.arb, app_en.arb

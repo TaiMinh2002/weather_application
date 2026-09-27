@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_application/core/error/errors.dart';
+import 'package:weather_application/core/storage/prefs.dart';
 import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/features/location/domain/entities/place.dart';
 import 'package:weather_application/features/location/presentation/providers/location_provider.dart';
@@ -14,17 +16,24 @@ import '../data/weather_fixture.dart';
 
 const _place = Place(lat: 21.03, lon: 105.85, name: 'Hà Nội');
 
-Widget _app(List overrides) => ProviderScope(
-  retry: noAutoRetry,
-  overrides: [...overrides],
-  child: MaterialApp(
-    theme: AppTheme.light,
-    locale: const Locale('vi'),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: const HomeScreen(),
-  ),
-);
+Future<Widget> _app(List overrides) async {
+  SharedPreferences.setMockInitialValues({});
+  final prefs = await SharedPreferences.getInstance();
+  return ProviderScope(
+    retry: noAutoRetry,
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      ...overrides,
+    ],
+    child: MaterialApp(
+      theme: AppTheme.light,
+      locale: const Locale('vi'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const HomeScreen(),
+    ),
+  );
+}
 
 void main() {
   testWidgets('shows current weather, hourly and daily sections', (
@@ -32,7 +41,7 @@ void main() {
   ) async {
     final weather = WeatherDto.fromJson(weatherJson()).toEntity();
     await tester.pumpWidget(
-      _app([
+      await _app([
         currentPlaceProvider.overrideWith((ref) async => _place),
         weatherProvider(
           _place.lat,
@@ -55,7 +64,7 @@ void main() {
     final weather = WeatherDto.fromJson(weatherJson())
         .toEntity(cachedAt: DateTime.now().copyWith(hour: 8, minute: 15));
     await tester.pumpWidget(
-      _app([
+      await _app([
         currentPlaceProvider.overrideWith((ref) async => _place),
         weatherProvider(
           _place.lat,
@@ -73,7 +82,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      _app([
+      await _app([
         currentPlaceProvider.overrideWith(
           (ref) async => throw const LocationFailure(LocationError.denied),
         ),
