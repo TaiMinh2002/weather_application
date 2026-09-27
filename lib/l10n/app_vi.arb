@@ -66,5 +66,11 @@
   "themeSystem": "Hệ thống",
   "language": "Ngôn ngữ",
   "about": "Giới thiệu",
-  "weatherData": "Dữ liệu thời tiết"
+  "weatherData": "Dữ liệu thời tiết",
+  "rainChanceTitle": "Khả năng mưa",
+  "rainChance": "Khả năng mưa {value}",
+  "maxWind": "Gió tối đa",
+  "maxUv": "UV tối đa",
+  "sunrise": "Bình minh",
+  "sunset": "Hoàng hôn"
 }

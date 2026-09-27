@@ -59,6 +59,8 @@ abstract class WeatherDto with _$WeatherDto {
           uvIndexMax: daily.uvIndexMax[i] ?? 0,
           precipitationProbabilityMax:
               daily.precipitationProbabilityMax[i] ?? 0,
+          windSpeedMax: daily.windSpeedMax[i] ?? 0,
+          windDirectionDominant: daily.windDirectionDominant[i] ?? 0,
         ),
     ],
   );
@@ -112,6 +114,9 @@ abstract class DailyDto with _$DailyDto {
     @JsonKey(name: 'uv_index_max') required List<double?> uvIndexMax,
     @JsonKey(name: 'precipitation_probability_max')
     required List<int?> precipitationProbabilityMax,
+    @JsonKey(name: 'wind_speed_10m_max') required List<double?> windSpeedMax,
+    @JsonKey(name: 'wind_direction_10m_dominant')
+    required List<int?> windDirectionDominant,
   }) = _DailyDto;
 
   factory DailyDto.fromJson(Map<String, dynamic> json) =>

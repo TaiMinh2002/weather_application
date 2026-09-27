@@ -28,6 +28,15 @@ class Weather {
     );
     return hourly.where((h) => !h.time.isBefore(from)).take(24).toList();
   }
+
+  /// The hours (local to the location) that fall on [day]'s date.
+  List<HourlyForecast> hoursOn(DateTime day) => [
+    for (final h in hourly)
+      if (h.time.year == day.year &&
+          h.time.month == day.month &&
+          h.time.day == day.day)
+        h,
+  ];
 }
 
 class CurrentWeather {
@@ -121,6 +130,8 @@ class DailyForecast {
     required this.sunset,
     required this.uvIndexMax,
     required this.precipitationProbabilityMax,
+    required this.windSpeedMax,
+    required this.windDirectionDominant,
   });
 
   final DateTime date;
@@ -131,4 +142,9 @@ class DailyForecast {
   final DateTime sunset;
   final double uvIndexMax;
   final int precipitationProbabilityMax;
+  final double windSpeedMax;
+  final int windDirectionDominant;
+
+  UvLevel get uvLevel => UvLevel.fromIndex(uvIndexMax);
+  CompassPoint get windFrom => CompassPoint.fromDegrees(windDirectionDominant);
 }

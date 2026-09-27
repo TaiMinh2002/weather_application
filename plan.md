@@ -113,7 +113,7 @@ Splash (native) ──(chưa onboard)──> Onboarding ──> Home
 | Tên địa điểm từ tọa độ | **geocoding** (dịch vụ có sẵn trên máy, free) hoặc Nominatim API | Hiện "Hà Nội" thay vì tọa độ |
 | Lưu trữ local | **shared_preferences** (cài đặt + cache thời tiết dạng JSON) | Đã có sẵn, đủ cho vài địa điểm. Chuyển sang Hive/file khi số thành phố lưu tăng nhiều |
 | Kiểm tra mạng | ~~connectivity_plus~~ không dùng | `NetworkException` từ Dio đã cho biết mất mạng; banner "Đang offline" hiện khi dữ liệu lấy từ cache |
-| Biểu đồ | **fl_chart** | Miễn phí, tùy biến tốt |
+| Biểu đồ | ~~fl_chart~~ `CustomPainter` | Design chỉ có 1 đường nhiệt độ + cột % mưa, không tương tác; tự vẽ ~150 dòng, khớp design, không thêm package |
 | Animation | **flutter_animate**, **lottie** | Nền động, icon động (file Lottie free trên LottieFiles) |
 | Skeleton | **skeletonizer** | Loading đẹp, ít code |
 | Đa ngôn ngữ | `flutter_localizations` + `intl` (file `.arb`) | Cách chính thức của Flutter |

@@ -98,9 +98,12 @@ class HourlyCard extends ConsumerWidget {
 }
 
 class DailyCard extends ConsumerWidget {
-  const DailyCard({super.key, required this.days});
+  const DailyCard({super.key, required this.days, this.onDayTap});
 
   final List<DailyForecast> days;
+
+  /// Opens Day Detail; null (e.g. in the skeleton) leaves rows inert.
+  final ValueChanged<int>? onDayTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -111,7 +114,6 @@ class DailyCard extends ConsumerWidget {
     final weekMin = days.map((d) => d.tempMin).fold(double.infinity, _min);
     final weekMax = days.map((d) => d.tempMax).fold(-double.infinity, _max);
     final muted = colors.onWeather.withValues(alpha: 0.7);
-    // ponytail: rows open Day Detail once that screen lands (day 11).
     return _GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -123,63 +125,70 @@ class DailyCard extends ConsumerWidget {
           ),
           for (final (i, d) in days.indexed) ...[
             Divider(color: colors.glass, height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-              child: Row(
-                spacing: 10,
-                children: [
-                  SizedBox(
-                    width: 64,
-                    child: Text(
-                      i == 0
-                          ? l10n.today
-                          : l10n.weekdayShort('${d.date.weekday}'),
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: i == 0 ? FontWeight.w600 : null,
+            InkWell(
+              onTap: onDayTap == null ? null : () => onDayTap!(i),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 4,
+                ),
+                child: Row(
+                  spacing: 10,
+                  children: [
+                    SizedBox(
+                      width: 64,
+                      child: Text(
+                        i == 0
+                            ? l10n.today
+                            : l10n.weekdayShort('${d.date.weekday}'),
+                        style: text.bodyMedium?.copyWith(
+                          fontWeight: i == 0 ? FontWeight.w600 : null,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(d.condition.icon(), size: 22),
-                  SizedBox(
-                    width: 32,
-                    child: Text(
-                      d.precipitationProbabilityMax > 0
-                          ? '${d.precipitationProbabilityMax}%'
-                          : '',
-                      textAlign: TextAlign.right,
-                      style: text.labelMedium?.copyWith(
-                        fontSize: 11,
-                        color: colors.rainy,
+                    Icon(d.condition.icon(), size: 22),
+                    SizedBox(
+                      width: 32,
+                      child: Text(
+                        d.precipitationProbabilityMax > 0
+                            ? '${d.precipitationProbabilityMax}%'
+                            : '',
+                        textAlign: TextAlign.right,
+                        style: text.labelMedium?.copyWith(
+                          fontSize: 11,
+                          color: colors.rainy,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 34,
-                    child: Text(
-                      units.formatTemp(d.tempMin),
-                      textAlign: TextAlign.right,
-                      style: text.bodyMedium?.copyWith(color: muted),
+                    SizedBox(
+                      width: 34,
+                      child: Text(
+                        units.formatTemp(d.tempMin),
+                        textAlign: TextAlign.right,
+                        style: text.bodyMedium?.copyWith(color: muted),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: _RangeBar(
-                      start: _fraction(d.tempMin, weekMin, weekMax),
-                      end: _fraction(d.tempMax, weekMin, weekMax),
+                    Expanded(
+                      child: _RangeBar(
+                        start: _fraction(d.tempMin, weekMin, weekMax),
+                        end: _fraction(d.tempMax, weekMin, weekMax),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 34,
-                    child: Text(
-                      units.formatTemp(d.tempMax),
-                      style: text.bodyMedium,
+                    SizedBox(
+                      width: 34,
+                      child: Text(
+                        units.formatTemp(d.tempMax),
+                        style: text.bodyMedium,
+                      ),
                     ),
-                  ),
-                  Icon(
-                    Symbols.chevron_right_rounded,
-                    size: 16,
-                    color: colors.onWeather.withValues(alpha: 0.6),
-                  ),
-                ],
+                    Icon(
+                      Symbols.chevron_right_rounded,
+                      size: 16,
+                      color: colors.onWeather.withValues(alpha: 0.6),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
