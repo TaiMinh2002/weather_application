@@ -5,6 +5,7 @@ Map<String, dynamic> weatherJson() => {
     'temperature_2m': 30.4,
     'relative_humidity_2m': 70,
     'apparent_temperature': 35,
+    'dew_point_2m': 24.3,
     'is_day': 1,
     'weather_code': 2,
     'wind_speed_10m': 8.3,

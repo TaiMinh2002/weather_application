@@ -32,6 +32,7 @@ class CurrentWeather {
     required this.temperature,
     required this.apparentTemperature,
     required this.humidity,
+    required this.dewPoint,
     required this.isDay,
     required this.condition,
     required this.windSpeed,
@@ -45,6 +46,7 @@ class CurrentWeather {
   final double temperature;
   final double apparentTemperature;
   final int humidity;
+  final double dewPoint;
   final bool isDay;
   final WeatherCondition condition;
   final double windSpeed;
@@ -52,6 +54,41 @@ class CurrentWeather {
   final double pressure;
   final double uvIndex;
   final double visibility;
+
+  UvLevel get uvLevel => UvLevel.fromIndex(uvIndex);
+  CompassPoint get windFrom => CompassPoint.fromDegrees(windDirection);
+}
+
+/// WHO UV index bands.
+enum UvLevel {
+  low,
+  moderate,
+  high,
+  veryHigh,
+  extreme;
+
+  static UvLevel fromIndex(double uv) => switch (uv.round()) {
+    <= 2 => low,
+    <= 5 => moderate,
+    <= 7 => high,
+    <= 10 => veryHigh,
+    _ => extreme,
+  };
+}
+
+/// Open-Meteo wind direction is where the wind blows from, in degrees.
+enum CompassPoint {
+  n,
+  ne,
+  e,
+  se,
+  s,
+  sw,
+  w,
+  nw;
+
+  static CompassPoint fromDegrees(int degrees) =>
+      values[((degrees % 360) / 45).round() % 8];
 }
 
 class HourlyForecast {
