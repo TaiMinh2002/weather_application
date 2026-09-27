@@ -13,6 +13,7 @@ import '../../../../core/utils/weather_code_mapper.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../cities/presentation/providers/cities_provider.dart';
 import '../../../location/domain/entities/place.dart';
+import '../../../notifications/presentation/morning_forecast.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/weather.dart';
@@ -116,6 +117,18 @@ class _PlaceWeather extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = weatherProvider(place.lat, place.lon);
+    if (isGps) {
+      ref.listen(provider, (_, next) {
+        if (next case AsyncData(:final value)) {
+          scheduleMorningForecast(
+            context,
+            ref,
+            value,
+            place.name ?? context.l10n.currentLocation,
+          );
+        }
+      });
+    }
     return ref
         .watch(provider)
         .when(

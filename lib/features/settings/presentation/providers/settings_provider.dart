@@ -14,6 +14,7 @@ class AppSettings {
     this.units = const Units(),
     this.themeMode = ThemeMode.system,
     this.locale,
+    this.morningForecast = false,
   });
 
   final Units units;
@@ -21,6 +22,9 @@ class AppSettings {
 
   /// Null follows the device language.
   final Locale? locale;
+
+  /// Daily 7:00 forecast notification (opt-in; asks for permission).
+  final bool morningForecast;
 
   /// Language for API calls (place and city names).
   Locale get effectiveLocale => locale ?? PlatformDispatcher.instance.locale;
@@ -45,6 +49,7 @@ class Settings extends _$Settings {
       ),
       themeMode: read(ThemeMode.values, PrefKeys.themeMode) ?? ThemeMode.system,
       locale: language == null ? null : Locale(language),
+      morningForecast: prefs.getBool(PrefKeys.morningForecast) ?? false,
     );
   }
 
@@ -59,6 +64,12 @@ class Settings extends _$Settings {
 
   Future<void> setLanguage(String languageCode) =>
       _save(PrefKeys.language, languageCode);
+
+  Future<void> setMorningForecast(bool on) {
+    final saved = _prefs.setBool(PrefKeys.morningForecast, on);
+    ref.invalidateSelf();
+    return saved;
+  }
 
   Future<void> _save(String key, String value) {
     // shared_preferences updates its in-memory cache synchronously, so the
