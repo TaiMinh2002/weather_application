@@ -78,6 +78,21 @@ class AppColors extends ThemeExtension<AppColors> {
   }
 }
 
+/// US EPA AQI category colours (good → hazardous), placed at the category
+/// breakpoints 0, 50, 100, 150, 200 and 300 on a 0–300 bar. The AQI card sits
+/// on the weather gradient, so they are the same in both themes.
+const aqiScale = LinearGradient(
+  colors: [
+    Color(0xFF00E400),
+    Color(0xFFFFFF00),
+    Color(0xFFFF7E00),
+    Color(0xFFFF0000),
+    Color(0xFF8F3F97),
+    Color(0xFF7E0023),
+  ],
+  stops: [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 1],
+);
+
 /// Home background while the weather (and so its condition) is unknown.
 const loadingGradient = LinearGradient(
   begin: Alignment.topCenter,

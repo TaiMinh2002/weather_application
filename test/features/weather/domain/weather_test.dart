@@ -28,4 +28,17 @@ void main() {
     };
     cases.forEach((deg, point) => expect(CompassPoint.fromDegrees(deg), point));
   });
+
+  test('AqiLevel.fromUsAqi follows US EPA breakpoints', () {
+    const cases = {
+      0: AqiLevel.good,
+      50: AqiLevel.good,
+      51: AqiLevel.moderate,
+      150: AqiLevel.sensitive,
+      174: AqiLevel.unhealthy,
+      300: AqiLevel.veryUnhealthy,
+      301: AqiLevel.hazardous,
+    };
+    cases.forEach((aqi, level) => expect(AqiLevel.fromUsAqi(aqi), level));
+  });
 }

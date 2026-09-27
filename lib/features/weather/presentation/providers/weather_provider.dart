@@ -12,3 +12,11 @@ Future<Weather> weather(Ref ref, double lat, double lon) async {
       .getWeather(lat: lat, lon: lon);
   return result.getOrThrow();
 }
+
+@riverpod
+Future<AirQuality?> airQuality(Ref ref, double lat, double lon) async {
+  final result = await ref
+      .watch(weatherRepositoryProvider)
+      .getAirQuality(lat: lat, lon: lon);
+  return result.getOrThrow();
+}

@@ -93,6 +93,23 @@ void main() {
       expect((result as Err).failure, isA<NetworkFailure>());
     });
 
+    test('air quality maps the response; no coverage is null', () async {
+      when(() => remote.getAirQuality(any(), any())).thenAnswer(
+        (_) async => AirQualityDto.fromJson({
+          'us_aqi': 174,
+          'pm2_5': 31.4,
+          'pm10': 32.4,
+        }),
+      );
+      final ok = await repo.getAirQuality(lat: 21, lon: 105);
+      expect((ok as Ok<AirQuality?>).data?.level, AqiLevel.unhealthy);
+
+      when(() => remote.getAirQuality(any(), any()))
+          .thenAnswer((_) async => AirQualityDto.fromJson({'us_aqi': null}));
+      final none = await repo.getAirQuality(lat: 0, lon: 0);
+      expect((none as Ok<AirQuality?>).data, isNull);
+    });
+
     test('server error: ServerFailure, cache not used', () async {
       when(() => remote.getForecast(any(), any()))
           .thenThrow(const ServerException(500));

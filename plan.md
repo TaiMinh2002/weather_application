@@ -491,7 +491,7 @@ README nên có đủ các mục:
 - [x] Xử lý quyền vị trí & lỗi
 
 ### Nâng cao
-- [ ] AQI
+- [x] AQI *(card cuối Home: US AQI + mức, thang màu EPA, PM2.5/PM10; không cache, offline thì ẩn)*
 - [ ] Gợi ý hoạt động
 - [x] Nền động *(bản nhẹ: `AnimatedContainer` + `AnimatedSwitcher`; Lottie/hạt mưa để sau nếu cần)*
 - [ ] Đồng bộ Supabase

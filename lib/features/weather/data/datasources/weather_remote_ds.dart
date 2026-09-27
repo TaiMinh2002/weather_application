@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/dio_client.dart';
 import '../models/weather_dto.dart';
 
@@ -33,6 +34,24 @@ class WeatherRemoteDataSource {
         },
       );
       return WeatherDto.fromJson(res.data!);
+    } on DioException catch (e) {
+      throw e.toAppException();
+    }
+  }
+
+  Future<AirQualityDto> getAirQuality(double lat, double lon) async {
+    try {
+      final res = await _dio.get<Map<String, dynamic>>(
+        '${ApiConstants.airQualityBaseUrl}/air-quality',
+        queryParameters: {
+          'latitude': lat,
+          'longitude': lon,
+          'current': 'us_aqi,pm2_5,pm10',
+        },
+      );
+      return AirQualityDto.fromJson(
+        res.data!['current'] as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       throw e.toAppException();
     }

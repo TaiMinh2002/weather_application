@@ -8,6 +8,7 @@ import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/features/location/domain/entities/place.dart';
 import 'package:weather_application/features/location/presentation/providers/location_provider.dart';
 import 'package:weather_application/features/weather/data/models/weather_dto.dart';
+import 'package:weather_application/features/weather/domain/entities/weather.dart';
 import 'package:weather_application/features/weather/presentation/providers/weather_provider.dart';
 import 'package:weather_application/features/weather/presentation/screens/home_screen.dart';
 import 'package:weather_application/l10n/app_localizations.dart';
@@ -16,13 +17,17 @@ import '../data/weather_fixture.dart';
 
 const _place = Place(lat: 21.03, lon: 105.85, name: 'Hà Nội');
 
-Future<Widget> _app(List overrides) async {
+Future<Widget> _app(List overrides, {AirQuality? airQuality}) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   return ProviderScope(
     retry: noAutoRetry,
     overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
+      airQualityProvider(
+        _place.lat,
+        _place.lon,
+      ).overrideWith((ref) async => airQuality),
       ...overrides,
     ],
     child: MaterialApp(
@@ -58,6 +63,32 @@ void main() {
     expect(find.text('Dự báo 24 giờ'), findsOneWidget);
     expect(find.text('Hôm nay'), findsOneWidget);
     expect(find.text('Bây giờ'), findsOneWidget);
+  });
+
+  testWidgets('air quality card shows the AQI and its level', (tester) async {
+    final weather = WeatherDto.fromJson(weatherJson()).toEntity();
+    await tester.pumpWidget(
+      await _app([
+        currentPlaceProvider.overrideWith((ref) async => _place),
+        weatherProvider(
+          _place.lat,
+          _place.lon,
+        ).overrideWith((ref) async => weather),
+      ], airQuality: const AirQuality(usAqi: 174, pm25: 31.4, pm10: 32.4)),
+    );
+    await tester.pump();
+    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.text('174'),
+      300,
+      // The PageView is also a Scrollable; pick the vertical page list.
+      scrollable: find.byWidgetPredicate(
+        (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+      ),
+    );
+
+    expect(find.text('Xấu'), findsOneWidget);
+    expect(find.text('PM2.5 31 µg/m³ · PM10 32 µg/m³'), findsOneWidget);
   });
 
   testWidgets('cached data shows the offline banner', (tester) async {
