@@ -91,4 +91,13 @@ void main() {
     final place = (await repo.getCurrentPlace()) as Ok<Place>;
     expect(place.data.name, isNull);
   });
+
+  test('placeAt names any point, and falls back to no name', () async {
+    expect((await repo.placeAt(16.07, 108.22)).name, 'Hà Nội');
+
+    when(() => ds.placeName(any(), any(), any())).thenThrow(Exception('x'));
+    final place = await repo.placeAt(16.07, 108.22);
+    expect(place.name, isNull);
+    expect(place.lat, 16.07);
+  });
 }

@@ -9,3 +9,7 @@ part 'location_provider.g.dart';
 Future<Place> currentPlace(Ref ref) async =>
     (await ref.watch(locationRepositoryProvider).getCurrentPlace())
         .getOrThrow();
+
+@riverpod
+Future<Place> placeAt(Ref ref, double lat, double lon) =>
+    ref.watch(locationRepositoryProvider).placeAt(lat, lon);

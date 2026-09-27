@@ -14,6 +14,7 @@ import 'package:weather_application/features/cities/data/repositories/cities_rep
 import 'package:weather_application/features/cities/domain/entities/city.dart';
 import 'package:weather_application/features/cities/presentation/providers/cities_provider.dart';
 import 'package:weather_application/features/cities/presentation/screens/cities_screen.dart';
+import 'package:weather_application/features/location/domain/entities/place.dart';
 import 'package:weather_application/features/location/presentation/providers/location_provider.dart';
 import 'package:weather_application/l10n/app_localizations.dart';
 
@@ -51,6 +52,27 @@ void main() {
 
     expect(city.area, 'Thừa Thiên Huế, Việt Nam');
     expect(const City(id: 1, name: 'X', lat: 0, lon: 0).area, '');
+  });
+
+  test('City.fromPlace: stable negative id per ~1 km, fallback name', () {
+    final a = City.fromPlace(
+      const Place(lat: 16.0712, lon: 108.2201, name: 'Đà Nẵng'),
+      fallbackName: '16.07, 108.22',
+    );
+    final b = City.fromPlace(
+      const Place(lat: 16.0709, lon: 108.2204),
+      fallbackName: '16.07, 108.22',
+    );
+    final far = City.fromPlace(
+      const Place(lat: 16.09, lon: 108.22),
+      fallbackName: '',
+    );
+
+    expect(a.id, isNegative);
+    expect(a.id, b.id);
+    expect(a.id, isNot(far.id));
+    expect(a.name, 'Đà Nẵng');
+    expect(b.name, '16.07, 108.22');
   });
 
   group('CitiesRepositoryImpl', () {

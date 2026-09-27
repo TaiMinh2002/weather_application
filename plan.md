@@ -48,7 +48,7 @@
 | Đồng bộ thành phố đã lưu lên cloud | Supabase (anonymous auth hoặc Google login) | Trung bình | ⭐ Nên làm |
 | Biểu đồ nhiệt độ theo giờ | `fl_chart` | Trung bình | Tùy chọn |
 | Thông báo dự báo mỗi sáng | `flutter_local_notifications` + `workmanager` | Trung bình | Tùy chọn |
-| Bản đồ chọn vị trí | `flutter_map` + OpenStreetMap | Trung bình | Tùy chọn |
+| Bản đồ chọn vị trí ✅ | `flutter_map` + OpenStreetMap | Trung bình | Tùy chọn |
 | Widget màn hình chính | `home_widget` | Khó | Tùy chọn |
 
 > Phần đồng bộ Supabase giúp dự án có "backend" đúng mục tiêu ban đầu.

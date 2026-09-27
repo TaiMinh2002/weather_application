@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/context_ext.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../location/domain/entities/place.dart';
 import '../../../location/presentation/providers/location_provider.dart';
@@ -17,14 +18,14 @@ import '../providers/cities_provider.dart';
 /// saved list, typing shows geocoding results.
 ///
 /// Pops with the Home page to show: 0 for GPS, i + 1 for saved city i.
-class CitiesScreen extends StatefulWidget {
+class CitiesScreen extends ConsumerStatefulWidget {
   const CitiesScreen({super.key});
 
   @override
-  State<CitiesScreen> createState() => _CitiesScreenState();
+  ConsumerState<CitiesScreen> createState() => _CitiesScreenState();
 }
 
-class _CitiesScreenState extends State<CitiesScreen> {
+class _CitiesScreenState extends ConsumerState<CitiesScreen> {
   final _search = TextEditingController();
   var _query = '';
 
@@ -45,7 +46,21 @@ class _CitiesScreenState extends State<CitiesScreen> {
     // Open-Meteo geocoding needs at least 2 characters to match anything.
     final searching = _query.length >= 2;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.cities)),
+      appBar: AppBar(
+        title: Text(l10n.cities),
+        actions: [
+          IconButton(
+            tooltip: l10n.pickOnMap,
+            icon: const Icon(Symbols.map_rounded),
+            onPressed: () async {
+              final city = await context.push<City>(Routes.map);
+              if (city != null && context.mounted) {
+                await _saveAndShow(context, ref, city);
+              }
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -76,6 +91,20 @@ class _CitiesScreenState extends State<CitiesScreen> {
       ),
     );
   }
+}
+
+/// Saves [city] (a search result or a map pick) and returns to Home on its
+/// page.
+Future<void> _saveAndShow(
+  BuildContext context,
+  WidgetRef ref,
+  City city,
+) async {
+  await ref.read(savedCitiesProvider.notifier).add(city);
+  final index = ref
+      .read(savedCitiesProvider)
+      .indexWhere((c) => c.id == city.id);
+  if (context.mounted) context.pop(index + 1);
 }
 
 class _SavedList extends ConsumerWidget {
@@ -306,14 +335,6 @@ class _SearchResults extends ConsumerWidget {
 
   final String query;
 
-  Future<void> _select(BuildContext context, WidgetRef ref, City city) async {
-    await ref.read(savedCitiesProvider.notifier).add(city);
-    final index = ref
-        .read(savedCitiesProvider)
-        .indexWhere((c) => c.id == city.id);
-    if (context.mounted) context.pop(index + 1);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final savedIds = {for (final c in ref.watch(savedCitiesProvider)) c.id};
@@ -329,7 +350,7 @@ class _SearchResults extends ConsumerWidget {
               : _ResultList(
                   results: results,
                   savedIds: savedIds,
-                  onSelect: (city) => _select(context, ref, city),
+                  onSelect: (city) => _saveAndShow(context, ref, city),
                 ),
           loading: () => Skeletonizer(
             child: _ResultList(
