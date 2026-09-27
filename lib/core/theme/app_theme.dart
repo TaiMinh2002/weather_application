@@ -100,42 +100,50 @@ const loadingGradient = LinearGradient(
   colors: [Color(0xFF4B5A72), Color(0xFF2B3648)],
 );
 
+/// Weather groups that share a background. The home-screen widget draws the
+/// same backgrounds natively, keyed by [Sky.key].
+enum Sky {
+  clear,
+  cloudy,
+  fog,
+  rain,
+  snow,
+  storm;
+
+  static Sky of(WeatherCondition condition) => switch (condition) {
+    WeatherCondition.clear || WeatherCondition.mainlyClear => clear,
+    WeatherCondition.fog => fog,
+    WeatherCondition.drizzle ||
+    WeatherCondition.rain ||
+    WeatherCondition.showers => rain,
+    WeatherCondition.snow => snow,
+    WeatherCondition.thunderstorm => storm,
+    WeatherCondition.partlyCloudy ||
+    WeatherCondition.overcast ||
+    WeatherCondition.unknown => cloudy,
+  };
+
+  /// e.g. `rain_night`; matches the Android `widget_bg_<key>` drawables.
+  String key({required bool isDay}) => '${name}_${isDay ? 'day' : 'night'}';
+
+  /// Top and bottom colours, (day, night).
+  ((int, int), (int, int)) get _stops => switch (this) {
+    clear => ((0xFF2272D6, 0xFF0F4DA8), (0xFF1E2A5E, 0xFF0B1026)),
+    cloudy => ((0xFF5A7390, 0xFF3A4F66), (0xFF2E3A52, 0xFF151B28)),
+    fog => ((0xFF6B7784, 0xFF4A5561), (0xFF343C4C, 0xFF181C25)),
+    rain => ((0xFF3A6A94, 0xFF1D3F63), (0xFF1B3350, 0xFF0A1424)),
+    snow => ((0xFF4A78A6, 0xFF2A5584), (0xFF2A3766, 0xFF10162E)),
+    storm => ((0xFF4A4468, 0xFF24223A), (0xFF231B3D, 0xFF09081A)),
+  };
+}
+
 /// Home background. Identical in both app themes, so it isn't a
 /// [ThemeExtension].
 LinearGradient weatherGradient(
   WeatherCondition condition, {
   required bool isDay,
 }) {
-  final (day, night) = switch (condition) {
-    WeatherCondition.clear || WeatherCondition.mainlyClear => (
-      (0xFF2272D6, 0xFF0F4DA8),
-      (0xFF1E2A5E, 0xFF0B1026),
-    ),
-    WeatherCondition.fog => (
-      (0xFF6B7784, 0xFF4A5561),
-      (0xFF343C4C, 0xFF181C25),
-    ),
-    WeatherCondition.drizzle ||
-    WeatherCondition.rain ||
-    WeatherCondition.showers => (
-      (0xFF3A6A94, 0xFF1D3F63),
-      (0xFF1B3350, 0xFF0A1424),
-    ),
-    WeatherCondition.snow => (
-      (0xFF4A78A6, 0xFF2A5584),
-      (0xFF2A3766, 0xFF10162E),
-    ),
-    WeatherCondition.thunderstorm => (
-      (0xFF4A4468, 0xFF24223A),
-      (0xFF231B3D, 0xFF09081A),
-    ),
-    WeatherCondition.partlyCloudy ||
-    WeatherCondition.overcast ||
-    WeatherCondition.unknown => (
-      (0xFF5A7390, 0xFF3A4F66),
-      (0xFF2E3A52, 0xFF151B28),
-    ),
-  };
+  final (day, night) = Sky.of(condition)._stops;
   final (top, bottom) = isDay ? day : night;
   return LinearGradient(
     begin: Alignment.topCenter,

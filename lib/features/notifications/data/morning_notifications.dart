@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -97,13 +96,3 @@ class MorningNotifications {
 @Riverpod(keepAlive: true)
 MorningNotifications morningNotifications(Ref ref) =>
     MorningNotifications(FlutterLocalNotificationsPlugin());
-
-/// Logs instead of failing: a missed morning notification must never break
-/// the screen that tried to schedule it.
-Future<void> runQuietly(Future<void> Function() body) async {
-  try {
-    await body();
-  } catch (e) {
-    debugPrint('Morning notifications skipped: $e');
-  }
-}

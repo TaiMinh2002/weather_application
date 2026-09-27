@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../core/error/errors.dart';
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/utils/unit_converter.dart';
 import '../../../location/presentation/providers/location_provider.dart';

@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Exceptions are thrown by datasources, then converted to [Failure] in the
 /// repository so the UI only ever deals with [Result] / [Failure].
 sealed class AppException implements Exception {
@@ -92,3 +94,13 @@ Future<Result<T>> guard<T>(Future<T> Function() body) async {
 /// default (up to 10 times, showing loading meanwhile), but every [Failure]
 /// here needs the user to act (grant permission, reconnect, tap Retry).
 Duration? noAutoRetry(int retryCount, Object error) => null;
+
+/// For best-effort side jobs (notifications, the home-screen widget): logs
+/// instead of failing, so they never break the screen that triggered them.
+Future<void> runQuietly(Future<void> Function() body) async {
+  try {
+    await body();
+  } catch (e) {
+    debugPrint('Background job skipped: $e');
+  }
+}
