@@ -7,15 +7,13 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/extensions/context_ext.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/weather.dart';
-import '../providers/weather_provider.dart';
 
 // Forecast blocks drawn on the weather gradient: text and icon colors come
 // from the surrounding theme, which the Home gradient page sets to onWeather.
 
-class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.padding, required this.child});
+class GlassCard extends StatelessWidget {
+  const GlassCard({super.key, required this.padding, required this.child});
 
   final EdgeInsets padding;
   final Widget child;
@@ -42,7 +40,7 @@ class HourlyCard extends ConsumerWidget {
     final l10n = context.l10n;
     final text = context.textTheme;
     final time = DateFormat.Hm(Localizations.localeOf(context).toString());
-    return _GlassCard(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +116,7 @@ class DailyCard extends ConsumerWidget {
     final weekMin = days.map((d) => d.tempMin).fold(double.infinity, _min);
     final weekMax = days.map((d) => d.tempMax).fold(-double.infinity, _max);
     final muted = colors.onWeather.withValues(alpha: 0.7);
-    return _GlassCard(
+    return GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,7 +355,7 @@ class _DetailTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = context.textTheme;
     final colors = context.colors;
-    return _GlassCard(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,119 +403,6 @@ class _DetailTile extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-/// Air quality is extra information: while it loads, fails, or isn't
-/// covered for this location, the card is simply absent instead of pushing
-/// a second error onto a page whose forecast loaded fine.
-class AirQualityCard extends ConsumerWidget {
-  const AirQualityCard({super.key, required this.lat, required this.lon});
-
-  final double lat;
-  final double lon;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final aq = ref.watch(airQualityProvider(lat, lon)).value;
-    if (aq == null) return const SizedBox.shrink();
-    final l10n = context.l10n;
-    final text = context.textTheme;
-    final colors = context.colors;
-    final pm = [
-      if (aq.pm25 case final v?) 'PM2.5 ${v.round()} µg/m³',
-      if (aq.pm10 case final v?) 'PM10 ${v.round()} µg/m³',
-    ].join(' · ');
-    return _GlassCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
-        children: [
-          Row(
-            spacing: 6,
-            children: [
-              const Icon(Symbols.airwave_rounded, size: 20),
-              Flexible(
-                child: Text(
-                  l10n.airQuality.toUpperCase(),
-                  style: text.labelMedium?.copyWith(letterSpacing: 0.36),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            spacing: 8,
-            children: [
-              Text('${aq.usAqi}', style: text.titleLarge),
-              Flexible(
-                child: Text(
-                  l10n.aqiLevel(aq.level.name),
-                  style: text.bodyLarge,
-                ),
-              ),
-            ],
-          ),
-          _AqiBar(fraction: (aq.usAqi / 300).clamp(0, 1)),
-          if (pm.isNotEmpty)
-            Text(
-              pm,
-              style: text.bodyMedium?.copyWith(
-                color: colors.onWeather.withValues(alpha: 0.75),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-/// The EPA colour scale with a dot at the current value.
-class _AqiBar extends StatelessWidget {
-  const _AqiBar({required this.fraction});
-
-  final double fraction;
-
-  @override
-  Widget build(BuildContext context) {
-    const dot = 12.0;
-    return LayoutBuilder(
-      builder: (context, box) => SizedBox(
-        height: dot,
-        child: Stack(
-          alignment: Alignment.centerLeft,
-          children: [
-            Container(
-              height: 6,
-              decoration: BoxDecoration(
-                gradient: aqiScale,
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-            Positioned(
-              left: (box.maxWidth - dot) * fraction,
-              child: Container(
-                width: dot,
-                height: dot,
-                decoration: BoxDecoration(
-                  color: context.colors.onWeather,
-                  shape: BoxShape.circle,
-                  // Keeps the white dot visible over the yellow band.
-                  boxShadow: [
-                    BoxShadow(
-                      color: context.colorScheme.shadow.withValues(alpha: 0.35),
-                      blurRadius: 3,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
