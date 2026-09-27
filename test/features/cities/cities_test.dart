@@ -8,6 +8,7 @@ import 'package:weather_application/core/storage/prefs.dart';
 import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/features/cities/data/datasources/cities_local_ds.dart';
 import 'package:weather_application/features/cities/data/datasources/cities_remote_ds.dart';
+import 'package:weather_application/features/cities/data/datasources/cities_sync_ds.dart';
 import 'package:weather_application/features/cities/data/models/city_dto.dart';
 import 'package:weather_application/features/cities/data/repositories/cities_repository_impl.dart';
 import 'package:weather_application/features/cities/domain/entities/city.dart';
@@ -17,6 +18,8 @@ import 'package:weather_application/features/location/presentation/providers/loc
 import 'package:weather_application/l10n/app_localizations.dart';
 
 class _MockRemote extends Mock implements CitiesRemoteDataSource {}
+
+class _MockSync extends Mock implements CitiesSyncDataSource {}
 
 const _hue = City(
   id: 1580240,
@@ -60,6 +63,7 @@ void main() {
         remote,
         CitiesLocalDataSource(await _prefs()),
         const Locale('vi'),
+        null,
       );
     });
 
@@ -82,6 +86,66 @@ void main() {
     test('saved cities round-trip in order', () async {
       await repo.saveCities([_hue, _danang]);
       expect(repo.savedCities().map((c) => c.name), ['Huế', 'Đà Nẵng']);
+    });
+  });
+
+  group('cloud backup', () {
+    late _MockSync sync;
+    late CitiesLocalDataSource local;
+    late CitiesRepositoryImpl repo;
+
+    setUpAll(() => registerFallbackValue(<CityDto>[]));
+
+    setUp(() async {
+      sync = _MockSync();
+      local = CitiesLocalDataSource(await _prefs());
+      repo = CitiesRepositoryImpl(
+        _MockRemote(),
+        local,
+        const Locale('vi'),
+        sync,
+      );
+      when(() => sync.push(any())).thenAnswer((_) async {});
+    });
+
+    test('saving writes locally and pushes the whole list', () async {
+      await repo.saveCities([_hue, _danang]);
+
+      expect(repo.savedCities().length, 2);
+      final pushed = verify(() => sync.push(captureAny())).captured.single;
+      expect((pushed as List<CityDto>).map((c) => c.name), ['Huế', 'Đà Nẵng']);
+    });
+
+    test('a failed push still keeps the local save', () async {
+      when(() => sync.push(any())).thenThrow(const NetworkException());
+
+      await repo.saveCities([_hue]);
+      expect(repo.savedCities().single.name, 'Huế');
+    });
+
+    test('on start, an empty device restores the cloud copy', () async {
+      when(sync.pull).thenAnswer((_) async => [CityDto.fromEntity(_hanoi)]);
+
+      final restored = await repo.syncOnStart();
+
+      expect(restored?.single.name, 'Hà Nội');
+      expect(repo.savedCities().single.name, 'Hà Nội');
+      verifyNever(() => sync.push(any()));
+    });
+
+    test('on start, a device with cities backs them up instead', () async {
+      await local.write([CityDto.fromEntity(_hue)]);
+
+      expect(await repo.syncOnStart(), isNull);
+      verifyNever(sync.pull);
+      verify(() => sync.push(any())).called(1);
+    });
+
+    test('on start, a failed pull changes nothing', () async {
+      when(sync.pull).thenThrow(const NetworkException());
+
+      expect(await repo.syncOnStart(), isNull);
+      expect(repo.savedCities(), isEmpty);
     });
   });
 

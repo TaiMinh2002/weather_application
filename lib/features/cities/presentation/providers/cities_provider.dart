@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/cities_repository_impl.dart';
 import '../../domain/entities/city.dart';
+import '../../domain/repositories/cities_repository.dart';
 
 part 'cities_provider.g.dart';
 
@@ -9,7 +10,17 @@ part 'cities_provider.g.dart';
 @Riverpod(keepAlive: true)
 class SavedCities extends _$SavedCities {
   @override
-  List<City> build() => ref.watch(citiesRepositoryProvider).savedCities();
+  List<City> build() {
+    final repo = ref.watch(citiesRepositoryProvider);
+    _syncOnStart(repo);
+    return repo.savedCities();
+  }
+
+  /// Background, once per provider lifetime (keepAlive = once per launch).
+  Future<void> _syncOnStart(CitiesRepository repo) async {
+    final restored = await repo.syncOnStart();
+    if (restored != null && ref.mounted) state = restored;
+  }
 
   Future<void> add(City city) async {
     if (state.any((c) => c.id == city.id)) return;

@@ -100,6 +100,14 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
+**Sao lưu thành phố lên Supabase (tùy chọn):** chép `supabase.example.json` thành `supabase.json` (đã gitignore), điền URL + anon key, chạy [`supabase/schema.sql`](supabase/schema.sql) trong SQL Editor và bật *Anonymous sign-ins*. Sau đó:
+
+```bash
+flutter run --dart-define-from-file=supabase.json
+```
+
+Không có file này thì app vẫn chạy, chỉ tắt sao lưu.
+
 Chạy test:
 
 ```bash
