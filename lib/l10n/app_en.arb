@@ -90,5 +90,13 @@
   },
   "pressure": "Pressure",
   "visibility": "Visibility",
-  "sunriseSunset": "Sunrise · Sunset"
+  "sunriseSunset": "Sunrise · Sunset",
+  "offlineUpdatedAt": "Offline · updated {time}",
+  "@offlineUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

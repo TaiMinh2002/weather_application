@@ -44,5 +44,6 @@
   "uvLevel": "{level, select, low{Thấp} moderate{Trung bình} high{Cao} veryHigh{Rất cao} other{Nguy hiểm}}",
   "pressure": "Áp suất",
   "visibility": "Tầm nhìn",
-  "sunriseSunset": "Bình minh · Hoàng hôn"
+  "sunriseSunset": "Bình minh · Hoàng hôn",
+  "offlineUpdatedAt": "Đang offline · cập nhật lúc {time}"
 }

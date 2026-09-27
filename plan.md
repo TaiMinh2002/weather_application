@@ -111,8 +111,8 @@ Splash (native) ──(chưa onboard)──> Onboarding ──> Home
 | Model | **freezed** + **json_serializable** | Model bất biến, `copyWith`, sealed class cho lỗi |
 | Vị trí | **geolocator** | Lấy GPS, kiểm tra/xin quyền, mở Cài đặt (không cần `permission_handler`) |
 | Tên địa điểm từ tọa độ | **geocoding** (dịch vụ có sẵn trên máy, free) hoặc Nominatim API | Hiện "Hà Nội" thay vì tọa độ |
-| Lưu trữ local | **shared_preferences** (cài đặt) + **hive_ce** (cache thời tiết, thành phố) | Nhẹ, nhanh, không cần SQL |
-| Kiểm tra mạng | **connectivity_plus** | Hiện banner "Đang offline" |
+| Lưu trữ local | **shared_preferences** (cài đặt + cache thời tiết dạng JSON) | Đã có sẵn, đủ cho vài địa điểm. Chuyển sang Hive/file khi số thành phố lưu tăng nhiều |
+| Kiểm tra mạng | ~~connectivity_plus~~ không dùng | `NetworkException` từ Dio đã cho biết mất mạng; banner "Đang offline" hiện khi dữ liệu lấy từ cache |
 | Biểu đồ | **fl_chart** | Miễn phí, tùy biến tốt |
 | Animation | **flutter_animate**, **lottie** | Nền động, icon động (file Lottie free trên LottieFiles) |
 | Skeleton | **skeletonizer** | Loading đẹp, ít code |
@@ -192,7 +192,7 @@ lib/
 │   ├── error/                    # errors.dart (AppException, Failure, Result, guard)
 │   ├── router/                   # app_router.dart (route + Routes + redirect)
 │   ├── theme/                    # app_theme.dart (ThemeData sáng/tối + ThemeExtension màu)
-│   ├── storage/                  # prefs.dart; thêm Hive khi làm cache (ngày 7)
+│   ├── storage/                  # prefs.dart
 │   ├── utils/                    # weather_code_mapper.dart; sau: date_formatter, unit_converter
 │   ├── extensions/               # context_ext.dart
 │   └── widgets/                  # state_views.dart (AppLoading, AppErrorView, EmptyView)
@@ -232,7 +232,7 @@ Provider (Riverpod)
    ▼
 Repository (quyết định nguồn dữ liệu)
    ├──> RemoteDataSource (Dio → Open-Meteo)
-   └──> LocalDataSource  (Hive cache)
+   └──> LocalDataSource  (cache JSON trong shared_preferences)
 ```
 
 **Logic repository:**
@@ -388,7 +388,7 @@ String? onboardingRedirect(SharedPreferences prefs, String location) {
 | 3 ✅ | Model (freezed), repository, provider thời tiết |
 | 4 ✅ | Lấy GPS, xử lý quyền, reverse geocoding |
 | 5–6 | Màn Home: thời tiết hiện tại, theo giờ, 7 ngày, thông số chi tiết |
-| 7 | Cache offline bằng Hive, pull-to-refresh, banner offline |
+| 7 | Cache offline, pull-to-refresh, banner offline |
 | 8 | Màn Thành phố: tìm kiếm (debounce), lưu thành phố |
 | 9 | Màn Thành phố: sắp xếp, xóa; PageView vuốt giữa các thành phố |
 | 10 | Màn cài đặt: đơn vị, theme, ngôn ngữ |
@@ -464,7 +464,8 @@ README nên có đủ các mục:
 - `Failure` không chứa câu thông báo; `AppErrorView` lấy câu theo loại lỗi từ l10n (rule.md cấm hard-code chuỗi). `LocationFailure` mang lý do: GPS tắt, bị từ chối, bị từ chối vĩnh viễn, không lấy được vị trí.
 - Exception, `Failure`, `Result` nằm chung `core/error/errors.dart` thay vì tách 2 file (theo rule 600 dòng).
 - Nhánh: `feature/*` tạo từ `dev`, Pull Request vào `dev` (không vào thẳng `main`).
-- Chưa làm: Hive cache (ngày 7), đổi đơn vị °C/°F (cùng màn Settings), `skeletonizer` (cùng màn Home).
+- Cache offline dùng `shared_preferences` (JSON, mỗi địa điểm ~30 KB) thay vì `hive_ce`: đủ dùng và không thêm package (rule.md mục 7). Chỉ fallback cache khi mất mạng; lỗi server vẫn báo lỗi.
+- Chưa làm: đổi đơn vị °C/°F (cùng màn Settings).
 
 
 ### Nền tảng

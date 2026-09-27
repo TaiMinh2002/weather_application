@@ -21,7 +21,8 @@ abstract class WeatherDto with _$WeatherDto {
   factory WeatherDto.fromJson(Map<String, dynamic> json) =>
       _$WeatherDtoFromJson(json);
 
-  Weather toEntity() => Weather(
+  Weather toEntity({DateTime? cachedAt}) => Weather(
+    cachedAt: cachedAt,
     current: CurrentWeather(
       time: DateTime.parse(current.time),
       temperature: current.temperature,

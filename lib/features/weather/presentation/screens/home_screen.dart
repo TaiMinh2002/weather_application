@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -304,6 +305,10 @@ class _WeatherBody extends StatelessWidget {
       40 + MediaQuery.paddingOf(context).bottom,
     ),
     children: [
+      if (weather.cachedAt case final cachedAt?) ...[
+        _OfflineBanner(cachedAt: cachedAt),
+        const SizedBox(height: 20),
+      ],
       _Header(name: name, weather: weather),
       const SizedBox(height: 20),
       HourlyCard(hours: weather.next24Hours),
@@ -313,6 +318,43 @@ class _WeatherBody extends StatelessWidget {
       DetailGrid(current: weather.current, today: weather.daily.firstOrNull),
     ],
   );
+}
+
+class _OfflineBanner extends StatelessWidget {
+  const _OfflineBanner({required this.cachedAt});
+
+  final DateTime cachedAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    final now = DateTime.now();
+    final sameDay = DateUtils.isSameDay(cachedAt, now);
+    final time =
+        (sameDay ? DateFormat.Hm(locale) : DateFormat.Md(locale).add_Hm())
+            .format(cachedAt);
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: context.colors.glass,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        spacing: 8,
+        children: [
+          const Icon(Symbols.wifi_off_rounded, size: 18),
+          Expanded(
+            child: Text(
+              context.l10n.offlineUpdatedAt(time),
+              style: context.textTheme.labelMedium,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Header extends StatelessWidget {

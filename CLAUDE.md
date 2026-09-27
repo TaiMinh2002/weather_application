@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Skycast: a Flutter weather app using the free Open-Meteo API (no API key needed). Done so far: base code in `lib/core/`, the `weather` data layer (remote only), the `location` feature (GPS + reverse geocoding), and onboarding. `HomeScreen` is a minimal view that proves the data layer, not the real Home UI. Hive caching, city search, saved cities, and settings are not built yet. Generated files (`*.g.dart`, `*.freezed.dart`, `lib/l10n/app_localizations*.dart`) are gitignored, so run `flutter gen-l10n` + `build_runner` after cloning.
+Skycast: a Flutter weather app using the free Open-Meteo API (no API key needed). Done so far: base code in `lib/core/`, the `weather` data layer with offline cache, the `location` feature (GPS + reverse geocoding), onboarding, and the Home screen (GPS page only). City search, saved cities, settings, and day detail are not built yet. Generated files (`*.g.dart`, `*.freezed.dart`, `lib/l10n/app_localizations*.dart`) are gitignored, so run `flutter gen-l10n` + `build_runner` after cloning.
 
 `// ponytail:` comments mark deliberate shortcuts and say which later step replaces them. Grep for them before building the feature they mention.
 
@@ -57,9 +57,9 @@ Providers live next to what they build: each datasource and repository impl file
 
 Failures carry no message strings; messages are resolved through l10n in the UI.
 
-### Data policy (target, per plan.md)
+### Data policy
 
-When online, call the API and write the result to the Hive cache. When offline, return the cache plus its "updated at" time. If there's neither network nor cache, return `Failure`. The weather repository is remote-only for now (Hive isn't in `pubspec.yaml` yet).
+When online, call the API and write the result to the cache (`weather_local_ds.dart`: JSON in shared_preferences, keyed by lat/lon rounded to 2 decimals). On `NetworkException`, return the cache with `Weather.cachedAt` set (Home shows the offline banner). No cache, or any other error: return the `Failure`.
 
 ### Other conventions
 
