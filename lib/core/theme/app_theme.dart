@@ -183,6 +183,9 @@ abstract final class AppTheme {
 
   static TextStyle _style(double size, double line, FontWeight weight) =>
       TextStyle(
+        // Set here, not only on ThemeData: component themes (buttons) use
+        // these styles directly and would fall back to the platform font.
+        fontFamily: _fontFamily,
         fontSize: size,
         height: line / size,
         fontWeight: weight,

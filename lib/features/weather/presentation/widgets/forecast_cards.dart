@@ -82,7 +82,9 @@ class HourlyCard extends ConsumerWidget {
                             style: text.labelMedium?.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: context.colors.rainy,
+                              // Rain % in `rainy` blue is 1.3–3.5:1 on the blue
+                              // gradients; text stays onWeather.
+                              color: context.colors.onWeather,
                             ),
                           ),
                       ],
@@ -157,7 +159,7 @@ class DailyCard extends ConsumerWidget {
                         textAlign: TextAlign.right,
                         style: text.labelMedium?.copyWith(
                           fontSize: 11,
-                          color: colors.rainy,
+                          color: colors.onWeather,
                         ),
                       ),
                     ),

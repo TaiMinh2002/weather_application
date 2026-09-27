@@ -24,7 +24,10 @@ flutter test                                               # all tests
 flutter test test/path/to_test.dart                        # single file
 flutter test --plain-name "test name"                      # single test by name
 flutter run
+flutter test tool/screenshots_test.dart --update-goldens    # regenerate README screenshots (docs/screenshots/)
 ```
+
+CI (`.github/workflows/ci.yml`) runs analyze + test + release APK on pushes/PRs to `dev`/`main`; pushing a `v*` tag also publishes a GitHub Release with the APK.
 
 Lint uses `flutter_lints` (see `analysis_options.yaml`; platform folders are excluded).
 
