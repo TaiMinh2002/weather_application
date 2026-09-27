@@ -26,7 +26,8 @@ class WeatherRemoteDataSource {
               'temperature_2m,weather_code,precipitation_probability,is_day',
           'daily':
               'weather_code,temperature_2m_max,temperature_2m_min,sunrise,'
-              'sunset,uv_index_max,precipitation_probability_max',
+              'sunset,uv_index_max,precipitation_probability_max,'
+              'wind_speed_10m_max,wind_direction_10m_dominant',
           'timezone': 'auto',
           'forecast_days': 7,
         },

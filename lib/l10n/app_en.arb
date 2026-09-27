@@ -133,5 +133,18 @@
   "themeSystem": "System",
   "language": "Language",
   "about": "About",
-  "weatherData": "Weather data"
+  "weatherData": "Weather data",
+  "rainChanceTitle": "Chance of rain",
+  "rainChance": "Chance of rain {value}",
+  "@rainChance": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "maxWind": "Max wind",
+  "maxUv": "Max UV",
+  "sunrise": "Sunrise",
+  "sunset": "Sunset"
 }

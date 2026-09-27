@@ -129,6 +129,7 @@ class _PlaceWeather extends ConsumerWidget {
                 child: _WeatherBody(
                   name: place.name ?? context.l10n.currentLocation,
                   showPin: isGps,
+                  onDayTap: (i) => context.push(Routes.dayOf(i, place)),
                   weather: weather,
                 ),
               ),
@@ -339,6 +340,8 @@ Weather _placeholderWeather() {
           sunset: now,
           uvIndexMax: 5,
           precipitationProbabilityMax: 0,
+          windSpeedMax: 10,
+          windDirectionDominant: 135,
         ),
     ],
   );
@@ -349,10 +352,12 @@ class _WeatherBody extends StatelessWidget {
     required this.name,
     required this.weather,
     this.showPin = true,
+    this.onDayTap,
   });
 
   final String name;
   final bool showPin;
+  final ValueChanged<int>? onDayTap;
   final Weather weather;
 
   @override
@@ -373,7 +378,7 @@ class _WeatherBody extends StatelessWidget {
       const SizedBox(height: 20),
       HourlyCard(hours: weather.next24Hours),
       const SizedBox(height: 20),
-      DailyCard(days: weather.daily),
+      DailyCard(days: weather.daily, onDayTap: onDayTap),
       const SizedBox(height: 20),
       DetailGrid(current: weather.current, today: weather.daily.firstOrNull),
     ],

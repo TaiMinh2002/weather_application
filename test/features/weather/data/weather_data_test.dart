@@ -29,6 +29,14 @@ void main() {
       expect(weather.daily[1].condition, WeatherCondition.thunderstorm);
     });
 
+    test('hoursOn keeps only that date', () {
+      final today = weather.hoursOn(DateTime(2026, 9, 24));
+      expect(today.length, 24);
+      expect(weather.hoursOn(DateTime(2026, 9, 25)).length, 2);
+      expect(weather.daily.first.windFrom, CompassPoint.se);
+      expect(weather.daily[1].windSpeedMax, 0);
+    });
+
     test('next24Hours starts at the current hour', () {
       final next = weather.next24Hours;
       expect(next.first.time, DateTime(2026, 9, 24, 10));

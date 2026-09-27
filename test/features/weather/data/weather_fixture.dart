@@ -33,5 +33,7 @@ Map<String, dynamic> weatherJson() => {
     'sunset': ['2026-09-24T17:56', '2026-09-25T17:55'],
     'uv_index_max': [7.1, null],
     'precipitation_probability_max': [60, 90],
+    'wind_speed_10m_max': [18.4, null],
+    'wind_direction_10m_dominant': [135, null],
   },
 };
