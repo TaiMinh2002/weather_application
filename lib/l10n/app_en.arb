@@ -8,9 +8,8 @@
   "errorLocation": "Unable to get your location",
   "errorUnknown": "Something went wrong",
   "emptyDefault": "Nothing here yet",
-  "onboardingTitle": "Weather where you are",
-  "onboardingBody": "Skycast uses your location to show local weather. You can also search for cities manually.",
-  "onboardingStart": "Get started",
+  "onboardingTitle": "Weather right where you are",
+  "onboardingBody": "Skycast uses your location to show accurate local weather. It stays on your device.",
   "conditionClear": "Clear sky",
   "conditionMainlyClear": "Mainly clear",
   "conditionPartlyCloudy": "Partly cloudy",
@@ -146,5 +145,7 @@
   "maxWind": "Max wind",
   "maxUv": "Max UV",
   "sunrise": "Sunrise",
-  "sunset": "Sunset"
+  "sunset": "Sunset",
+  "allowLocation": "Allow location",
+  "chooseCityManually": "Choose a city instead"
 }
