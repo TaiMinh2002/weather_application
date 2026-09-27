@@ -168,5 +168,17 @@
   },
   "pickOnMap": "Pick on map",
   "mapHint": "Tap the map to choose a place",
-  "saveCity": "Save city"
+  "saveCity": "Save city",
+  "notifications": "Notifications",
+  "morningForecast": "Forecast every morning at 7:00",
+  "morningChannel": "Morning forecast",
+  "morningTitle": "{place} today",
+  "@morningTitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsDenied": "Notifications are off for Skycast. Turn them on in your phone's Settings."
 }

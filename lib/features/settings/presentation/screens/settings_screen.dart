@@ -4,6 +4,10 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/utils/unit_converter.dart';
+import '../../../location/presentation/providers/location_provider.dart';
+import '../../../notifications/data/morning_notifications.dart';
+import '../../../notifications/presentation/morning_forecast.dart';
+import '../../../weather/presentation/providers/weather_provider.dart';
 import '../providers/settings_provider.dart';
 
 /// Every change applies immediately, so there is no Save button.
@@ -91,6 +95,19 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           _Group(
+            title: l10n.notifications,
+            rows: [
+              _Row(
+                label: l10n.morningForecast,
+                trailing: Switch(
+                  value: settings.morningForecast,
+                  onChanged: (on) => _setMorningForecast(context, ref, on),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _Group(
             title: l10n.about,
             rows: [
               _Row(
@@ -107,6 +124,43 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Asks for permission on the way on; schedules straight away from the GPS
+/// forecast Home already loaded, instead of waiting for the next refresh.
+Future<void> _setMorningForecast(
+  BuildContext context,
+  WidgetRef ref,
+  bool on,
+) async {
+  final notifications = ref.read(morningNotificationsProvider);
+  final settings = ref.read(settingsProvider.notifier);
+  if (!on) {
+    await settings.setMorningForecast(false);
+    await runQuietly(notifications.cancel);
+    return;
+  }
+  if (!await notifications.requestPermission()) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.notificationsDenied)));
+    }
+    return;
+  }
+  await settings.setMorningForecast(true);
+  final place = ref.read(currentPlaceProvider).value;
+  final weather = place == null
+      ? null
+      : ref.read(weatherProvider(place.lat, place.lon)).value;
+  if (place != null && weather != null && context.mounted) {
+    await scheduleMorningForecast(
+      context,
+      ref,
+      weather,
+      place.name ?? context.l10n.currentLocation,
     );
   }
 }

@@ -80,5 +80,10 @@
   "weatherTip": "{tip, select, storm{Có dông trong 12 giờ tới, hạn chế ra ngoài} umbrella{Có thể mưa, nhớ mang ô hoặc áo mưa} mask{Không khí kém, nên đeo khẩu trang} hydrate{Trời nóng, uống đủ nước và tránh nắng gắt} sunscreen{UV cao, bôi kem chống nắng khi ra ngoài} jacket{Trời lạnh, mặc thêm áo ấm} wind{Gió mạnh, cẩn thận khi đi xe máy} other{Thời tiết đẹp, hợp để ra ngoài}}",
   "pickOnMap": "Chọn trên bản đồ",
   "mapHint": "Chạm vào bản đồ để chọn địa điểm",
-  "saveCity": "Lưu thành phố"
+  "saveCity": "Lưu thành phố",
+  "notifications": "Thông báo",
+  "morningForecast": "Dự báo lúc 7:00 mỗi sáng",
+  "morningChannel": "Dự báo buổi sáng",
+  "morningTitle": "{place} hôm nay",
+  "notificationsDenied": "Skycast chưa được phép gửi thông báo. Bật lại trong Cài đặt của máy."
 }

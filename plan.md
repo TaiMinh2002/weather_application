@@ -496,7 +496,7 @@ README nên có đủ các mục:
 - [x] Nền động *(bản nhẹ: `AnimatedContainer` + `AnimatedSwitcher`; Lottie/hạt mưa để sau nếu cần)*
 - [x] Đồng bộ Supabase *(anonymous ngầm, không màn login; sao lưu danh sách thành phố, khôi phục khi máy trống; key qua `--dart-define-from-file`)*
 - [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*
-- [ ] Thông báo mỗi sáng
+- [x] Thông báo mỗi sáng *(bật trong Cài đặt; mỗi lần có dự báo GPS mới thì lên lịch sẵn 7 thông báo 7:00, mỗi cái mang dự báo của đúng ngày đó → không cần `workmanager`/chạy nền)*
 
 ### Chất lượng & trình bày
 - [x] Unit test + widget test *(45 test)*

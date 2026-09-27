@@ -10,6 +10,7 @@ abstract final class PrefKeys {
   static const windUnit = 'wind_unit';
   static const themeMode = 'theme_mode';
   static const language = 'language';
+  static const morningForecast = 'morning_forecast';
 }
 
 /// Loaded once in `main()` and injected via `overrideWithValue`.
