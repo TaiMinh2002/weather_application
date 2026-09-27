@@ -148,3 +148,35 @@ class DailyForecast {
   UvLevel get uvLevel => UvLevel.fromIndex(uvIndexMax);
   CompassPoint get windFrom => CompassPoint.fromDegrees(windDirectionDominant);
 }
+
+/// Current air quality from Open-Meteo's air-quality API.
+class AirQuality {
+  const AirQuality({required this.usAqi, this.pm25, this.pm10});
+
+  final int usAqi;
+
+  /// µg/m³.
+  final double? pm25;
+  final double? pm10;
+
+  AqiLevel get level => AqiLevel.fromUsAqi(usAqi);
+}
+
+/// US EPA AQI categories.
+enum AqiLevel {
+  good,
+  moderate,
+  sensitive,
+  unhealthy,
+  veryUnhealthy,
+  hazardous;
+
+  static AqiLevel fromUsAqi(int aqi) => switch (aqi) {
+    <= 50 => good,
+    <= 100 => moderate,
+    <= 150 => sensitive,
+    <= 200 => unhealthy,
+    <= 300 => veryUnhealthy,
+    _ => hazardous,
+  };
+}

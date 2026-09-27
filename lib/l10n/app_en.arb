@@ -147,5 +147,14 @@
   "sunrise": "Sunrise",
   "sunset": "Sunset",
   "allowLocation": "Allow location",
-  "chooseCityManually": "Choose a city instead"
+  "chooseCityManually": "Choose a city instead",
+  "airQuality": "Air quality",
+  "aqiLevel": "{level, select, good{Good} moderate{Moderate} sensitive{Unhealthy for sensitive groups} unhealthy{Unhealthy} veryUnhealthy{Very unhealthy} other{Hazardous}}",
+  "@aqiLevel": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  }
 }

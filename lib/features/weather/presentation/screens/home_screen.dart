@@ -134,6 +134,7 @@ class _PlaceWeather extends ConsumerWidget {
                   name: place.name ?? context.l10n.currentLocation,
                   showPin: isGps,
                   onDayTap: (i) => context.push(Routes.dayOf(i, place)),
+                  place: place,
                   weather: weather,
                 ),
               ),
@@ -370,11 +371,15 @@ class _WeatherBody extends StatelessWidget {
     required this.weather,
     this.showPin = true,
     this.onDayTap,
+    this.place,
   });
 
   final String name;
   final bool showPin;
   final ValueChanged<int>? onDayTap;
+
+  /// Enables the air-quality card; null in the skeleton.
+  final Place? place;
   final Weather weather;
 
   @override
@@ -398,6 +403,10 @@ class _WeatherBody extends StatelessWidget {
       DailyCard(days: weather.daily, onDayTap: onDayTap),
       const SizedBox(height: 20),
       DetailGrid(current: weather.current, today: weather.daily.firstOrNull),
+      if (place case final place?) ...[
+        const SizedBox(height: 20),
+        AirQualityCard(lat: place.lat, lon: place.lon),
+      ],
     ],
   );
 }

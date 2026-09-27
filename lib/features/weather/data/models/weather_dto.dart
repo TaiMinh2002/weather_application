@@ -122,3 +122,24 @@ abstract class DailyDto with _$DailyDto {
   factory DailyDto.fromJson(Map<String, dynamic> json) =>
       _$DailyDtoFromJson(json);
 }
+
+/// `current` of the air-quality response. `us_aqi` is null where the model
+/// has no coverage.
+@freezed
+abstract class AirQualityDto with _$AirQualityDto {
+  const AirQualityDto._();
+
+  const factory AirQualityDto({
+    @JsonKey(name: 'us_aqi') int? usAqi,
+    @JsonKey(name: 'pm2_5') double? pm25,
+    double? pm10,
+  }) = _AirQualityDto;
+
+  factory AirQualityDto.fromJson(Map<String, dynamic> json) =>
+      _$AirQualityDtoFromJson(json);
+
+  AirQuality? toEntity() => switch (usAqi) {
+    final aqi? => AirQuality(usAqi: aqi, pm25: pm25, pm10: pm10),
+    null => null,
+  };
+}

@@ -143,6 +143,10 @@ Future<void> _shoot(
             _hanoi.lat,
             _hanoi.lon,
           ).overrideWith((ref) async => _weather(31, WeatherCondition.clear)),
+          for (final p in [_hanoi, for (final c in _cities) c.place])
+            airQualityProvider(p.lat, p.lon).overrideWith(
+              (ref) async => const AirQuality(usAqi: 74, pm25: 23, pm10: 31),
+            ),
           for (final (i, c) in _cities.indexed)
             weatherProvider(c.lat, c.lon).overrideWith(
               (ref) async => _weather(

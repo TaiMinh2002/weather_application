@@ -32,6 +32,14 @@ class WeatherRepositoryImpl implements WeatherRepository {
       return dto.toEntity(cachedAt: savedAt);
     }
   });
+
+  // ponytail: not cached; offline just hides the AQI card. Cache it like the
+  // forecast if offline AQI turns out to matter.
+  @override
+  Future<Result<AirQuality?>> getAirQuality({
+    required double lat,
+    required double lon,
+  }) => guard(() async => (await _remote.getAirQuality(lat, lon)).toEntity());
 }
 
 @Riverpod(keepAlive: true)

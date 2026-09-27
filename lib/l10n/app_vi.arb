@@ -73,5 +73,7 @@
   "sunrise": "Bình minh",
   "sunset": "Hoàng hôn",
   "allowLocation": "Cho phép vị trí",
-  "chooseCityManually": "Chọn thành phố thủ công"
+  "chooseCityManually": "Chọn thành phố thủ công",
+  "airQuality": "Chất lượng không khí",
+  "aqiLevel": "{level, select, good{Tốt} moderate{Trung bình} sensitive{Kém} unhealthy{Xấu} veryUnhealthy{Rất xấu} other{Nguy hại}}"
 }
