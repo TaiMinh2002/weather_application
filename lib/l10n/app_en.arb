@@ -98,5 +98,29 @@
         "type": "String"
       }
     }
-  }
+  },
+  "searchCityHint": "Search for a city…",
+  "clearSearch": "Clear",
+  "savedCitiesHint": "Hold and drag to reorder · Swipe left to delete",
+  "savedCitiesEmpty": "No saved cities yet",
+  "savedCitiesEmptyHint": "Use the search field above to add a city",
+  "searchNoResults": "No results for \"{query}\"",
+  "@searchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "cityDeleted": "Removed {name}",
+  "@cityDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "undo": "Undo",
+  "delete": "Delete",
+  "chooseCity": "Choose a city"
 }

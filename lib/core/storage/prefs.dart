@@ -5,6 +5,7 @@ part 'prefs.g.dart';
 
 abstract final class PrefKeys {
   static const onboarded = 'onboarded';
+  static const savedCities = 'saved_cities';
 }
 
 /// Loaded once in `main()` and injected via `overrideWithValue`.
