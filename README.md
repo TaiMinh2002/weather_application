@@ -1,49 +1,73 @@
 # Skycast 🌤️
 
-Ứng dụng thời tiết viết bằng Flutter, dùng API miễn phí [Open-Meteo](https://open-meteo.com) (không cần API key).
+[![CI](https://github.com/TaiMinh2002/weather_application/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/TaiMinh2002/weather_application/actions/workflows/ci.yml)
+![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.13-0175C2?logo=dart)
 
-> 🚧 Đang phát triển. Kế hoạch chi tiết: [plan.md](plan.md) · Quy tắc code: [rule.md](rule.md)
+Ứng dụng thời tiết viết bằng Flutter, dùng API miễn phí [Open-Meteo](https://open-meteo.com) (không cần API key). **0 đồng chi phí phát triển.**
 
-## Tính năng (MVP)
+Kế hoạch: [plan.md](plan.md) · Quy tắc code: [rule.md](rule.md) · Design: [`design/`](design/)
 
-- Thời tiết hiện tại theo GPS
-- Dự báo 24 giờ và 7 ngày
-- Thông số chi tiết: độ ẩm, gió, UV, áp suất, tầm nhìn, bình minh/hoàng hôn
-- Tìm kiếm và lưu nhiều thành phố
-- Cài đặt: °C/°F, đơn vị gió, sáng/tối, Việt/Anh
-- Offline cache, pull-to-refresh
+## Tính năng
 
-**Nâng cao (dự kiến):** AQI, gợi ý hoạt động, nền động, đồng bộ Supabase.
+- **Thời tiết hiện tại theo GPS**: nhiệt độ, cảm giác như, cao/thấp, nền gradient đổi theo thời tiết và ngày/đêm
+- **Dự báo 24 giờ và 7 ngày**, kèm % khả năng mưa
+- **Thông số chi tiết**: độ ẩm và điểm sương, gió và hướng gió, UV, áp suất, tầm nhìn, bình minh/hoàng hôn
+- **Chi tiết ngày**: biểu đồ nhiệt độ theo giờ, biểu đồ % mưa, gió và UV tối đa
+- **Nhiều thành phố**: tìm kiếm (debounce), lưu, kéo thả sắp xếp, vuốt để xóa (có hoàn tác), vuốt ngang giữa các thành phố ở Home
+- **Cài đặt**: °C/°F, km/h hoặc m/s, sáng/tối/theo hệ thống, Tiếng Việt/English
+- **Offline**: mất mạng vẫn hiện dữ liệu gần nhất, kèm "cập nhật lúc…"
+- **Đủ trạng thái**: skeleton khi tải, lỗi mạng/máy chủ có nút thử lại, từ chối quyền vị trí, GPS tắt
+- Onboarding giải thích quyền vị trí trước khi hệ thống hỏi, splash native, dark mode từ đầu
+
+**Hướng phát triển tiếp:** chỉ số chất lượng không khí (AQI), gợi ý hoạt động theo thời tiết, nền động, đồng bộ thành phố lên Supabase.
 
 ## Công nghệ
 
-| Hạng mục | Package |
+| Hạng mục | Lựa chọn |
 |---|---|
-| State management | Riverpod (codegen) |
-| Router | go_router |
-| Network | dio |
+| State management | Riverpod 3 (codegen `@riverpod`) |
+| Router | go_router (redirect onboarding) |
+| Network | dio, không tự viết interceptor |
 | Model | freezed + json_serializable |
 | Vị trí | geolocator + geocoding |
-| Lưu trữ | shared_preferences (cài đặt + cache offline) |
+| Lưu trữ | shared_preferences (cài đặt, thành phố, cache thời tiết dạng JSON) |
+| UI | Material 3, font Be Vietnam Pro, Material Symbols, skeletonizer; biểu đồ tự vẽ bằng `CustomPainter` |
+| Đa ngôn ngữ | `flutter_localizations` + `.arb` (vi, en) |
 | Test | flutter_test + mocktail |
+| CI | GitHub Actions: analyze, test, build APK |
 
 ## Kiến trúc
 
-Clean Architecture theo feature (`data` / `domain` / `presentation`), không có lớp usecase.
+Clean Architecture theo feature (`data` / `domain` / `presentation`). **Không có lớp usecase**: provider gọi thẳng repository.
 
+```mermaid
+flowchart LR
+  UI["Screen / Widget"] -- "ref.watch" --> P["Provider (Riverpod)"]
+  P --> R["Repository → Result&lt;T&gt;"]
+  R --> RDS["RemoteDataSource<br/>Dio → Open-Meteo"]
+  R --> LDS["LocalDataSource<br/>shared_preferences"]
 ```
-UI ──ref.watch──> Provider ──> Repository ──┬──> RemoteDataSource (Dio → Open-Meteo)
-                                            └──> LocalDataSource  (cache JSON)
-```
+
+**Luồng lỗi:** datasource bắt `DioException` và ném exception của app, repository bọc bằng `guard()` để trả `Result<T>` (`Ok` / `Err(Failure)`), UI dùng `.when(data, loading, error)`, còn `AppErrorView` lấy câu thông báo theo loại lỗi từ l10n.
+
+**Dữ liệu:** có mạng thì gọi API và lưu cache. Mất mạng thì trả cache kèm thời điểm cập nhật. Không có cả hai thì báo lỗi.
 
 ```
 lib/
-├── core/        # network, error, router, theme, storage, utils, widgets dùng chung
-├── features/    # weather, location, cities, settings, onboarding
-└── l10n/        # app_vi.arb, app_en.arb
+├── core/          # network, error (Result/Failure), router, theme, storage, utils, widgets dùng chung
+├── features/
+│   ├── weather/   # dự báo + cache offline, màn Home và Chi tiết ngày
+│   ├── location/  # GPS, quyền vị trí, tên địa điểm
+│   ├── cities/    # tìm kiếm và quản lý thành phố
+│   ├── settings/  # đơn vị, theme, ngôn ngữ
+│   └── onboarding/
+└── l10n/          # app_vi.arb, app_en.arb
 ```
 
 ## Chạy project
+
+Cần Flutter 3.47+ (Dart 3.13+). File sinh ra (`*.g.dart`, `*.freezed.dart`, l10n) không commit, nên phải generate sau khi clone:
 
 ```bash
 flutter pub get
@@ -61,6 +85,18 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
+Chạy test:
+
+```bash
+flutter test
+```
+
+## Tải APK
+
+Mỗi lần push lên `dev`/`main`, GitHub Actions build một APK. Vào tab [Actions](https://github.com/TaiMinh2002/weather_application/actions/workflows/ci.yml), chọn lần chạy mới nhất, tải artifact **skycast-apk**.
+
 ## Credits
 
-- Dữ liệu thời tiết: [Open-Meteo](https://open-meteo.com)
+- Dữ liệu thời tiết và tìm kiếm địa điểm: [Open-Meteo](https://open-meteo.com) (CC BY 4.0)
+- Font: [Be Vietnam Pro](https://github.com/bettergui/BeVietnamPro) (SIL Open Font License)
+- Icon: [Material Symbols](https://fonts.google.com/icons) (Apache 2.0)

@@ -386,14 +386,14 @@ String? onboardingRedirect(SharedPreferences prefs, String location) {
 | 2 ✅ | DioClient, Failure, Result type, gọi thử API Open-Meteo |
 | 3 ✅ | Model (freezed), repository, provider thời tiết |
 | 4 ✅ | Lấy GPS, xử lý quyền, reverse geocoding |
-| 5–6 | Màn Home: thời tiết hiện tại, theo giờ, 7 ngày, thông số chi tiết |
-| 7 | Cache offline, pull-to-refresh, banner offline |
-| 8 | Màn Thành phố: tìm kiếm (debounce), lưu thành phố |
-| 9 | Màn Thành phố: sắp xếp, xóa; PageView vuốt giữa các thành phố |
-| 10 | Màn cài đặt: đơn vị, theme, ngôn ngữ |
-| 11 | Onboarding, splash native, màn chi tiết ngày + biểu đồ |
-| 12 | Nền động, skeleton loading, hoàn thiện UI |
-| 13 | Viết test (mapper, repository, provider), GitHub Actions |
+| 5–6 ✅ | Màn Home: thời tiết hiện tại, theo giờ, 7 ngày, thông số chi tiết |
+| 7 ✅ | Cache offline, pull-to-refresh, banner offline |
+| 8 ✅ | Màn Thành phố: tìm kiếm (debounce), lưu thành phố |
+| 9 ✅ | Màn Thành phố: sắp xếp, xóa; PageView vuốt giữa các thành phố |
+| 10 ✅ | Màn cài đặt: đơn vị, theme, ngôn ngữ |
+| 11 ✅ | Onboarding, splash native, màn chi tiết ngày + biểu đồ |
+| 12 | Nền động, hoàn thiện UI *(skeleton đã làm cùng từng màn)* |
+| 13 ✅ | Viết test (mapper, repository, provider), GitHub Actions |
 | 14 | README, chụp ảnh/quay GIF, build APK đưa lên Releases |
 
 ✅ = đã xong (merge vào `dev`).
@@ -452,11 +452,11 @@ README nên có đủ các mục:
 
 ## 10. Checklist hoàn thành
 
-### Tiến độ (cập nhật 2026-09-24)
+### Tiến độ (cập nhật 2026-09-27)
 
-Đã merge vào `dev`: **base code** (PR #1), **dữ liệu thời tiết** (PR #2), **vị trí** (PR #3). Tương ứng ngày 1–4 trong lộ trình.
+Đã merge vào `dev`: base code, dữ liệu thời tiết, vị trí, design tokens, Home, cache offline, Thành phố, Cài đặt, Chi tiết ngày, Onboarding + splash native (PR #1–#11). Tương ứng ngày 1–11.
 
-**Tiếp theo:** màn Home thật (ngày 5–6).
+**Tiếp theo:** chụp ảnh/GIF cho README, APK trên Releases (ngày 14); nền động (ngày 12) tùy chọn.
 
 **Thay đổi so với kế hoạch ban đầu:**
 - Không dùng `permission_handler`: `geolocator` đã có sẵn kiểm tra quyền, xin quyền và mở Cài đặt.
@@ -464,7 +464,8 @@ README nên có đủ các mục:
 - Exception, `Failure`, `Result` nằm chung `core/error/errors.dart` thay vì tách 2 file (theo rule 600 dòng).
 - Nhánh: `feature/*` tạo từ `dev`, Pull Request vào `dev` (không vào thẳng `main`).
 - Cache offline dùng `shared_preferences` (JSON, mỗi địa điểm ~30 KB) thay vì `hive_ce`: đủ dùng và không thêm package (rule.md mục 7). Chỉ fallback cache khi mất mạng; lỗi server vẫn báo lỗi.
-- Chưa làm: đổi đơn vị °C/°F (cùng màn Settings).
+- Không dùng `connectivity_plus`, `fl_chart`, `hive_ce`, `flutter_native_splash`: `NetworkException`, `CustomPainter`, `shared_preferences` và file native tự viết đã đủ (rule.md mục 7).
+- Tìm kiếm và quản lý thành phố gộp một màn `/cities` (feature `cities/`).
 
 
 ### Nền tảng
@@ -478,14 +479,14 @@ README nên có đủ các mục:
 - [x] Đa ngôn ngữ Việt/Anh
 
 ### Tính năng MVP
-- [x] Thời tiết hiện tại theo GPS *(màn Home mới là bản tạm)*
-- [ ] Dự báo theo giờ *(đã có dữ liệu `next24Hours`, chưa có UI)*
-- [ ] Dự báo 7 ngày *(đã có dữ liệu, chưa có UI)*
-- [ ] Thông số chi tiết *(đã có dữ liệu, chưa có UI)*
-- [ ] Tìm kiếm thành phố
-- [ ] Lưu / sắp xếp / xóa thành phố
-- [ ] Cài đặt đơn vị, theme, ngôn ngữ
-- [ ] Offline cache
+- [x] Thời tiết hiện tại theo GPS
+- [x] Dự báo theo giờ
+- [x] Dự báo 7 ngày
+- [x] Thông số chi tiết
+- [x] Tìm kiếm thành phố
+- [x] Lưu / sắp xếp / xóa thành phố
+- [x] Cài đặt đơn vị, theme, ngôn ngữ
+- [x] Offline cache
 - [x] Pull-to-refresh
 - [x] Xử lý quyền vị trí & lỗi
 
@@ -494,11 +495,11 @@ README nên có đủ các mục:
 - [ ] Gợi ý hoạt động
 - [ ] Nền động
 - [ ] Đồng bộ Supabase
-- [ ] Biểu đồ nhiệt độ
+- [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*
 - [ ] Thông báo mỗi sáng
 
 ### Chất lượng & trình bày
-- [ ] Unit test + widget test *(đang làm dần theo từng tính năng, hiện 21 test)*
-- [ ] GitHub Actions
-- [ ] README đầy đủ
+- [x] Unit test + widget test *(45 test)*
+- [x] GitHub Actions
+- [ ] README đầy đủ *(còn ảnh chụp / GIF)*
 - [ ] APK trên GitHub Releases
