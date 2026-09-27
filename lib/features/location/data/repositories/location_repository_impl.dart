@@ -1,9 +1,11 @@
 import 'dart:ui';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/error/errors.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/place.dart';
 import '../../domain/repositories/location_repository.dart';
 import '../datasources/location_ds.dart';
@@ -46,10 +48,8 @@ class LocationRepositoryImpl implements LocationRepository {
   });
 }
 
-// ponytail: device locale for place names; switch to the settings locale
-// once the settings feature exists.
 @Riverpod(keepAlive: true)
 LocationRepository locationRepository(Ref ref) => LocationRepositoryImpl(
   ref.watch(locationDataSourceProvider),
-  PlatformDispatcher.instance.locale,
+  ref.watch(settingsProvider.select((s) => s.effectiveLocale)),
 );

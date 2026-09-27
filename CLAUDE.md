@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Skycast: a Flutter weather app using the free Open-Meteo API (no API key needed). Done so far: base code in `lib/core/`, the `weather` data layer with offline cache, the `location` feature (GPS + reverse geocoding), onboarding, the Home screen (GPS page + one page per saved city), and the Cities screen (search + saved list, `features/cities/`). Settings and day detail are not built yet. Generated files (`*.g.dart`, `*.freezed.dart`, `lib/l10n/app_localizations*.dart`) are gitignored, so run `flutter gen-l10n` + `build_runner` after cloning.
+Skycast: a Flutter weather app using the free Open-Meteo API (no API key needed). Done so far: base code in `lib/core/`, the `weather` data layer with offline cache, the `location` feature (GPS + reverse geocoding), onboarding, the Home screen (GPS page + one page per saved city), the Cities screen (search + saved list, `features/cities/`), and Settings (`settingsProvider`: units, theme, language, stored in shared_preferences). Day detail and the native splash are not built yet. Format temperatures and wind with `settingsProvider.units` (`core/utils/unit_converter.dart`), never by hand. Generated files (`*.g.dart`, `*.freezed.dart`, `lib/l10n/app_localizations*.dart`) are gitignored, so run `flutter gen-l10n` + `build_runner` after cloning.
 
 `// ponytail:` comments mark deliberate shortcuts and say which later step replaces them. Grep for them before building the feature they mention.
 

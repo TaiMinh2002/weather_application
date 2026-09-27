@@ -9,7 +9,7 @@ import '../../../../core/widgets/state_views.dart';
 import '../../../location/domain/entities/place.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../weather/presentation/providers/weather_provider.dart';
-import '../../../weather/presentation/widgets/forecast_cards.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/city.dart';
 import '../providers/cities_provider.dart';
 
@@ -287,12 +287,14 @@ class _CurrentTemp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final style = context.textTheme.titleLarge;
+    final units = ref.watch(settingsProvider).units;
     return ref
         .watch(weatherProvider(place.lat, place.lon))
         .when(
-          data: (w) => Text(formatTemp(w.current.temperature), style: style),
+          data: (w) =>
+              Text(units.formatTemp(w.current.temperature), style: style),
           loading: () =>
-              Skeletonizer(child: Text(formatTemp(30), style: style)),
+              Skeletonizer(child: Text(units.formatTemp(30), style: style)),
           // The row stays useful without a temperature; Home shows the error.
           error: (_, _) => const SizedBox.shrink(),
         );

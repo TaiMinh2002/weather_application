@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/cities/presentation/screens/cities_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/weather/presentation/screens/home_screen.dart';
 import '../storage/prefs.dart';
@@ -13,7 +14,8 @@ abstract final class Routes {
   static const home = '/';
   static const onboarding = '/onboarding';
   static const cities = '/cities';
-  // Add as screens land: /settings, /day/:index
+  static const settings = '/settings';
+  // Add as screens land: /day/:index
 }
 
 /// Pure so it can be unit-tested without a widget tree.
@@ -37,6 +39,7 @@ GoRouter appRouter(Ref ref) {
         builder: (_, _) => const OnboardingScreen(),
       ),
       GoRoute(path: Routes.cities, builder: (_, _) => const CitiesScreen()),
+      GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen()),
     ],
   );
 }

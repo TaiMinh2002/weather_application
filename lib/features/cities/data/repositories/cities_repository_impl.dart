@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/error/errors.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/city.dart';
 import '../../domain/repositories/cities_repository.dart';
 import '../datasources/cities_local_ds.dart';
@@ -32,11 +34,9 @@ class CitiesRepositoryImpl implements CitiesRepository {
       _local.write([for (final c in cities) CityDto.fromEntity(c)]);
 }
 
-// ponytail: device locale for city names; switch to the settings locale
-// once the settings feature exists.
 @Riverpod(keepAlive: true)
 CitiesRepository citiesRepository(Ref ref) => CitiesRepositoryImpl(
   ref.watch(citiesRemoteDataSourceProvider),
   ref.watch(citiesLocalDataSourceProvider),
-  PlatformDispatcher.instance.locale,
+  ref.watch(settingsProvider.select((s) => s.effectiveLocale)),
 );

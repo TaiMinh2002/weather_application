@@ -1,17 +1,16 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/extensions/context_ext.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/weather.dart';
 
 // Forecast blocks drawn on the weather gradient: text and icon colors come
 // from the surrounding theme, which the Home gradient page sets to onWeather.
-
-// ponytail: always °C until the unit converter lands with Settings (day 10).
-String formatTemp(double t) => '${t.round()}°';
 
 class _GlassCard extends StatelessWidget {
   const _GlassCard({required this.padding, required this.child});
@@ -30,13 +29,14 @@ class _GlassCard extends StatelessWidget {
   );
 }
 
-class HourlyCard extends StatelessWidget {
+class HourlyCard extends ConsumerWidget {
   const HourlyCard({super.key, required this.hours});
 
   final List<HourlyForecast> hours;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final units = ref.watch(settingsProvider).units;
     final l10n = context.l10n;
     final text = context.textTheme;
     final time = DateFormat.Hm(Localizations.localeOf(context).toString());
@@ -72,7 +72,10 @@ class HourlyCard extends StatelessWidget {
                           maxLines: 1,
                         ),
                         Icon(h.condition.icon(isDay: h.isDay), size: 22),
-                        Text(formatTemp(h.temperature), style: text.bodyLarge),
+                        Text(
+                          units.formatTemp(h.temperature),
+                          style: text.bodyLarge,
+                        ),
                         if (h.precipitationProbability > 0)
                           Text(
                             '${h.precipitationProbability}%',
@@ -94,13 +97,14 @@ class HourlyCard extends StatelessWidget {
   }
 }
 
-class DailyCard extends StatelessWidget {
+class DailyCard extends ConsumerWidget {
   const DailyCard({super.key, required this.days});
 
   final List<DailyForecast> days;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final units = ref.watch(settingsProvider).units;
     final l10n = context.l10n;
     final text = context.textTheme;
     final colors = context.colors;
@@ -152,7 +156,7 @@ class DailyCard extends StatelessWidget {
                   SizedBox(
                     width: 34,
                     child: Text(
-                      formatTemp(d.tempMin),
+                      units.formatTemp(d.tempMin),
                       textAlign: TextAlign.right,
                       style: text.bodyMedium?.copyWith(color: muted),
                     ),
@@ -165,7 +169,10 @@ class DailyCard extends StatelessWidget {
                   ),
                   SizedBox(
                     width: 34,
-                    child: Text(formatTemp(d.tempMax), style: text.bodyMedium),
+                    child: Text(
+                      units.formatTemp(d.tempMax),
+                      style: text.bodyMedium,
+                    ),
                   ),
                   Icon(
                     Symbols.chevron_right_rounded,
@@ -219,14 +226,15 @@ class _RangeBar extends StatelessWidget {
   }
 }
 
-class DetailGrid extends StatelessWidget {
+class DetailGrid extends ConsumerWidget {
   const DetailGrid({super.key, required this.current, required this.today});
 
   final CurrentWeather current;
   final DailyForecast? today;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final units = ref.watch(settingsProvider).units;
     final l10n = context.l10n;
     final text = context.textTheme;
     final c = current;
@@ -239,13 +247,13 @@ class DetailGrid extends StatelessWidget {
         icon: Symbols.humidity_percentage_rounded,
         label: l10n.humidity,
         value: value('${c.humidity}%'),
-        caption: l10n.dewPoint(formatTemp(c.dewPoint)),
+        caption: l10n.dewPoint(units.formatTemp(c.dewPoint)),
       ),
       _DetailTile(
         icon: Symbols.navigation_rounded,
         iconAngle: c.windDirection,
         label: l10n.wind,
-        value: value('${c.windSpeed.round()} km/h'),
+        value: value(units.formatWind(c.windSpeed)),
         caption: l10n.windFrom(c.windFrom.name),
       ),
       _DetailTile(

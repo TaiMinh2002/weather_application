@@ -1,0 +1,259 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+import '../../../../core/extensions/context_ext.dart';
+import '../../../../core/utils/unit_converter.dart';
+import '../providers/settings_provider.dart';
+
+/// Every change applies immediately, so there is no Save button.
+class SettingsScreen extends ConsumerWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final settings = ref.watch(settingsProvider);
+    final notifier = ref.read(settingsProvider.notifier);
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.settings)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _Group(
+            title: l10n.units,
+            rows: [
+              _Row(
+                label: l10n.temperature,
+                trailing: _Segmented(
+                  selected: settings.units.temp,
+                  onSelected: notifier.setTempUnit,
+                  options: const [
+                    (TempUnit.celsius, '°C', null),
+                    (TempUnit.fahrenheit, '°F', null),
+                  ],
+                ),
+              ),
+              _Row(
+                label: l10n.windSpeed,
+                trailing: _Segmented(
+                  selected: settings.units.wind,
+                  onSelected: notifier.setWindUnit,
+                  options: const [
+                    (WindUnit.kmh, 'km/h', null),
+                    (WindUnit.ms, 'm/s', null),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _Group(
+            title: l10n.appearance,
+            rows: [
+              _Row(
+                label: l10n.theme,
+                trailing: _Segmented(
+                  selected: settings.themeMode,
+                  onSelected: notifier.setThemeMode,
+                  options: [
+                    (
+                      ThemeMode.light,
+                      l10n.themeLight,
+                      Symbols.light_mode_rounded,
+                    ),
+                    (ThemeMode.dark, l10n.themeDark, Symbols.dark_mode_rounded),
+                    (
+                      ThemeMode.system,
+                      l10n.themeSystem,
+                      Symbols.routine_rounded,
+                    ),
+                  ],
+                ),
+              ),
+              _Row(
+                label: l10n.language,
+                trailing: _Segmented(
+                  // Unset follows the device; show what the UI resolved to.
+                  selected:
+                      settings.locale?.languageCode ??
+                      Localizations.localeOf(context).languageCode,
+                  onSelected: notifier.setLanguage,
+                  // Language names are written in their own language, so a
+                  // user can find theirs whatever the UI language is.
+                  options: const [
+                    ('vi', 'Tiếng Việt', null),
+                    ('en', 'English', null),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _Group(
+            title: l10n.about,
+            rows: [
+              _Row(
+                label: l10n.weatherData,
+                icon: Symbols.cloud_rounded,
+                trailing: Text(
+                  'Open-Meteo',
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    color: context.colors.textMuted,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Group extends StatelessWidget {
+  const _Group({required this.title, required this.rows});
+
+  final String title;
+  final List<Widget> rows;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    spacing: 10,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Text(
+          title.toUpperCase(),
+          style: context.textTheme.labelMedium?.copyWith(
+            color: context.colors.textMuted,
+            letterSpacing: 0.48,
+          ),
+        ),
+      ),
+      Container(
+        decoration: BoxDecoration(
+          color: context.colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            for (final (i, row) in rows.indexed) ...[
+              if (i > 0) const Divider(),
+              row,
+            ],
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+class _Row extends StatelessWidget {
+  const _Row({required this.label, required this.trailing, this.icon});
+
+  final String label;
+  final Widget trailing;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(minHeight: 48),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        spacing: 12,
+        children: [
+          if (icon != null)
+            Icon(icon, size: 18, color: context.colors.textMuted),
+          Expanded(child: Text(label, style: context.textTheme.bodyLarge)),
+          // Scales down rather than wrapping on narrow screens (iPhone SE).
+          Flexible(
+            flex: 3,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Pill segmented control from the design; Material's SegmentedButton is an
+/// outlined style that doesn't match.
+class _Segmented<T> extends StatelessWidget {
+  const _Segmented({
+    required this.selected,
+    required this.onSelected,
+    required this.options,
+  });
+
+  final T selected;
+  final ValueChanged<T> onSelected;
+  final List<(T, String, IconData?)> options;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+    final style = context.textTheme.labelMedium?.copyWith(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+    );
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: context.colors.card,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final (value, label, icon) in options)
+            Semantics(
+              button: true,
+              selected: value == selected,
+              child: Material(
+                color: value == selected ? scheme.primary : context.colors.card,
+                shape: const StadiumBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () => onSelected(value),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 4,
+                      children: [
+                        if (icon != null)
+                          Icon(
+                            icon,
+                            size: 14,
+                            color: value == selected
+                                ? scheme.onPrimary
+                                : context.colors.textMuted,
+                          ),
+                        Text(
+                          label,
+                          style: style?.copyWith(
+                            color: value == selected
+                                ? scheme.onPrimary
+                                : context.colors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

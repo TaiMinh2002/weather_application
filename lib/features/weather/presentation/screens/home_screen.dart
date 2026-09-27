@@ -14,11 +14,11 @@ import '../../../../core/widgets/state_views.dart';
 import '../../../cities/presentation/providers/cities_provider.dart';
 import '../../../location/domain/entities/place.dart';
 import '../../../location/presentation/providers/location_provider.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/forecast_cards.dart';
 
-// ponytail: units fixed to °C, km/h, hPa, km until Settings (plan.md day 10).
 /// Page 0 is the GPS location, then one page per saved city.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -226,8 +226,6 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = IconTheme.of(context).color ?? context.colorScheme.onSurface;
-    final disabled = color.withValues(alpha: 0.38);
-    // ponytail: settings button is a no-op until /settings (day 10).
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
@@ -236,7 +234,6 @@ class _TopBar extends StatelessWidget {
             onPressed: onCities,
             color: color,
             tooltip: context.l10n.cities,
-            disabledColor: disabled,
             icon: const Icon(Symbols.list_rounded),
           ),
           Expanded(
@@ -267,9 +264,9 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: null,
+            onPressed: () => context.push(Routes.settings),
+            color: color,
             tooltip: context.l10n.settings,
-            disabledColor: disabled,
             icon: const Icon(Symbols.settings_rounded),
           ),
         ],
@@ -420,7 +417,7 @@ class _OfflineBanner extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   const _Header({
     required this.name,
     required this.weather,
@@ -432,7 +429,8 @@ class _Header extends StatelessWidget {
   final Weather weather;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final units = ref.watch(settingsProvider).units;
     final l10n = context.l10n;
     final text = context.textTheme;
     final c = weather.current;
@@ -460,7 +458,7 @@ class _Header extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Text(
-            formatTemp(c.temperature),
+            units.formatTemp(c.temperature),
             style: text.displayLarge?.copyWith(
               fontSize: compact ? 80 : null,
               height: 1,
@@ -470,13 +468,16 @@ class _Header extends StatelessWidget {
         Text(c.condition.label(l10n), style: text.bodyLarge),
         if (today != null)
           Text(
-            l10n.hiLo(formatTemp(today.tempMax), formatTemp(today.tempMin)),
+            l10n.hiLo(
+              units.formatTemp(today.tempMax),
+              units.formatTemp(today.tempMin),
+            ),
             style: text.bodyMedium,
           ),
         Opacity(
           opacity: 0.85,
           child: Text(
-            l10n.feelsLike(formatTemp(c.apparentTemperature)),
+            l10n.feelsLike(units.formatTemp(c.apparentTemperature)),
             style: text.bodyMedium,
           ),
         ),
