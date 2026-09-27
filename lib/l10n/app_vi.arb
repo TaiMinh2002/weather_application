@@ -8,9 +8,8 @@
   "errorLocation": "Không lấy được vị trí của bạn",
   "errorUnknown": "Đã có lỗi xảy ra",
   "emptyDefault": "Chưa có dữ liệu",
-  "onboardingTitle": "Thời tiết nơi bạn đứng",
-  "onboardingBody": "Skycast dùng vị trí của bạn để hiển thị thời tiết tại chỗ. Bạn cũng có thể tự tìm thành phố.",
-  "onboardingStart": "Bắt đầu",
+  "onboardingTitle": "Thời tiết ngay nơi bạn đứng",
+  "onboardingBody": "Skycast dùng vị trí để hiện thời tiết chính xác nơi bạn ở. Vị trí chỉ dùng trên máy, không gửi đi đâu khác.",
   "conditionClear": "Trời quang",
   "conditionMainlyClear": "Ít mây",
   "conditionPartlyCloudy": "Có mây",
@@ -72,5 +71,7 @@
   "maxWind": "Gió tối đa",
   "maxUv": "UV tối đa",
   "sunrise": "Bình minh",
-  "sunset": "Hoàng hôn"
+  "sunset": "Hoàng hôn",
+  "allowLocation": "Cho phép vị trí",
+  "chooseCityManually": "Chọn thành phố thủ công"
 }

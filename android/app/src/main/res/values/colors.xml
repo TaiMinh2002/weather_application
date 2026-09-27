@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Match AppTheme surface / primary so the hand-off to Flutter doesn't flash. -->
+    <color name="splash_background">#F8FAFC</color>
+    <color name="splash_icon">#2563EB</color>
+    <color name="ic_launcher_background">#2563EB</color>
+</resources>
