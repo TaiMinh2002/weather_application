@@ -19,7 +19,7 @@ class WeatherRemoteDataSource {
           'latitude': lat,
           'longitude': lon,
           'current':
-              'temperature_2m,relative_humidity_2m,apparent_temperature,'
+              'temperature_2m,relative_humidity_2m,apparent_temperature,dew_point_2m,'
               'is_day,weather_code,wind_speed_10m,wind_direction_10m,'
               'pressure_msl,uv_index,visibility',
           'hourly':

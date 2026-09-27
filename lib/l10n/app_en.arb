@@ -33,5 +33,62 @@
   "errorLocationDisabled": "Location services are turned off",
   "errorLocationDenied": "Location permission is needed to show local weather",
   "errorLocationDeniedForever": "Location permission is blocked. Enable it in Settings",
-  "openSettings": "Open settings"
+  "openSettings": "Open settings",
+  "currentLocation": "Current location",
+  "cities": "Cities",
+  "settings": "Settings",
+  "now": "Now",
+  "today": "Today",
+  "hourlyTitle": "24-hour forecast",
+  "dailyTitle": "7 days",
+  "hiLo": "H:{hi} L:{lo}",
+  "@hiLo": {
+    "placeholders": {
+      "hi": {
+        "type": "String"
+      },
+      "lo": {
+        "type": "String"
+      }
+    }
+  },
+  "weekdayShort": "{day, select, 1{Mon} 2{Tue} 3{Wed} 4{Thu} 5{Fri} 6{Sat} other{Sun}}",
+  "@weekdayShort": {
+    "description": "DateTime.weekday: 1 = Monday … 7 = Sunday",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "humidity": "Humidity",
+  "dewPoint": "Dew point {temp}",
+  "@dewPoint": {
+    "placeholders": {
+      "temp": {
+        "type": "String"
+      }
+    }
+  },
+  "wind": "Wind",
+  "windFrom": "{dir, select, n{From north} ne{From north-east} e{From east} se{From south-east} s{From south} sw{From south-west} w{From west} other{From north-west}}",
+  "@windFrom": {
+    "placeholders": {
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "uvIndex": "UV",
+  "uvLevel": "{level, select, low{Low} moderate{Moderate} high{High} veryHigh{Very high} other{Extreme}}",
+  "@uvLevel": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "pressure": "Pressure",
+  "visibility": "Visibility",
+  "sunriseSunset": "Sunrise · Sunset"
 }

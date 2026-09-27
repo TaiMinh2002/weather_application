@@ -87,3 +87,8 @@ Future<Result<T>> guard<T>(Future<T> Function() body) async {
     return Err(toFailure(e));
   }
 }
+
+/// Passed to `ProviderScope(retry:)`. Riverpod retries failed providers by
+/// default (up to 10 times, showing loading meanwhile), but every [Failure]
+/// here needs the user to act (grant permission, reconnect, tap Retry).
+Duration? noAutoRetry(int retryCount, Object error) => null;

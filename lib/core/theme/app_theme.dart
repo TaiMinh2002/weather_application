@@ -78,6 +78,13 @@ class AppColors extends ThemeExtension<AppColors> {
   }
 }
 
+/// Home background while the weather (and so its condition) is unknown.
+const loadingGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [Color(0xFF4B5A72), Color(0xFF2B3648)],
+);
+
 /// Home background. Identical in both app themes, so it isn't a
 /// [ThemeExtension].
 LinearGradient weatherGradient(
