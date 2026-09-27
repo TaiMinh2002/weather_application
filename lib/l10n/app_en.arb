@@ -122,5 +122,16 @@
   },
   "undo": "Undo",
   "delete": "Delete",
-  "chooseCity": "Choose a city"
+  "chooseCity": "Choose a city",
+  "units": "Units",
+  "temperature": "Temperature",
+  "windSpeed": "Wind speed",
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "language": "Language",
+  "about": "About",
+  "weatherData": "Weather data"
 }

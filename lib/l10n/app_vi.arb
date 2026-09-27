@@ -55,5 +55,16 @@
   "cityDeleted": "Đã xóa {name}",
   "undo": "Hoàn tác",
   "delete": "Xóa",
-  "chooseCity": "Chọn thành phố"
+  "chooseCity": "Chọn thành phố",
+  "units": "Đơn vị",
+  "temperature": "Nhiệt độ",
+  "windSpeed": "Tốc độ gió",
+  "appearance": "Giao diện",
+  "theme": "Chủ đề",
+  "themeLight": "Sáng",
+  "themeDark": "Tối",
+  "themeSystem": "Hệ thống",
+  "language": "Ngôn ngữ",
+  "about": "Giới thiệu",
+  "weatherData": "Dữ liệu thời tiết"
 }

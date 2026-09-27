@@ -6,6 +6,10 @@ part 'prefs.g.dart';
 abstract final class PrefKeys {
   static const onboarded = 'onboarded';
   static const savedCities = 'saved_cities';
+  static const tempUnit = 'temp_unit';
+  static const windUnit = 'wind_unit';
+  static const themeMode = 'theme_mode';
+  static const language = 'language';
 }
 
 /// Loaded once in `main()` and injected via `overrideWithValue`.
