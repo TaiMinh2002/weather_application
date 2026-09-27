@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error/errors.dart';
 import '../../../core/extensions/context_ext.dart';
 import '../../settings/presentation/providers/settings_provider.dart';
 import '../../weather/domain/entities/weather.dart';

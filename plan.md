@@ -49,7 +49,7 @@
 | Biểu đồ nhiệt độ theo giờ | `fl_chart` | Trung bình | Tùy chọn |
 | Thông báo dự báo mỗi sáng | `flutter_local_notifications` + `workmanager` | Trung bình | Tùy chọn |
 | Bản đồ chọn vị trí ✅ | `flutter_map` + OpenStreetMap | Trung bình | Tùy chọn |
-| Widget màn hình chính | `home_widget` | Khó | Tùy chọn |
+| Widget màn hình chính ✅ | `home_widget` | Khó | Tùy chọn |
 
 > Phần đồng bộ Supabase giúp dự án có "backend" đúng mục tiêu ban đầu.
 
@@ -496,6 +496,7 @@ README nên có đủ các mục:
 - [x] Nền động *(bản nhẹ: `AnimatedContainer` + `AnimatedSwitcher`; Lottie/hạt mưa để sau nếu cần)*
 - [x] Đồng bộ Supabase *(anonymous ngầm, không màn login; sao lưu danh sách thành phố, khôi phục khi máy trống; key qua `--dart-define-from-file`)*
 - [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*
+- [x] Widget màn hình chính *(2×2: Android native xong; iOS có sẵn code SwiftUI, cần thêm target trong Xcode theo `ios/SkycastWidget/README.md`)*
 - [x] Thông báo mỗi sáng *(bật trong Cài đặt; mỗi lần có dự báo GPS mới thì lên lịch sẵn 7 thông báo 7:00, mỗi cái mang dự báo của đúng ngày đó → không cần `workmanager`/chạy nền)*
 
 ### Chất lượng & trình bày

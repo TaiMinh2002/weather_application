@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget background; colours mirror Sky in app_theme.dart. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:angle="270" android:startColor="#4A4468" android:endColor="#24223A" />
+    <corners android:radius="20dp" />
+</shape>
