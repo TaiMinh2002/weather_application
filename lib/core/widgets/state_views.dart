@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../error/errors.dart';
 import '../extensions/context_ext.dart';
@@ -22,11 +23,13 @@ class AppErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final (icon, message) = switch (error) {
-      NetworkFailure() => (Icons.wifi_off, l10n.errorNetwork),
-      ServerFailure() => (Icons.cloud_off, l10n.errorServer),
-      CacheFailure() => (Icons.inventory_2_outlined, l10n.errorCache),
+      NetworkFailure() => (Symbols.wifi_off_rounded, l10n.errorNetwork),
+      ServerFailure() => (Symbols.cloud_off_rounded, l10n.errorServer),
+      CacheFailure() => (Symbols.inventory_2_rounded, l10n.errorCache),
       LocationFailure(:final reason) => (
-        Icons.location_off,
+        reason == LocationError.serviceDisabled
+            ? Symbols.gps_off_rounded
+            : Symbols.location_off_rounded,
         switch (reason) {
           LocationError.serviceDisabled => l10n.errorLocationDisabled,
           LocationError.denied => l10n.errorLocationDenied,
@@ -34,7 +37,7 @@ class AppErrorView extends StatelessWidget {
           LocationError.unavailable => l10n.errorLocation,
         },
       ),
-      _ => (Icons.error_outline, l10n.errorUnknown),
+      _ => (Symbols.error_rounded, l10n.errorUnknown),
     };
     // Retrying can't fix these; the user must change a system setting first.
     final openSettings = switch (error) {
@@ -52,13 +55,13 @@ class AppErrorView extends StatelessWidget {
         runSpacing: 12,
         alignment: WrapAlignment.center,
         children: [
+          if (onRetry != null)
+            FilledButton(onPressed: onRetry, child: Text(l10n.retry)),
           if (openSettings != null)
-            FilledButton(
+            FilledButton.tonal(
               onPressed: openSettings,
               child: Text(l10n.openSettings),
             ),
-          if (onRetry != null)
-            FilledButton.tonal(onPressed: onRetry, child: Text(l10n.retry)),
         ],
       ),
     );
@@ -66,14 +69,27 @@ class AppErrorView extends StatelessWidget {
 }
 
 class EmptyView extends StatelessWidget {
-  const EmptyView({super.key, this.message, this.icon = Icons.inbox_outlined});
+  const EmptyView({
+    super.key,
+    this.message,
+    this.icon = Symbols.inbox_rounded,
+    this.actionLabel,
+    this.onAction,
+  });
 
   final String? message;
   final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) =>
-      _MessageView(icon: icon, message: message ?? context.l10n.emptyDefault);
+  Widget build(BuildContext context) => _MessageView(
+    icon: icon,
+    message: message ?? context.l10n.emptyDefault,
+    action: actionLabel == null
+        ? null
+        : FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+  );
 }
 
 class _MessageView extends StatelessWidget {
@@ -90,14 +106,14 @@ class _MessageView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 64, color: context.colors.textMuted),
-          const SizedBox(height: 16),
+          Icon(icon, size: 64, weight: 300, color: context.colors.textMuted),
+          const SizedBox(height: 12),
           Text(
             message,
             textAlign: TextAlign.center,
             style: context.textTheme.bodyLarge,
           ),
-          if (action != null) ...[const SizedBox(height: 16), action!],
+          if (action != null) ...[const SizedBox(height: 20), action!],
         ],
       ),
     ),

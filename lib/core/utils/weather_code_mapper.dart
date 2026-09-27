@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/app_localizations.dart';
 
@@ -32,14 +33,18 @@ enum WeatherCondition {
   };
 
   IconData icon({bool isDay = true}) => switch (this) {
-    clear => isDay ? Icons.wb_sunny : Icons.nightlight_round,
-    mainlyClear || partlyCloudy => isDay ? Icons.wb_cloudy : Icons.nights_stay,
-    overcast => Icons.cloud,
-    fog => Icons.foggy,
-    drizzle || rain || showers => Icons.water_drop,
-    snow => Icons.ac_unit,
-    thunderstorm => Icons.thunderstorm,
-    unknown => Icons.help_outline,
+    clear ||
+    mainlyClear => isDay ? Symbols.sunny_rounded : Symbols.clear_night_rounded,
+    partlyCloudy =>
+      isDay
+          ? Symbols.partly_cloudy_day_rounded
+          : Symbols.partly_cloudy_night_rounded,
+    overcast => Symbols.cloud_rounded,
+    fog => Symbols.foggy_rounded,
+    drizzle || rain || showers => Symbols.water_drop_rounded,
+    snow => Symbols.ac_unit_rounded,
+    thunderstorm => Symbols.thunderstorm_rounded,
+    unknown => Symbols.help_rounded,
   };
 
   String label(AppLocalizations l10n) => switch (this) {

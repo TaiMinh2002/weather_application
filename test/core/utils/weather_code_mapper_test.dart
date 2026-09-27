@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:weather_application/core/utils/weather_code_mapper.dart';
 
@@ -23,7 +23,10 @@ void main() {
   });
 
   test('clear sky icon depends on day/night', () {
-    expect(WeatherCondition.clear.icon(), Icons.wb_sunny);
-    expect(WeatherCondition.clear.icon(isDay: false), Icons.nightlight_round);
+    expect(WeatherCondition.clear.icon(), Symbols.sunny_rounded);
+    expect(
+      WeatherCondition.clear.icon(isDay: false),
+      Symbols.clear_night_rounded,
+    );
   });
 }
