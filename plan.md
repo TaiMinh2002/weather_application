@@ -392,7 +392,7 @@ String? onboardingRedirect(SharedPreferences prefs, String location) {
 | 9 ✅ | Màn Thành phố: sắp xếp, xóa; PageView vuốt giữa các thành phố |
 | 10 ✅ | Màn cài đặt: đơn vị, theme, ngôn ngữ |
 | 11 ✅ | Onboarding, splash native, màn chi tiết ngày + biểu đồ |
-| 12 | Nền động, hoàn thiện UI *(skeleton đã làm cùng từng màn)* |
+| 12 ✅ | Nền động, hoàn thiện UI *(gradient chuyển mượt khi tải xong / đổi thời tiết, nội dung fade từ skeleton; tắt khi máy bật giảm chuyển động)* |
 | 13 ✅ | Viết test (mapper, repository, provider), GitHub Actions |
 | 14 | README, chụp ảnh/quay GIF, build APK đưa lên Releases |
 
@@ -493,7 +493,7 @@ README nên có đủ các mục:
 ### Nâng cao
 - [ ] AQI
 - [ ] Gợi ý hoạt động
-- [ ] Nền động
+- [x] Nền động *(bản nhẹ: `AnimatedContainer` + `AnimatedSwitcher`; Lottie/hạt mưa để sau nếu cần)*
 - [ ] Đồng bộ Supabase
 - [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*
 - [ ] Thông báo mỗi sáng

@@ -81,7 +81,11 @@ class _GpsPage extends ConsumerWidget {
       .when(
         data: (place) =>
             _PlaceWeather(place: place, topBar: topBar, isGps: true),
-        loading: () => _WeatherSkeleton(topBar: topBar),
+        loading: () => _GradientPage(
+          gradient: loadingGradient,
+          topBar: topBar,
+          child: const _WeatherSkeleton(),
+        ),
         error: (e, _) => _SurfacePage(
           topBar: topBar,
           child: AppErrorView(
@@ -135,7 +139,11 @@ class _PlaceWeather extends ConsumerWidget {
               ),
             ),
           ),
-          loading: () => _WeatherSkeleton(topBar: topBar),
+          loading: () => _GradientPage(
+            gradient: loadingGradient,
+            topBar: topBar,
+            child: const _WeatherSkeleton(),
+          ),
           error: (e, _) => _SurfacePage(
             topBar: topBar,
             child: AppErrorView(
@@ -149,6 +157,10 @@ class _PlaceWeather extends ConsumerWidget {
 
 /// Weather content sits on a gradient, so text and icons switch to
 /// `onWeather` for the whole subtree instead of per widget.
+///
+/// Loading and loaded states both build this at the same spot, so the
+/// gradient animates from [loadingGradient] to the weather's own, and again
+/// when a refresh changes the condition or day/night.
 class _GradientPage extends StatelessWidget {
   const _GradientPage({
     required this.gradient,
@@ -164,9 +176,13 @@ class _GradientPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final onWeather = context.colors.onWeather;
     final theme = context.theme;
+    // Respect the OS "reduce motion" setting.
+    final still = MediaQuery.disableAnimationsOf(context);
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.light,
-      child: DecoratedBox(
+      child: AnimatedContainer(
+        duration: still ? Duration.zero : const Duration(milliseconds: 800),
+        curve: Curves.easeInOut,
         decoration: BoxDecoration(gradient: gradient),
         child: Theme(
           data: theme.copyWith(
@@ -181,7 +197,14 @@ class _GradientPage extends StatelessWidget {
             child: Column(
               children: [
                 topBar,
-                Expanded(child: child),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: still
+                        ? Duration.zero
+                        : const Duration(milliseconds: 300),
+                    child: child,
+                  ),
+                ),
               ],
             ),
           ),
@@ -279,24 +302,18 @@ class _TopBar extends StatelessWidget {
 /// Renders the real layout with placeholder data, so the skeleton always
 /// matches the loaded screen.
 class _WeatherSkeleton extends StatelessWidget {
-  const _WeatherSkeleton({required this.topBar});
-
-  final Widget topBar;
+  const _WeatherSkeleton();
 
   @override
-  Widget build(BuildContext context) => _GradientPage(
-    gradient: loadingGradient,
-    topBar: topBar,
-    child: Skeletonizer(
-      effect: ShimmerEffect(
-        baseColor: context.colors.glass,
-        highlightColor: context.colors.onWeather.withValues(alpha: 0.24),
-        duration: const Duration(milliseconds: 1600),
-      ),
-      child: _WeatherBody(
-        name: context.l10n.currentLocation,
-        weather: _placeholderWeather(),
-      ),
+  Widget build(BuildContext context) => Skeletonizer(
+    effect: ShimmerEffect(
+      baseColor: context.colors.glass,
+      highlightColor: context.colors.onWeather.withValues(alpha: 0.24),
+      duration: const Duration(milliseconds: 1600),
+    ),
+    child: _WeatherBody(
+      name: context.l10n.currentLocation,
+      weather: _placeholderWeather(),
     ),
   );
 }
