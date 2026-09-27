@@ -165,5 +165,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pickOnMap": "Pick on map",
+  "mapHint": "Tap the map to choose a place",
+  "saveCity": "Save city"
 }

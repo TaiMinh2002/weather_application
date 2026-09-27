@@ -49,6 +49,8 @@ dependencies:
   material_symbols_icons: ^4.2960.0
   skeletonizer: ^3.0.0
   supabase_flutter: ^2.17.2
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
 
 dev_dependencies:
   flutter_test:

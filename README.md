@@ -29,7 +29,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 - **Gợi ý hôm nay**: mang ô, kem chống nắng, khẩu trang, áo ấm… theo 12 giờ tới, UV và AQI (quy tắc tự viết, có unit test)
 - **Chất lượng không khí**: chỉ số US AQI kèm mức (Tốt → Nguy hại), thang màu EPA, PM2.5 và PM10
 - **Chi tiết ngày**: biểu đồ nhiệt độ theo giờ, biểu đồ % mưa, gió và UV tối đa
-- **Nhiều thành phố**: tìm kiếm (debounce), lưu, kéo thả sắp xếp, vuốt để xóa (có hoàn tác), vuốt ngang giữa các thành phố ở Home
+- **Nhiều thành phố**: tìm kiếm (debounce) hoặc chạm chọn trên bản đồ OpenStreetMap, lưu, kéo thả sắp xếp, vuốt để xóa (có hoàn tác), vuốt ngang giữa các thành phố ở Home
 - **Cài đặt**: °C/°F, km/h hoặc m/s, sáng/tối/theo hệ thống, Tiếng Việt/English
 - **Offline**: mất mạng vẫn hiện dữ liệu gần nhất, kèm "cập nhật lúc…"
 - **Đủ trạng thái**: skeleton khi tải, lỗi mạng/máy chủ có nút thử lại, từ chối quyền vị trí, GPS tắt
@@ -126,3 +126,4 @@ APK hiện ký bằng debug key: cài thử được, chưa đưa lên Play Stor
 - Dữ liệu thời tiết và tìm kiếm địa điểm: [Open-Meteo](https://open-meteo.com) (CC BY 4.0)
 - Font: [Be Vietnam Pro](https://github.com/bettergui/BeVietnamPro) (SIL Open Font License)
 - Icon: [Material Symbols](https://fonts.google.com/icons) (Apache 2.0)
+- Bản đồ: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, hiển thị bằng [flutter_map](https://pub.dev/packages/flutter_map)

@@ -77,5 +77,8 @@
   "airQuality": "Chất lượng không khí",
   "aqiLevel": "{level, select, good{Tốt} moderate{Trung bình} sensitive{Kém} unhealthy{Xấu} veryUnhealthy{Rất xấu} other{Nguy hại}}",
   "tipsTitle": "Gợi ý hôm nay",
-  "weatherTip": "{tip, select, storm{Có dông trong 12 giờ tới, hạn chế ra ngoài} umbrella{Có thể mưa, nhớ mang ô hoặc áo mưa} mask{Không khí kém, nên đeo khẩu trang} hydrate{Trời nóng, uống đủ nước và tránh nắng gắt} sunscreen{UV cao, bôi kem chống nắng khi ra ngoài} jacket{Trời lạnh, mặc thêm áo ấm} wind{Gió mạnh, cẩn thận khi đi xe máy} other{Thời tiết đẹp, hợp để ra ngoài}}"
+  "weatherTip": "{tip, select, storm{Có dông trong 12 giờ tới, hạn chế ra ngoài} umbrella{Có thể mưa, nhớ mang ô hoặc áo mưa} mask{Không khí kém, nên đeo khẩu trang} hydrate{Trời nóng, uống đủ nước và tránh nắng gắt} sunscreen{UV cao, bôi kem chống nắng khi ra ngoài} jacket{Trời lạnh, mặc thêm áo ấm} wind{Gió mạnh, cẩn thận khi đi xe máy} other{Thời tiết đẹp, hợp để ra ngoài}}",
+  "pickOnMap": "Chọn trên bản đồ",
+  "mapHint": "Chạm vào bản đồ để chọn địa điểm",
+  "saveCity": "Lưu thành phố"
 }

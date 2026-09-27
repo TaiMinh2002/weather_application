@@ -38,14 +38,19 @@ class LocationRepositoryImpl implements LocationRepository {
     }
 
     final pos = await _ds.getPosition();
+    return placeAt(pos.latitude, pos.longitude);
+  });
+
+  @override
+  Future<Place> placeAt(double lat, double lon) async {
     String? name;
     try {
-      name = await _ds.placeName(pos.latitude, pos.longitude, _locale);
+      name = await _ds.placeName(lat, lon, _locale);
     } catch (_) {
       // A missing city name must not block the weather; UI falls back.
     }
-    return Place(lat: pos.latitude, lon: pos.longitude, name: name);
-  });
+    return Place(lat: lat, lon: lon, name: name);
+  }
 }
 
 @Riverpod(keepAlive: true)

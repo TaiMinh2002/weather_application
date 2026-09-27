@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/cities/presentation/screens/cities_screen.dart';
+import '../../features/cities/presentation/screens/map_pick_screen.dart';
 import '../../features/location/domain/entities/place.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
@@ -18,6 +19,7 @@ abstract final class Routes {
   static const cities = '/cities';
   static const settings = '/settings';
   static const day = '/day/:index';
+  static const map = '/map';
 
   /// Day Detail for forecast day [index] (0 = today) at [place].
   static String dayOf(int index, Place place) => Uri(
@@ -61,6 +63,7 @@ GoRouter appRouter(Ref ref) {
         builder: (_, _) => const OnboardingScreen(),
       ),
       GoRoute(path: Routes.cities, builder: (_, _) => const CitiesScreen()),
+      GoRoute(path: Routes.map, builder: (_, _) => const MapPickScreen()),
       GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen()),
       GoRoute(
         path: Routes.day,
