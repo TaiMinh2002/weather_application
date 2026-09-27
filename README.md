@@ -8,6 +8,19 @@
 
 Kế hoạch: [plan.md](plan.md) · Quy tắc code: [rule.md](rule.md) · Design: [`design/`](design/)
 
+## Ảnh chụp
+
+| | Home | Chi tiết ngày | Thành phố | Cài đặt | Onboarding |
+|---|---|---|---|---|---|
+| Sáng | <img src="docs/screenshots/home_light.png" width="160"> | <img src="docs/screenshots/day_detail_light.png" width="160"> | <img src="docs/screenshots/cities_light.png" width="160"> | <img src="docs/screenshots/settings_light.png" width="160"> | <img src="docs/screenshots/onboarding_light.png" width="160"> |
+| Tối | <img src="docs/screenshots/home_dark.png" width="160"> | <img src="docs/screenshots/day_detail_dark.png" width="160"> | <img src="docs/screenshots/cities_dark.png" width="160"> | <img src="docs/screenshots/settings_dark.png" width="160"> | <img src="docs/screenshots/onboarding_dark.png" width="160"> |
+
+Ảnh được dựng từ code với dữ liệu mẫu (không cần simulator). Sau khi đổi UI, chạy lại:
+
+```bash
+flutter test tool/screenshots_test.dart --update-goldens
+```
+
 ## Tính năng
 
 - **Thời tiết hiện tại theo GPS**: nhiệt độ, cảm giác như, cao/thấp, nền gradient đổi theo thời tiết và ngày/đêm
@@ -93,7 +106,10 @@ flutter test
 
 ## Tải APK
 
-Mỗi lần push lên `dev`/`main`, GitHub Actions build một APK. Vào tab [Actions](https://github.com/TaiMinh2002/weather_application/actions/workflows/ci.yml), chọn lần chạy mới nhất, tải artifact **skycast-apk**.
+- **Bản phát hành:** trang [Releases](https://github.com/TaiMinh2002/weather_application/releases). Mỗi tag `v*` (ví dụ `v1.0.0`) tự build APK và đính kèm vào Release.
+- **Bản mới nhất của `dev`:** tab [Actions](https://github.com/TaiMinh2002/weather_application/actions/workflows/ci.yml), chọn lần chạy mới nhất, tải artifact **skycast-apk**.
+
+APK hiện ký bằng debug key: cài thử được, chưa đưa lên Play Store được.
 
 ## Credits
 

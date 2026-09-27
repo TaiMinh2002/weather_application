@@ -392,11 +392,20 @@ class _TempChartPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
+    // Curves between midpoints with each hour as the control point: smooth
+    // at any point density (point-to-point curves read as steps at 24).
     final path = Path()..moveTo(point(0).dx, point(0).dy);
-    for (var i = 1; i < temps.length; i++) {
-      final (p0, p1) = (point(i - 1), point(i));
-      path.quadraticBezierTo((p0.dx + p1.dx) / 2, p0.dy, p1.dx, p1.dy);
+    for (var i = 1; i < temps.length - 1; i++) {
+      final (p, next) = (point(i), point(i + 1));
+      path.quadraticBezierTo(
+        p.dx,
+        p.dy,
+        (p.dx + next.dx) / 2,
+        (p.dy + next.dy) / 2,
+      );
     }
+    final last = point(temps.length - 1);
+    path.lineTo(last.dx, last.dy);
     final area = Path.from(path)
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
@@ -449,8 +458,10 @@ class _TempChartPainter extends CustomPainter {
       old.labelStyle != labelStyle;
 }
 
-/// One bar per hour; bars of 30 % or more are labelled.
+/// One bar per hour; peaks of 30 % or more are labelled.
 class _RainBarsPainter extends CustomPainter {
+  static const _labelGap = 3;
+
   _RainBarsPainter({
     required this.chances,
     required this.bar,
@@ -468,6 +479,7 @@ class _RainBarsPainter extends CustomPainter {
     final step = size.width / chances.length;
     final width = step * 0.55;
     final paint = Paint()..color = bar;
+    var lastLabel = -_labelGap;
     for (final (i, pct) in chances.indexed) {
       final h = pct / 100 * (size.height - labelRoom);
       final x = i * step + (step - width) / 2;
@@ -476,7 +488,13 @@ class _RainBarsPainter extends CustomPainter {
         RRect.fromRectAndRadius(rect, const Radius.circular(3)),
         paint,
       );
-      if (pct >= 30) {
+      // Label peaks only, spaced out: a rainy afternoon has many bars over
+      // 30 % in a row and their labels would overlap.
+      final isPeak =
+          (i == 0 || pct >= chances[i - 1]) &&
+          (i == chances.length - 1 || pct >= chances[i + 1]);
+      if (pct >= 30 && isPeak && i - lastLabel >= _labelGap) {
+        lastLabel = i;
         final tp = TextPainter(
           text: TextSpan(text: '$pct%', style: labelStyle),
           textDirection: TextDirection.ltr,

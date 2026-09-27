@@ -162,21 +162,26 @@ class _Row extends StatelessWidget {
     constraints: const BoxConstraints(minHeight: 48),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        spacing: 12,
-        children: [
-          if (icon != null)
-            Icon(icon, size: 18, color: context.colors.textMuted),
-          Expanded(child: Text(label, style: context.textTheme.bodyLarge)),
-          // Scales down rather than wrapping on narrow screens (iPhone SE).
-          Flexible(
-            flex: 3,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
+      // The label keeps its natural width (up to half the row) so it doesn't
+      // wrap; the control takes the rest and scales down on narrow screens.
+      child: LayoutBuilder(
+        builder: (context, box) => Row(
+          spacing: 12,
+          children: [
+            if (icon != null)
+              Icon(icon, size: 18, color: context.colors.textMuted),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: box.maxWidth / 2),
+              child: Text(label, style: context.textTheme.bodyLarge),
             ),
-          ),
-        ],
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );

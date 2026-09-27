@@ -394,7 +394,7 @@ String? onboardingRedirect(SharedPreferences prefs, String location) {
 | 11 ✅ | Onboarding, splash native, màn chi tiết ngày + biểu đồ |
 | 12 ✅ | Nền động, hoàn thiện UI *(gradient chuyển mượt khi tải xong / đổi thời tiết, nội dung fade từ skeleton; tắt khi máy bật giảm chuyển động)* |
 | 13 ✅ | Viết test (mapper, repository, provider), GitHub Actions |
-| 14 | README, chụp ảnh/quay GIF, build APK đưa lên Releases |
+| 14 ✅ | README, chụp ảnh *(tự dựng bằng `tool/screenshots_test.dart`)*, APK lên Releases khi push tag `v*` |
 
 ✅ = đã xong (merge vào `dev`).
 
@@ -456,7 +456,7 @@ README nên có đủ các mục:
 
 Đã merge vào `dev`: base code, dữ liệu thời tiết, vị trí, design tokens, Home, cache offline, Thành phố, Cài đặt, Chi tiết ngày, Onboarding + splash native (PR #1–#11). Tương ứng ngày 1–11.
 
-**Tiếp theo:** chụp ảnh/GIF cho README, APK trên Releases (ngày 14); nền động (ngày 12) tùy chọn.
+**Tiếp theo:** merge `dev` → `main`, tag `v1.0.0`. Sau MVP: AQI → gợi ý hoạt động → Supabase sync.
 
 **Thay đổi so với kế hoạch ban đầu:**
 - Không dùng `permission_handler`: `geolocator` đã có sẵn kiểm tra quyền, xin quyền và mở Cài đặt.
@@ -501,5 +501,5 @@ README nên có đủ các mục:
 ### Chất lượng & trình bày
 - [x] Unit test + widget test *(45 test)*
 - [x] GitHub Actions
-- [ ] README đầy đủ *(còn ảnh chụp / GIF)*
-- [ ] APK trên GitHub Releases
+- [x] README đầy đủ *(ảnh chụp sáng/tối; GIF demo để sau)*
+- [x] APK trên GitHub Releases *(push tag `v*`)*
