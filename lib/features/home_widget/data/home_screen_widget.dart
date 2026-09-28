@@ -10,7 +10,7 @@ class HomeScreenWidget {
   const HomeScreenWidget();
 
   /// Shared with the iOS widget extension; see ios/SkycastWidget/README.md.
-  static const appGroupId = 'group.com.example.weatherApplication';
+  static const appGroupId = 'group.com.minhpt.skycast';
 
   Future<void> update(Map<String, String> data) async {
     await HomeWidget.setAppGroupId(appGroupId);

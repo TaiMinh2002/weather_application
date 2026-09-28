@@ -8,7 +8,7 @@ phase, which sits before *Thin Binary* to avoid Xcode's build-cycle error).
   Flutter app writes (`lib/features/home_widget/`) from the App Group and only
   draws it. Sky colours mirror `Sky` in `lib/core/theme/app_theme.dart`.
 - `Info.plist`, `SkycastWidget.entitlements`: extension metadata and the App
-  Group `group.com.example.weatherApplication`. `Runner/Runner.entitlements`
+  Group `group.com.minhpt.skycast`. `Runner/Runner.entitlements`
   has the same group (must match `HomeScreenWidget.appGroupId`).
 
 ## Running on a real iPhone
@@ -20,7 +20,7 @@ registered with your Apple developer team once:
 2. For both the **Runner** and **SkycastWidget** targets, open
    **Signing & Capabilities**, keep *Automatically manage signing* on and pick
    your team. Xcode registers the App Group and the
-   `com.example.weatherApplication.SkycastWidget` bundle id.
+   `com.minhpt.skycast.SkycastWidget` bundle id.
 3. Run once from Xcode (or `flutter run`), open Home so it loads the weather,
    then add the widget from the home screen.
 

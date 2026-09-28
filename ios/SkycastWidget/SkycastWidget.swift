@@ -4,7 +4,7 @@ import WidgetKit
 // 2×2 current-weather widget. The Flutter app writes already-formatted text
 // (lib/features/home_widget/) into the shared App Group; this only draws it.
 
-private let appGroup = "group.com.example.weatherApplication"
+private let appGroup = "group.com.minhpt.skycast"
 
 /// Top/bottom colours per sky key; mirrors `Sky` in lib/core/theme/app_theme.dart.
 private let skies: [String: [UInt32]] = [
