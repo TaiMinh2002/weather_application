@@ -242,5 +242,14 @@
         "type": "String"
       }
     }
+  },
+  "weatherAlerts": "Weather alerts",
+  "alertType": "{type, select, rain{Rain soon} uv{Very high UV} air{Unhealthy air} other{Extreme heat}}",
+  "@alertType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
   }
 }

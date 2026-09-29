@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/network/supabase_session.dart';
 import '../models/city_dto.dart';
 
 part 'cities_sync_ds.g.dart';
@@ -15,22 +16,12 @@ class CitiesSyncDataSource {
 
   static const _table = 'saved_cities';
 
-  /// No login screen: each install signs in anonymously once and the session
-  /// is kept on the device.
-  Future<String> _userId() async {
-    final user =
-        _client.auth.currentUser ??
-        (await _client.auth.signInAnonymously()).user;
-    if (user == null) throw const AuthException('Anonymous sign-in failed');
-    return user.id;
-  }
-
   /// Null when this user has never backed anything up.
   Future<List<CityDto>?> pull() async {
     final row = await _client
         .from(_table)
         .select('cities')
-        .eq('user_id', await _userId())
+        .eq('user_id', await _client.anonymousUserId())
         .maybeSingle();
     if (row == null) return null;
     return [
@@ -41,7 +32,7 @@ class CitiesSyncDataSource {
 
   Future<void> push(List<CityDto> cities) async {
     await _client.from(_table).upsert({
-      'user_id': await _userId(),
+      'user_id': await _client.anonymousUserId(),
       'cities': [for (final c in cities) c.toJson()],
       'updated_at': DateTime.now().toUtc().toIso8601String(),
     });

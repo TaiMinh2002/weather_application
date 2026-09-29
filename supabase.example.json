@@ -1,4 +1,10 @@
 {
   "SUPABASE_URL": "https://<project-ref>.supabase.co",
-  "SUPABASE_ANON_KEY": "<anon key from Project Settings \u2192 API>"
+  "SUPABASE_ANON_KEY": "<anon key from Project Settings → API>",
+  "FIREBASE_PROJECT_ID": "<Firebase project id>",
+  "FIREBASE_SENDER_ID": "<Project number, Project settings → General>",
+  "FIREBASE_ANDROID_API_KEY": "<Android app: Web API key / current_key>",
+  "FIREBASE_ANDROID_APP_ID": "<Android app: App ID, 1:...:android:...>",
+  "FIREBASE_IOS_API_KEY": "<iOS app: API_KEY>",
+  "FIREBASE_IOS_APP_ID": "<iOS app: App ID, 1:...:ios:...>"
 }

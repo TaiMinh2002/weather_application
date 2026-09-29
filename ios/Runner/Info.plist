@@ -55,6 +55,10 @@
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Cho phép công cụ debug Flutter kết nối tới ứng dụng (chỉ dùng khi phát triển).</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

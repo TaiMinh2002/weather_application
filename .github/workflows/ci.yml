@@ -43,12 +43,16 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
-      # Cloud backup keys come from repo secrets; without them the APK still
-      # builds and simply has sync turned off.
+      # Cloud backup and push-alert keys come from repo secrets; without them
+      # the APK still builds and simply has those features turned off.
       - run: >-
           flutter build apk --release
           --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }}
           --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+          --dart-define=FIREBASE_SENDER_ID=${{ secrets.FIREBASE_SENDER_ID }}
+          --dart-define=FIREBASE_ANDROID_API_KEY=${{ secrets.FIREBASE_ANDROID_API_KEY }}
+          --dart-define=FIREBASE_ANDROID_APP_ID=${{ secrets.FIREBASE_ANDROID_APP_ID }}
 
       - uses: actions/upload-artifact@v4
         with:
