@@ -1,5 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/extensions/context_ext.dart';
@@ -120,6 +123,85 @@ class _AqiBar extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Shown only when [rainOutlook] finds rain in the next 2 hours: one bar per
+/// 15 minutes under the summary sentence.
+class NowcastCard extends StatelessWidget {
+  const NowcastCard({super.key, required this.slots, required this.outlook});
+
+  final List<({DateTime time, double mm})> slots;
+  final ({RainTrend trend, int minutes}) outlook;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final text = context.textTheme;
+    final colors = context.colors;
+    final time = DateFormat.Hm(Localizations.localeOf(context).toString());
+    // 1 mm in 15 minutes is already heavy rain; scale up only past it.
+    final top = slots.map((s) => s.mm).fold(1.0, math.max);
+    final muted = text.labelSmall?.copyWith(
+      color: colors.onWeather.withValues(alpha: 0.75),
+    );
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 12,
+        children: [
+          Row(
+            spacing: 6,
+            children: [
+              const Icon(Symbols.rainy_rounded, size: 20),
+              Flexible(
+                child: Text(
+                  l10n.nowcastTitle.toUpperCase(),
+                  style: text.labelMedium?.copyWith(letterSpacing: 0.36),
+                ),
+              ),
+            ],
+          ),
+          Text(
+            l10n.rainOutlook(outlook.trend.name, outlook.minutes),
+            style: text.bodyLarge,
+          ),
+          SizedBox(
+            height: 48,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: 6,
+              children: [
+                for (final s in slots)
+                  Expanded(
+                    child: FractionallySizedBox(
+                      // A sliver even when dry, so the timeline stays readable.
+                      heightFactor: math.max(s.mm / top, 0.06),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colors.onWeather.withValues(
+                            alpha: s.mm >= 0.2 ? 0.9 : 0.35,
+                          ),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (slots.length > 1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(l10n.now, style: muted),
+                Text(time.format(slots.last.time), style: muted),
+              ],
+            ),
+        ],
       ),
     );
   }

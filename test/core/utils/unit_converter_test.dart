@@ -12,6 +12,13 @@ void main() {
     expect(f.formatTemp(-40), '-40°');
   });
 
+  test('formatTempDelta is unsigned and has no Fahrenheit offset', () {
+    const c = Units();
+    const f = Units(temp: TempUnit.fahrenheit);
+    expect(c.formatTempDelta(-3.4), '3°');
+    expect(f.formatTempDelta(5), '9°');
+  });
+
   test('formatWind converts km/h to m/s with one decimal', () {
     expect(const Units().formatWind(12.4), '12 km/h');
     expect(const Units(wind: WindUnit.ms).formatWind(12), '3.3 m/s');

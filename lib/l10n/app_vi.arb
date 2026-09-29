@@ -85,5 +85,8 @@
   "morningForecast": "Dự báo lúc 7:00 mỗi sáng",
   "morningChannel": "Dự báo buổi sáng",
   "morningTitle": "{place} hôm nay",
-  "notificationsDenied": "Skycast chưa được phép gửi thông báo. Bật lại trong Cài đặt của máy."
+  "notificationsDenied": "Skycast chưa được phép gửi thông báo. Bật lại trong Cài đặt của máy.",
+  "vsYesterday": "{direction, select, warmer{Nóng hơn hôm qua {delta}} other{Mát hơn hôm qua {delta}}}",
+  "nowcastTitle": "Mưa 2 giờ tới",
+  "rainOutlook": "{trend, select, starting{Mưa bắt đầu sau khoảng {minutes} phút} stopping{Mưa tạnh sau khoảng {minutes} phút} other{Mưa kéo dài ít nhất 2 giờ tới}}"
 }

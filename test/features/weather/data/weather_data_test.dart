@@ -37,6 +37,40 @@ void main() {
       expect(weather.daily[1].windSpeedMax, 0);
     });
 
+    test('past day is split off; daily and hourly start today', () {
+      final json = weatherJson();
+      final hourly = json['hourly'] as Map<String, dynamic>;
+      final daily = json['daily'] as Map<String, dynamic>;
+      hourly['time'] = ['2026-09-23T23:00', ...hourly['time'] as List];
+      for (final key in hourly.keys.where((k) => k != 'time')) {
+        hourly[key] = [(hourly[key] as List)[1], ...hourly[key] as List];
+      }
+      daily['time'] = ['2026-09-23', ...daily['time'] as List];
+      for (final key in daily.keys.where((k) => k != 'time')) {
+        daily[key] = [(daily[key] as List)[1], ...daily[key] as List];
+      }
+      (daily['temperature_2m_max'] as List)[0] = 29;
+      json['minutely_15'] = {
+        'time': ['2026-09-24T10:15', '2026-09-24T10:30'],
+        'precipitation': [0.0, null],
+      };
+
+      final w = WeatherDto.fromJson(json).toEntity();
+
+      expect(w.yesterday?.date, DateTime(2026, 9, 23));
+      expect(w.yesterday?.tempMax, 29);
+      expect(w.daily.first.date, DateTime(2026, 9, 24));
+      expect(w.daily.length, 2);
+      expect(w.hourly.first.time, DateTime(2026, 9, 24));
+      expect(w.nowcast.map((s) => s.mm), [0, 0]);
+    });
+
+    test('old caches without the past day or nowcast still map', () {
+      expect(weather.yesterday, isNull);
+      expect(weather.nowcast, isEmpty);
+      expect(weather.daily.first.date, DateTime(2026, 9, 24));
+    });
+
     test('next24Hours starts at the current hour', () {
       final next = weather.next24Hours;
       expect(next.first.time, DateTime(2026, 9, 24, 10));

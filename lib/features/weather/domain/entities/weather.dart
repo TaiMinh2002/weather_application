@@ -7,14 +7,24 @@ class Weather {
     required this.current,
     required this.hourly,
     required this.daily,
+    this.yesterday,
+    this.nowcast = const [],
     this.cachedAt,
   });
 
   final CurrentWeather current;
 
-  /// All hours for the forecast range (7 days); see [next24Hours].
+  /// All hours from today's midnight to the end of the range (7 days); see
+  /// [next24Hours].
   final List<HourlyForecast> hourly;
+
+  /// Starts today.
   final List<DailyForecast> daily;
+  final DailyForecast? yesterday;
+
+  /// Precipitation for the next 2 hours in 15-minute slots, from the current
+  /// slot; see [rainOutlook].
+  final List<({DateTime time, double mm})> nowcast;
 
   /// Set when the network failed and this came from the offline cache.
   final DateTime? cachedAt;
@@ -218,4 +228,41 @@ List<WeatherTip> tipsFor(Weather weather, AirQuality? air, {int max = 3}) {
     if (c.windSpeed >= 40) WeatherTip.wind,
   ];
   return tips.isEmpty ? const [WeatherTip.niceDay] : tips.take(max).toList();
+}
+
+/// Today's high minus yesterday's, in °C. Null without yesterday's data or
+/// under 1.5°, a gap nobody notices.
+double? highVsYesterday(Weather weather) {
+  final (today, yesterday) = (weather.daily.firstOrNull, weather.yesterday);
+  if (today == null || yesterday == null) return null;
+  final delta = today.tempMax - yesterday.tempMax;
+  return delta.abs() < 1.5 ? null : delta;
+}
+
+enum RainTrend {
+  /// Dry now, rain in `minutes`.
+  starting,
+
+  /// Raining now, dry in `minutes`.
+  stopping,
+
+  /// Raining for the whole 2 hours.
+  continuing,
+}
+
+/// Null when the next 2 hours are dry. 0.2 mm per 15 minutes is the lightest
+/// rain that wets the ground; below it the model is mostly noise.
+({RainTrend trend, int minutes})? rainOutlook(
+  List<({DateTime time, double mm})> nowcast,
+) {
+  final wet = [for (final s in nowcast) s.mm >= 0.2];
+  if (!wet.contains(true)) return null;
+  const step = 15;
+  if (!wet.first) {
+    return (trend: RainTrend.starting, minutes: wet.indexOf(true) * step);
+  }
+  final dry = wet.indexOf(false);
+  return dry == -1
+      ? (trend: RainTrend.continuing, minutes: 0)
+      : (trend: RainTrend.stopping, minutes: dry * step);
 }
