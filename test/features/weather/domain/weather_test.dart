@@ -172,6 +172,11 @@ Weather _weather({
           condition: hourly,
           precipitationProbability: rainChance,
           isDay: isDay,
+          apparentTemperature: feelsLike,
+          precipitation: 0,
+          windSpeed: wind,
+          uvIndex: uvMax,
+          humidity: 60,
         ),
     ],
     daily: [

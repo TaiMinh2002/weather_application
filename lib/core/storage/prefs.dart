@@ -11,6 +11,7 @@ abstract final class PrefKeys {
   static const themeMode = 'theme_mode';
   static const language = 'language';
   static const morningForecast = 'morning_forecast';
+  static const activities = 'activities';
 }
 
 /// Loaded once in `main()` and injected via `overrideWithValue`.

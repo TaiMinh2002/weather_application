@@ -11,6 +11,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/weather_code_mapper.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../../../activities/presentation/activities_card.dart';
 import '../../../cities/presentation/providers/cities_provider.dart';
 import '../../../home_widget/presentation/widget_data.dart';
 import '../../../location/domain/entities/place.dart';
@@ -357,6 +358,11 @@ Weather _placeholderWeather() {
           condition: condition,
           precipitationProbability: 0,
           isDay: true,
+          apparentTemperature: 30,
+          precipitation: 0,
+          windSpeed: 10,
+          uvIndex: 5,
+          humidity: 70,
         ),
     ],
     daily: [
@@ -417,6 +423,8 @@ class _WeatherBody extends StatelessWidget {
           const SizedBox(height: 20),
         ],
       HourlyCard(hours: weather.next24Hours),
+      const SizedBox(height: 20),
+      ActivitiesCard(weather: weather, place: place),
       const SizedBox(height: 20),
       TipsCard(weather: weather, place: place),
       const SizedBox(height: 20),

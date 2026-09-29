@@ -23,6 +23,11 @@ Map<String, dynamic> weatherJson() => {
     'weather_code': List.filled(26, 61),
     'precipitation_probability': [null, ...List.filled(25, 40)],
     'is_day': List.filled(26, 1),
+    'apparent_temperature': [null, ...List.filled(25, 33)],
+    'precipitation': List.filled(26, 0.4),
+    'wind_speed_10m': List.filled(26, 9),
+    'uv_index': List.filled(26, 4.5),
+    'relative_humidity_2m': List.filled(26, 80),
   },
   'daily': {
     'time': ['2026-09-24', '2026-09-25'],

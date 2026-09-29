@@ -121,6 +121,11 @@ class HourlyForecast {
     required this.condition,
     required this.precipitationProbability,
     required this.isDay,
+    required this.apparentTemperature,
+    required this.precipitation,
+    required this.windSpeed,
+    required this.uvIndex,
+    required this.humidity,
   });
 
   final DateTime time;
@@ -128,6 +133,13 @@ class HourlyForecast {
   final WeatherCondition condition;
   final int precipitationProbability;
   final bool isDay;
+  final double apparentTemperature;
+
+  /// mm over the hour.
+  final double precipitation;
+  final double windSpeed;
+  final double uvIndex;
+  final int humidity;
 }
 
 class DailyForecast {

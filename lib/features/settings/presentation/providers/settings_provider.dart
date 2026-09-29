@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/storage/prefs.dart';
 import '../../../../core/utils/unit_converter.dart';
+import '../../../activities/domain/activity.dart';
 
 part 'settings_provider.g.dart';
 
@@ -15,6 +16,7 @@ class AppSettings {
     this.themeMode = ThemeMode.system,
     this.locale,
     this.morningForecast = false,
+    this.activities = Activity.defaults,
   });
 
   final Units units;
@@ -25,6 +27,9 @@ class AppSettings {
 
   /// Daily 7:00 forecast notification (opt-in; asks for permission).
   final bool morningForecast;
+
+  /// Scored on Home's activities card; may be empty.
+  final Set<Activity> activities;
 
   /// Language for API calls (place and city names).
   Locale get effectiveLocale => locale ?? PlatformDispatcher.instance.locale;
@@ -50,7 +55,21 @@ class Settings extends _$Settings {
       themeMode: read(ThemeMode.values, PrefKeys.themeMode) ?? ThemeMode.system,
       locale: language == null ? null : Locale(language),
       morningForecast: prefs.getBool(PrefKeys.morningForecast) ?? false,
+      activities: switch (prefs.getStringList(PrefKeys.activities)) {
+        final names? => {
+          for (final n in names) ?Activity.values.asNameMap()[n],
+        },
+        null => Activity.defaults,
+      },
     );
+  }
+
+  Future<void> setActivities(Set<Activity> activities) {
+    final saved = _prefs.setStringList(PrefKeys.activities, [
+      for (final a in activities) a.name,
+    ]);
+    ref.invalidateSelf();
+    return saved;
   }
 
   Future<void> setTempUnit(TempUnit unit) =>

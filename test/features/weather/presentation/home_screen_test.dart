@@ -17,6 +17,11 @@ import '../data/weather_fixture.dart';
 
 const _place = Place(lat: 21.03, lon: 105.85, name: 'Hà Nội');
 
+// The PageView is also a Scrollable; this is the vertical page list.
+final _pageList = find.byWidgetPredicate(
+  (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+);
+
 Future<Widget> _app(List overrides, {AirQuality? airQuality}) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -62,22 +67,54 @@ void main() {
     expect(find.text('C:32° T:25°'), findsOneWidget);
     expect(find.text('Dự báo 24 giờ'), findsOneWidget);
     expect(find.text('Bây giờ'), findsOneWidget);
-    expect(
+    // Fixture: steady light rain and 33° feels-like, so only running is
+    // borderline.
+    expect(find.text('Chạy bộ'), findsOneWidget);
+    expect(find.text('10:00–11:00'), findsOneWidget);
+    expect(find.text('Tạm được'), findsOneWidget);
+    expect(find.text('Không nên'), findsNWidgets(2));
+    // The tips and daily cards sit below the 800×600 test viewport.
+    await tester.scrollUntilVisible(
       find.text('Trời nóng, uống đủ nước và tránh nắng gắt'),
-      findsOneWidget,
+      200,
+      scrollable: _pageList,
     );
     expect(
       find.text('UV cao, bôi kem chống nắng khi ra ngoài'),
       findsOneWidget,
     );
-    // The daily card sits below the 800×600 test viewport.
     await tester.scrollUntilVisible(
       find.text('Hôm nay'),
       200,
-      scrollable: find.byWidgetPredicate(
-        (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
-      ),
+      scrollable: _pageList,
     );
+  });
+
+  testWidgets('the activities sheet adds and removes rows', (tester) async {
+    final weather = WeatherDto.fromJson(weatherJson()).toEntity();
+    await tester.pumpWidget(
+      await _app([
+        currentPlaceProvider.overrideWith((ref) async => _place),
+        weatherProvider(
+          _place.lat,
+          _place.lon,
+        ).overrideWith((ref) async => weather),
+      ]),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Chọn hoạt động'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, 'Đạp xe'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilterChip, 'Chạy bộ'));
+    await tester.pump();
+    Navigator.of(tester.element(find.byType(FilterChip).first)).pop();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Đạp xe'), findsOneWidget);
+    expect(find.text('Chạy bộ'), findsNothing);
   });
 
   testWidgets('air quality card shows the AQI and its level', (tester) async {
@@ -95,14 +132,15 @@ void main() {
     await tester.pump();
     // Air quality starts loading only once the forecast has rendered.
     await tester.pump();
-    expect(find.text('Không khí kém, nên đeo khẩu trang'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Không khí kém, nên đeo khẩu trang'),
+      200,
+      scrollable: _pageList,
+    );
     await tester.scrollUntilVisible(
       find.text('174'),
       300,
-      // The PageView is also a Scrollable; pick the vertical page list.
-      scrollable: find.byWidgetPredicate(
-        (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
-      ),
+      scrollable: _pageList,
     );
 
     expect(find.text('Xấu'), findsOneWidget);

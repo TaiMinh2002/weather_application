@@ -203,5 +203,44 @@
         "type": "int"
       }
     }
+  },
+  "activitiesTitle": "Best times for you",
+  "activitiesEdit": "Choose activities",
+  "activitiesEmpty": "Pick the activities you care about to see the best time for each.",
+  "activityName": "{activity, select, motorbike{Riding a motorbike} laundry{Drying laundry} running{Running} cycling{Cycling} carWash{Washing the car} other{Picnic}}",
+  "@activityName": {
+    "placeholders": {
+      "activity": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLevel": "{level, select, great{Great} good{Good} fair{Fair} other{Not advised}}",
+  "@activityLevel": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "activityTomorrow": "Tomorrow {time}",
+  "@activityTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "activityNoGoodTime": "No good time",
+  "morningActivity": "{activity}: best {time}",
+  "@morningActivity": {
+    "placeholders": {
+      "activity": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

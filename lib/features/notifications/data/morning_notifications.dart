@@ -66,11 +66,17 @@ class MorningNotifications {
   }) async {
     await _ready;
     await cancel();
-    final details = NotificationDetails(
-      android: AndroidNotificationDetails('morning_forecast', channelName),
-      iOS: const DarwinNotificationDetails(),
-    );
     for (final (i, item) in items.take(_slots).indexed) {
+      final details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'morning_forecast',
+          channelName,
+          // The body can carry a second line (best activity time), which the
+          // default style cuts off.
+          styleInformation: BigTextStyleInformation(item.body),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      );
       await _plugin.zonedSchedule(
         id: _firstId + i,
         // An absolute instant, so no device time-zone lookup is needed.
