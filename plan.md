@@ -64,7 +64,7 @@
 | 3 | Thẻ hoạt động (chạy bộ, phơi đồ…) | `feature/activities` | 3–4 ngày | không |
 | 4 | Cảnh báo đẩy (mưa sắp tới, UV, AQI, nắng nóng) | `feature/push-alerts` | 5–7 ngày | `firebase_core`, `firebase_messaging` |
 
-Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4.
+Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã làm: 1, 3, 4; bỏ 2** (xem dưới).
 
 **GĐ 1 – So sánh hôm qua + mưa sắp tới**
 - `/forecast` thêm `past_days=1` và `minutely_15=precipitation` (`forecast_minutely_15=8`). Mapper tách ngày hôm qua ra `Weather.yesterday` và bỏ giờ của hôm qua, nên `daily[0]` vẫn là hôm nay (`DailyCard`, `morningSlots`, `Routes.dayOf` không đổi).
@@ -75,6 +75,7 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4.
 **GĐ 2 – Radar mưa**
 - RainViewer (`api.rainviewer.com/public/weather-maps.json`, miễn phí, không key) → `TileLayer` trên `flutter_map`. Feature `radar/`, route `/radar?lat=&lon=`, play/pause qua các frame.
 - Kiểm tra trước: độ phủ radar ở VN và điều khoản gói miễn phí hiện tại. Phủ kém thì bỏ giai đoạn này.
+- **Kết quả (2026-09-29): bỏ.** Độ phủ VN tốt (10 radar), nhưng từ 1/1/2026 gói miễn phí chỉ cho dùng cá nhân/giáo dục, zoom tối đa 7, không còn frame dự báo (chỉ ~2 giờ radar đã qua). Card nowcast (GĐ 1) đã trả lời "sắp mưa không".
 
 **GĐ 3 – Thẻ hoạt động**
 - Hourly thêm `apparent_temperature, precipitation, wind_speed_10m, uv_index, relative_humidity_2m`. Đo thực tế: response ~13 KB/vị trí (không phải ~40 KB như ước tính) → **giữ cache trong shared_preferences**, không thêm `path_provider`. Cache cũ thiếu các trường mới thì bị bỏ qua (chỉ xảy ra một lần, khi vừa cập nhật mà đang offline).
@@ -83,9 +84,11 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4.
 - Thông báo 7:00 thêm dòng "Chạy bộ: tốt nhất 5:00–6:00" cho hoạt động đầu tiên đã chọn (chỉ khi điểm ≥ 60; Android dùng `BigTextStyle` để không bị cắt).
 
 **GĐ 4 – Cảnh báo đẩy**
-- `pg_cron` 15 phút/lần → Edge Function `check-alerts` (gom vị trí theo ô ~0,1°, gọi Open-Meteo, chống spam 1 cảnh báo/loại/3 giờ, giờ yên lặng) → FCM HTTP v1.
-- Bảng `alert_subscriptions` (RLS theo user anonymous): token, lat/lon, locale, units, ngưỡng, `last_sent`. App upsert mỗi lần có dự báo GPS mới, lỗi chỉ log (giống `cities_sync_ds.dart`). Build không có key thì bỏ qua.
-- Lưu ý chi phí: iOS cần APNs key (tài khoản Apple Developer 99 USD/năm), trái tiêu chí 0 đồng → làm Android trước.
+- `pg_cron` 15 phút/lần → Edge Function `check-alerts` (gom vị trí theo ô ~0,1°, gọi Open-Meteo forecast + air-quality, giờ yên lặng 22:00–6:00 theo giờ địa phương) → FCM HTTP v1. Luật thuần trong `rules.ts` (có `rules_test.ts`): sắp mưa (khô bây giờ, ≥ 0,2 mm trong 45 phút; chống lặp 3 giờ), UV ≥ 8 ban ngày, AQI > 150, cảm giác nhiệt ≥ 39° (mỗi loại 1 lần/ngày). Ngưỡng cố định trên server, người dùng chỉ bật/tắt từng loại.
+- Bảng `alert_subscriptions` (RLS theo user anonymous): token, lat/lon (làm tròn ~1 km), locale, °F, types, `last_sent`. App upsert mỗi lần có dự báo GPS mới, lỗi chỉ log (giống `cities_sync_ds.dart`); tắt công tắc thì xóa dòng; token chết (UNREGISTERED) thì server xóa.
+- Key Firebase qua `--dart-define` (như Supabase), không dùng `google-services.json` / `GoogleService-Info.plist` / Gradle plugin → CI và máy clone mới vẫn build được; thiếu key thì ẩn công tắc.
+- Android: app đang mở thì hiện lại bằng `flutter_local_notifications` (FCM không tự hiện); kênh `weather_alerts`. iOS: `aps-environment` + `UIBackgroundModes: remote-notification`; foreground dùng `setForegroundNotificationPresentationOptions`.
+- Làm cả iOS và Android (đã có tài khoản Apple Developer). Hướng dẫn cài đặt: `supabase/functions/check-alerts/README.md`.
 
 Để sau: hồ sơ sức khỏe (hen suyễn, phấn hoa), theo dõi bão VN (cần nguồn NCHMF), thẻ chia sẻ dạng ảnh, Live Activity, Wear OS.
 
@@ -537,9 +540,9 @@ README nên có đủ các mục:
 
 ### Khác biệt (mục 1.3)
 - [x] GĐ 1: So sánh hôm qua + mưa 2 giờ tới *(`highVsYesterday`, `rainOutlook` trong `weather.dart`; `NowcastCard` trong `insight_cards.dart`)*
-- [ ] GĐ 2: Radar mưa
+- [ ] ~~GĐ 2: Radar mưa~~ *(bỏ: điều khoản RainViewer, xem mục 1.3)*
 - [x] GĐ 3: Thẻ hoạt động *(`features/activities/`: `scoreAt`, `bestWindow`, `ActivitiesCard`)*
-- [ ] GĐ 4: Cảnh báo đẩy
+- [x] GĐ 4: Cảnh báo đẩy *(`features/alerts/`, `supabase/functions/check-alerts/`)*
 
 ### Chất lượng & trình bày
 - [x] Unit test + widget test *(45 test)*
