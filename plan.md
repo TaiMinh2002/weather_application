@@ -53,6 +53,41 @@
 
 > Phần đồng bộ Supabase giúp dự án có "backend" đúng mục tiêu ban đầu.
 
+### 1.3. Khác biệt với app mặc định (sau v1)
+
+Định vị: app mặc định cho biết "trời thế nào", Skycast trả lời **"tôi nên làm gì, và lúc nào"**. Mỗi giai đoạn là một PR vào `dev`, phát hành được độc lập.
+
+| GĐ | Tính năng | Nhánh | Công sức | Package mới |
+|---|---|---|---|---|
+| 1 | So sánh với hôm qua + mưa 2 giờ tới | `feature/nowcast` | 1,5–2 ngày | không |
+| 2 | Radar mưa trên bản đồ | `feature/rain-radar` | 1,5–2 ngày | không |
+| 3 | Thẻ hoạt động (chạy bộ, phơi đồ…) | `feature/activities` | 3–4 ngày | không |
+| 4 | Cảnh báo đẩy (mưa sắp tới, UV, AQI, nắng nóng) | `feature/push-alerts` | 5–7 ngày | `firebase_core`, `firebase_messaging` |
+
+Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4.
+
+**GĐ 1 – So sánh hôm qua + mưa sắp tới**
+- `/forecast` thêm `past_days=1` và `minutely_15=precipitation` (`forecast_minutely_15=8`). Mapper tách ngày hôm qua ra `Weather.yesterday` và bỏ giờ của hôm qua, nên `daily[0]` vẫn là hôm nay (`DailyCard`, `morningSlots`, `Routes.dayOf` không đổi).
+- Hàm thuần có test: `compareToYesterday` (bỏ qua chênh < 1,5°) và `rainOutlook` (mưa bắt đầu/tạnh sau X phút, ngưỡng 0,2 mm/15 phút).
+- UI: dòng "Nóng hơn hôm qua 3°" ở header; `NowcastCard` (8 cột mưa, `CustomPainter`) chỉ hiện khi 2 giờ tới có mưa. Ở VN dữ liệu 15 phút là nội suy từ mô hình, nên câu chữ dùng "khoảng".
+- Không đưa "mưa sau X phút" lên widget màn hình chính: widget chỉ cập nhật khi mở Home, nên câu đó sẽ sai sau vài chục phút. Vì lý do tương tự, `NowcastCard` ẩn khi dữ liệu lấy từ cache offline.
+
+**GĐ 2 – Radar mưa**
+- RainViewer (`api.rainviewer.com/public/weather-maps.json`, miễn phí, không key) → `TileLayer` trên `flutter_map`. Feature `radar/`, route `/radar?lat=&lon=`, play/pause qua các frame.
+- Kiểm tra trước: độ phủ radar ở VN và điều khoản gói miễn phí hiện tại. Phủ kém thì bỏ giai đoạn này.
+
+**GĐ 3 – Thẻ hoạt động**
+- Hourly thêm `apparent_temperature, precipitation, wind_speed_10m, uv_index, relative_humidity_2m`. Cache lớn thêm ~40% → chuyển cache sang file JSON (`dart:io` + `path_provider`), xử lý ghi chú `ponytail:` trong `weather_local_ds.dart`.
+- `features/activities/`: `enum Activity` (chạy bộ, đạp xe, phơi đồ, xe máy, rửa xe, câu cá, dã ngoại), `scoreHour` (0–100) và `bestWindow` (khung giờ tốt nhất hôm nay). Mỗi luật có unit test.
+- Người dùng chọn hoạt động ở một trang onboarding mới + Cài đặt (`settingsProvider.activities`). `ActivitiesCard` trên Home; thông báo 7:00 thêm "Chạy bộ tốt nhất 5:30–7:00".
+
+**GĐ 4 – Cảnh báo đẩy**
+- `pg_cron` 15 phút/lần → Edge Function `check-alerts` (gom vị trí theo ô ~0,1°, gọi Open-Meteo, chống spam 1 cảnh báo/loại/3 giờ, giờ yên lặng) → FCM HTTP v1.
+- Bảng `alert_subscriptions` (RLS theo user anonymous): token, lat/lon, locale, units, ngưỡng, `last_sent`. App upsert mỗi lần có dự báo GPS mới, lỗi chỉ log (giống `cities_sync_ds.dart`). Build không có key thì bỏ qua.
+- Lưu ý chi phí: iOS cần APNs key (tài khoản Apple Developer 99 USD/năm), trái tiêu chí 0 đồng → làm Android trước.
+
+Để sau: hồ sơ sức khỏe (hen suyễn, phấn hoa), theo dõi bão VN (cần nguồn NCHMF), thẻ chia sẻ dạng ảnh, Live Activity, Wear OS.
+
 ---
 
 ## 2. Màn hình (UI/UX)
@@ -498,6 +533,12 @@ README nên có đủ các mục:
 - [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*
 - [x] Widget màn hình chính *(2×2: Android native xong; iOS có target WidgetKit `SkycastWidget`, iOS 17+)*
 - [x] Thông báo mỗi sáng *(bật trong Cài đặt; mỗi lần có dự báo GPS mới thì lên lịch sẵn 7 thông báo 7:00, mỗi cái mang dự báo của đúng ngày đó → không cần `workmanager`/chạy nền)*
+
+### Khác biệt (mục 1.3)
+- [x] GĐ 1: So sánh hôm qua + mưa 2 giờ tới *(`highVsYesterday`, `rainOutlook` trong `weather.dart`; `NowcastCard` trong `insight_cards.dart`)*
+- [ ] GĐ 2: Radar mưa
+- [ ] GĐ 3: Thẻ hoạt động
+- [ ] GĐ 4: Cảnh báo đẩy
 
 ### Chất lượng & trình bày
 - [x] Unit test + widget test *(45 test)*
