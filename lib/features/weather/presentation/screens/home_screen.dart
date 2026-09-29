@@ -410,6 +410,12 @@ class _WeatherBody extends StatelessWidget {
       ],
       _Header(name: name, weather: weather, showPin: showPin),
       const SizedBox(height: 20),
+      // An offline copy's "rain in 15 min" is already wrong, so it's hidden.
+      if (weather.cachedAt == null)
+        if (rainOutlook(weather.nowcast) case final outlook?) ...[
+          NowcastCard(slots: weather.nowcast, outlook: outlook),
+          const SizedBox(height: 20),
+        ],
       HourlyCard(hours: weather.next24Hours),
       const SizedBox(height: 20),
       TipsCard(weather: weather, place: place),
@@ -516,6 +522,14 @@ class _Header extends ConsumerWidget {
             l10n.hiLo(
               units.formatTemp(today.tempMax),
               units.formatTemp(today.tempMin),
+            ),
+            style: text.bodyMedium,
+          ),
+        if (highVsYesterday(weather) case final delta?)
+          Text(
+            l10n.vsYesterday(
+              delta > 0 ? 'warmer' : 'cooler',
+              units.formatTempDelta(delta),
             ),
             style: text.bodyMedium,
           ),

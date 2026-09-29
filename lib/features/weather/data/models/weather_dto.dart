@@ -16,54 +16,81 @@ abstract class WeatherDto with _$WeatherDto {
     required CurrentDto current,
     required HourlyDto hourly,
     required DailyDto daily,
+
+    /// Null in caches written before it was requested.
+    @JsonKey(name: 'minutely_15') MinutelyDto? minutely15,
   }) = _WeatherDto;
 
   factory WeatherDto.fromJson(Map<String, dynamic> json) =>
       _$WeatherDtoFromJson(json);
 
-  Weather toEntity({DateTime? cachedAt}) => Weather(
-    cachedAt: cachedAt,
-    current: CurrentWeather(
-      time: DateTime.parse(current.time),
-      temperature: current.temperature,
-      apparentTemperature: current.apparentTemperature,
-      humidity: current.humidity,
-      dewPoint: current.dewPoint,
-      isDay: current.isDay == 1,
-      condition: WeatherCondition.fromCode(current.weatherCode),
-      windSpeed: current.windSpeed,
-      windDirection: current.windDirection,
-      pressure: current.pressure,
-      uvIndex: current.uvIndex ?? 0,
-      visibility: current.visibility ?? 0,
-    ),
-    hourly: [
-      for (var i = 0; i < hourly.time.length; i++)
-        HourlyForecast(
-          time: DateTime.parse(hourly.time[i]),
-          temperature: hourly.temperature[i],
-          condition: WeatherCondition.fromCode(hourly.weatherCode[i]),
-          precipitationProbability: hourly.precipitationProbability[i] ?? 0,
-          isDay: hourly.isDay[i] == 1,
-        ),
-    ],
-    daily: [
-      for (var i = 0; i < daily.time.length; i++)
-        DailyForecast(
-          date: DateTime.parse(daily.time[i]),
-          condition: WeatherCondition.fromCode(daily.weatherCode[i]),
-          tempMax: daily.tempMax[i],
-          tempMin: daily.tempMin[i],
-          sunrise: DateTime.parse(daily.sunrise[i]),
-          sunset: DateTime.parse(daily.sunset[i]),
-          uvIndexMax: daily.uvIndexMax[i] ?? 0,
-          precipitationProbabilityMax:
-              daily.precipitationProbabilityMax[i] ?? 0,
-          windSpeedMax: daily.windSpeedMax[i] ?? 0,
-          windDirectionDominant: daily.windDirectionDominant[i] ?? 0,
-        ),
-    ],
+  Weather toEntity({DateTime? cachedAt}) {
+    final now = DateTime.parse(current.time);
+    final today = DateTime(now.year, now.month, now.day);
+    // Split by date rather than dropping index 0, so caches from before
+    // `past_days` was requested still start at today.
+    final days = _days();
+    return Weather(
+      cachedAt: cachedAt,
+      current: _current(now),
+      hourly: [
+        for (final h in _hours())
+          if (!h.time.isBefore(today)) h,
+      ],
+      daily: [
+        for (final d in days)
+          if (!d.date.isBefore(today)) d,
+      ],
+      yesterday: days.where((d) => d.date.isBefore(today)).lastOrNull,
+      nowcast: [
+        if (minutely15 case final m?)
+          for (var i = 0; i < m.time.length; i++)
+            (time: DateTime.parse(m.time[i]), mm: m.precipitation[i] ?? 0),
+      ],
+    );
+  }
+
+  CurrentWeather _current(DateTime time) => CurrentWeather(
+    time: time,
+    temperature: current.temperature,
+    apparentTemperature: current.apparentTemperature,
+    humidity: current.humidity,
+    dewPoint: current.dewPoint,
+    isDay: current.isDay == 1,
+    condition: WeatherCondition.fromCode(current.weatherCode),
+    windSpeed: current.windSpeed,
+    windDirection: current.windDirection,
+    pressure: current.pressure,
+    uvIndex: current.uvIndex ?? 0,
+    visibility: current.visibility ?? 0,
   );
+
+  List<HourlyForecast> _hours() => [
+    for (var i = 0; i < hourly.time.length; i++)
+      HourlyForecast(
+        time: DateTime.parse(hourly.time[i]),
+        temperature: hourly.temperature[i],
+        condition: WeatherCondition.fromCode(hourly.weatherCode[i]),
+        precipitationProbability: hourly.precipitationProbability[i] ?? 0,
+        isDay: hourly.isDay[i] == 1,
+      ),
+  ];
+
+  List<DailyForecast> _days() => [
+    for (var i = 0; i < daily.time.length; i++)
+      DailyForecast(
+        date: DateTime.parse(daily.time[i]),
+        condition: WeatherCondition.fromCode(daily.weatherCode[i]),
+        tempMax: daily.tempMax[i],
+        tempMin: daily.tempMin[i],
+        sunrise: DateTime.parse(daily.sunrise[i]),
+        sunset: DateTime.parse(daily.sunset[i]),
+        uvIndexMax: daily.uvIndexMax[i] ?? 0,
+        precipitationProbabilityMax: daily.precipitationProbabilityMax[i] ?? 0,
+        windSpeedMax: daily.windSpeedMax[i] ?? 0,
+        windDirectionDominant: daily.windDirectionDominant[i] ?? 0,
+      ),
+  ];
 }
 
 @freezed
@@ -121,6 +148,18 @@ abstract class DailyDto with _$DailyDto {
 
   factory DailyDto.fromJson(Map<String, dynamic> json) =>
       _$DailyDtoFromJson(json);
+}
+
+/// Next 2 hours in 15-minute steps, starting at the current slot.
+@freezed
+abstract class MinutelyDto with _$MinutelyDto {
+  const factory MinutelyDto({
+    required List<String> time,
+    required List<double?> precipitation,
+  }) = _MinutelyDto;
+
+  factory MinutelyDto.fromJson(Map<String, dynamic> json) =>
+      _$MinutelyDtoFromJson(json);
 }
 
 /// `current` of the air-quality response. `us_aqi` is null where the model

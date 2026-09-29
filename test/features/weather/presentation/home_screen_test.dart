@@ -127,6 +127,37 @@ void main() {
     expect(find.text('Đang offline · cập nhật lúc 8:15'), findsOneWidget);
   });
 
+  testWidgets('rain soon shows the nowcast card, but not offline', (
+    tester,
+  ) async {
+    final json = weatherJson()
+      ..['minutely_15'] = {
+        'time': [for (var m = 15; m < 60; m += 15) '2026-09-24T10:$m'],
+        'precipitation': [0.0, 0.0, 0.6],
+      };
+    for (final cachedAt in [null, DateTime(2026, 9, 24, 8)]) {
+      final weather = WeatherDto.fromJson(json).toEntity(cachedAt: cachedAt);
+      // A fresh tree, or the second pump would keep the first ProviderScope.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpWidget(
+        await _app([
+          currentPlaceProvider.overrideWith((ref) async => _place),
+          weatherProvider(
+            _place.lat,
+            _place.lon,
+          ).overrideWith((ref) async => weather),
+        ]),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.text('Mưa bắt đầu sau khoảng 30 phút'),
+        cachedAt == null ? findsOneWidget : findsNothing,
+      );
+    }
+  });
+
   testWidgets('location failure shows the error view with retry', (
     tester,
   ) async {

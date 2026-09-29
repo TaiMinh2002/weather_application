@@ -81,6 +81,62 @@ void main() {
       ]);
     });
   });
+
+  test('highVsYesterday ignores small gaps and missing data', () {
+    final today = _weather();
+    final day = today.daily.first;
+    Weather withYesterday(double max) => Weather(
+      current: today.current,
+      hourly: today.hourly,
+      daily: today.daily,
+      yesterday: DailyForecast(
+        date: DateTime(2026, 9, 25),
+        condition: day.condition,
+        tempMax: max,
+        tempMin: day.tempMin,
+        sunrise: day.sunrise,
+        sunset: day.sunset,
+        uvIndexMax: day.uvIndexMax,
+        precipitationProbabilityMax: 0,
+        windSpeedMax: 0,
+        windDirectionDominant: 0,
+      ),
+    );
+    expect(highVsYesterday(today), isNull);
+    expect(highVsYesterday(withYesterday(27)), 3);
+    expect(highVsYesterday(withYesterday(33.5)), -3.5);
+    expect(highVsYesterday(withYesterday(28.6)), isNull);
+  });
+
+  group('rainOutlook', () {
+    List<({DateTime time, double mm})> slots(List<double> mm) => [
+      for (final (i, v) in mm.indexed)
+        (time: DateTime(2026, 9, 26, 10, i * 15), mm: v),
+    ];
+
+    test('dry or drizzle under 0.2 mm is no rain', () {
+      expect(rainOutlook(const []), isNull);
+      expect(rainOutlook(slots([0, 0.1, 0.19, 0])), isNull);
+    });
+
+    test('dry now: minutes until the first wet slot', () {
+      expect(rainOutlook(slots([0, 0, 0.2, 1.5])), (
+        trend: RainTrend.starting,
+        minutes: 30,
+      ));
+    });
+
+    test('raining now: minutes until it stops, or the whole window', () {
+      expect(rainOutlook(slots([0.8, 0.4, 0, 0.5])), (
+        trend: RainTrend.stopping,
+        minutes: 30,
+      ));
+      expect(rainOutlook(slots([0.3, 0.3, 0.3])), (
+        trend: RainTrend.continuing,
+        minutes: 0,
+      ));
+    });
+  });
 }
 
 Weather _weather({

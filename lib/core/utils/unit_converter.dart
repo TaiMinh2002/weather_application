@@ -15,6 +15,12 @@ class Units {
     TempUnit.fahrenheit => '${(celsius * 9 / 5 + 32).round()}°',
   };
 
+  /// A temperature difference, unsigned: no +32 offset for °F.
+  String formatTempDelta(double celsius) => switch (temp) {
+    TempUnit.celsius => '${celsius.abs().round()}°',
+    TempUnit.fahrenheit => '${(celsius.abs() * 9 / 5).round()}°',
+  };
+
   String formatWind(double kmh) => switch (wind) {
     WindUnit.kmh => '${kmh.round()} km/h',
     // m/s values are small (12 km/h ≈ 3.3 m/s), so keep one decimal.

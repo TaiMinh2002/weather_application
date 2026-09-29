@@ -180,5 +180,28 @@
       }
     }
   },
-  "notificationsDenied": "Notifications are off for Skycast. Turn them on in your phone's Settings."
+  "notificationsDenied": "Notifications are off for Skycast. Turn them on in your phone's Settings.",
+  "vsYesterday": "{direction, select, warmer{{delta} warmer than yesterday} other{{delta} cooler than yesterday}}",
+  "@vsYesterday": {
+    "placeholders": {
+      "direction": {
+        "type": "String"
+      },
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "nowcastTitle": "Rain, next 2 hours",
+  "rainOutlook": "{trend, select, starting{Rain starting in about {minutes} min} stopping{Rain easing off in about {minutes} min} other{Rain for at least the next 2 hours}}",
+  "@rainOutlook": {
+    "placeholders": {
+      "trend": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  }
 }
