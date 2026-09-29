@@ -10,7 +10,7 @@ import '../models/weather_dto.dart';
 part 'weather_local_ds.g.dart';
 
 /// Last successful forecast per location, as JSON in shared_preferences.
-/// ponytail: one ~30 KB entry per location; move to a real store (Hive/file)
+/// ponytail: one ~13 KB entry per location; move to a real store (Hive/file)
 /// if saved cities grow past a handful.
 class WeatherLocalDataSource {
   const WeatherLocalDataSource(this._prefs);

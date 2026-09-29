@@ -77,9 +77,10 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4.
 - Kiểm tra trước: độ phủ radar ở VN và điều khoản gói miễn phí hiện tại. Phủ kém thì bỏ giai đoạn này.
 
 **GĐ 3 – Thẻ hoạt động**
-- Hourly thêm `apparent_temperature, precipitation, wind_speed_10m, uv_index, relative_humidity_2m`. Cache lớn thêm ~40% → chuyển cache sang file JSON (`dart:io` + `path_provider`), xử lý ghi chú `ponytail:` trong `weather_local_ds.dart`.
-- `features/activities/`: `enum Activity` (chạy bộ, đạp xe, phơi đồ, xe máy, rửa xe, câu cá, dã ngoại), `scoreHour` (0–100) và `bestWindow` (khung giờ tốt nhất hôm nay). Mỗi luật có unit test.
-- Người dùng chọn hoạt động ở một trang onboarding mới + Cài đặt (`settingsProvider.activities`). `ActivitiesCard` trên Home; thông báo 7:00 thêm "Chạy bộ tốt nhất 5:30–7:00".
+- Hourly thêm `apparent_temperature, precipitation, wind_speed_10m, uv_index, relative_humidity_2m`. Đo thực tế: response ~13 KB/vị trí (không phải ~40 KB như ước tính) → **giữ cache trong shared_preferences**, không thêm `path_provider`. Cache cũ thiếu các trường mới thì bị bỏ qua (chỉ xảy ra một lần, khi vừa cập nhật mà đang offline).
+- `features/activities/domain/activity.dart`: `enum Activity` (xe máy, phơi đồ, chạy bộ, đạp xe, rửa xe, dã ngoại; bỏ câu cá vì khó chấm điểm có ý nghĩa), `scoreAt` (0–100, trừ điểm theo mưa/nóng/UV/gió/độ ẩm/AQI tùy hoạt động) và `bestWindow` (khối `Activity.hours` giờ liền nhau trong 5:00–21:00, xếp theo giờ tệ nhất trong khối). Mỗi luật có unit test.
+- Không thêm trang onboarding / mục Cài đặt: mặc định chọn sẵn xe máy, phơi đồ, chạy bộ (`Activity.defaults`); người dùng sửa bằng nút trên chính card (bottom sheet `FilterChip`), lưu ở `settingsProvider.activities`. Chiều tối hết giờ trong ngày thì card hiện khung giờ ngày mai.
+- Thông báo 7:00 thêm dòng "Chạy bộ: tốt nhất 5:00–6:00" cho hoạt động đầu tiên đã chọn (chỉ khi điểm ≥ 60; Android dùng `BigTextStyle` để không bị cắt).
 
 **GĐ 4 – Cảnh báo đẩy**
 - `pg_cron` 15 phút/lần → Edge Function `check-alerts` (gom vị trí theo ô ~0,1°, gọi Open-Meteo, chống spam 1 cảnh báo/loại/3 giờ, giờ yên lặng) → FCM HTTP v1.
@@ -537,7 +538,7 @@ README nên có đủ các mục:
 ### Khác biệt (mục 1.3)
 - [x] GĐ 1: So sánh hôm qua + mưa 2 giờ tới *(`highVsYesterday`, `rainOutlook` trong `weather.dart`; `NowcastCard` trong `insight_cards.dart`)*
 - [ ] GĐ 2: Radar mưa
-- [ ] GĐ 3: Thẻ hoạt động
+- [x] GĐ 3: Thẻ hoạt động *(`features/activities/`: `scoreAt`, `bestWindow`, `ActivitiesCard`)*
 - [ ] GĐ 4: Cảnh báo đẩy
 
 ### Chất lượng & trình bày

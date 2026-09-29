@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_application/core/storage/prefs.dart';
 import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/core/utils/unit_converter.dart';
+import 'package:weather_application/features/activities/domain/activity.dart';
 import 'package:weather_application/features/settings/presentation/providers/settings_provider.dart';
 import 'package:weather_application/features/settings/presentation/screens/settings_screen.dart';
 import 'package:weather_application/l10n/app_localizations.dart';
@@ -28,6 +29,20 @@ void main() {
     expect(settings.units.wind, WindUnit.kmh);
     expect(settings.themeMode, ThemeMode.system);
     expect(settings.locale, isNull);
+  });
+
+  test('activities: defaults, persisted picks, empty kept empty', () async {
+    expect(
+      (await _container()).read(settingsProvider).activities,
+      Activity.defaults,
+    );
+    final container = await _container({
+      PrefKeys.activities: ['cycling', 'skydiving'],
+    });
+    expect(container.read(settingsProvider).activities, {Activity.cycling});
+
+    await container.read(settingsProvider.notifier).setActivities({});
+    expect(container.read(settingsProvider).activities, isEmpty);
   });
 
   test(

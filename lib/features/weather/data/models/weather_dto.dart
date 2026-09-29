@@ -73,6 +73,12 @@ abstract class WeatherDto with _$WeatherDto {
         condition: WeatherCondition.fromCode(hourly.weatherCode[i]),
         precipitationProbability: hourly.precipitationProbability[i] ?? 0,
         isDay: hourly.isDay[i] == 1,
+        apparentTemperature:
+            hourly.apparentTemperature[i] ?? hourly.temperature[i],
+        precipitation: hourly.precipitation[i] ?? 0,
+        windSpeed: hourly.windSpeed[i] ?? 0,
+        uvIndex: hourly.uvIndex[i] ?? 0,
+        humidity: hourly.humidity[i] ?? 0,
       ),
   ];
 
@@ -123,6 +129,12 @@ abstract class HourlyDto with _$HourlyDto {
     @JsonKey(name: 'precipitation_probability')
     required List<int?> precipitationProbability,
     @JsonKey(name: 'is_day') required List<int> isDay,
+    @JsonKey(name: 'apparent_temperature')
+    required List<double?> apparentTemperature,
+    required List<double?> precipitation,
+    @JsonKey(name: 'wind_speed_10m') required List<double?> windSpeed,
+    @JsonKey(name: 'uv_index') required List<double?> uvIndex,
+    @JsonKey(name: 'relative_humidity_2m') required List<int?> humidity,
   }) = _HourlyDto;
 
   factory HourlyDto.fromJson(Map<String, dynamic> json) =>

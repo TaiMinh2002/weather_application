@@ -69,6 +69,11 @@ Weather _weather(double base, WeatherCondition condition) {
         condition: h < 24 ? condition : days[h ~/ 24],
         precipitationProbability: ((math.sin(h / 5) + 1) * 45).round(),
         isDay: h % 24 >= 6 && h % 24 < 18,
+        apparentTemperature: tempAt(start.add(Duration(hours: h)), h ~/ 24) + 2,
+        precipitation: 0,
+        windSpeed: 12,
+        uvIndex: h % 24 >= 10 && h % 24 < 15 ? 8 : 2,
+        humidity: 65,
       ),
   ];
   return Weather(

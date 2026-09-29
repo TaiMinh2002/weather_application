@@ -88,5 +88,13 @@
   "notificationsDenied": "Skycast chưa được phép gửi thông báo. Bật lại trong Cài đặt của máy.",
   "vsYesterday": "{direction, select, warmer{Nóng hơn hôm qua {delta}} other{Mát hơn hôm qua {delta}}}",
   "nowcastTitle": "Mưa 2 giờ tới",
-  "rainOutlook": "{trend, select, starting{Mưa bắt đầu sau khoảng {minutes} phút} stopping{Mưa tạnh sau khoảng {minutes} phút} other{Mưa kéo dài ít nhất 2 giờ tới}}"
+  "rainOutlook": "{trend, select, starting{Mưa bắt đầu sau khoảng {minutes} phút} stopping{Mưa tạnh sau khoảng {minutes} phút} other{Mưa kéo dài ít nhất 2 giờ tới}}",
+  "activitiesTitle": "Giờ đẹp cho bạn",
+  "activitiesEdit": "Chọn hoạt động",
+  "activitiesEmpty": "Chọn các hoạt động bạn quan tâm để xem giờ phù hợp nhất cho từng việc.",
+  "activityName": "{activity, select, motorbike{Đi xe máy} laundry{Phơi đồ} running{Chạy bộ} cycling{Đạp xe} carWash{Rửa xe} other{Dã ngoại}}",
+  "activityLevel": "{level, select, great{Rất tốt} good{Tốt} fair{Tạm được} other{Không nên}}",
+  "activityTomorrow": "Ngày mai {time}",
+  "activityNoGoodTime": "Không có giờ phù hợp",
+  "morningActivity": "{activity}: tốt nhất {time}"
 }

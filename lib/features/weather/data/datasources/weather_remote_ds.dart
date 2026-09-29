@@ -24,7 +24,9 @@ class WeatherRemoteDataSource {
               'is_day,weather_code,wind_speed_10m,wind_direction_10m,'
               'pressure_msl,uv_index,visibility',
           'hourly':
-              'temperature_2m,weather_code,precipitation_probability,is_day',
+              'temperature_2m,weather_code,precipitation_probability,is_day,'
+              'apparent_temperature,precipitation,wind_speed_10m,uv_index,'
+              'relative_humidity_2m',
           'daily':
               'weather_code,temperature_2m_max,temperature_2m_min,sunrise,'
               'sunset,uv_index_max,precipitation_probability_max,'
