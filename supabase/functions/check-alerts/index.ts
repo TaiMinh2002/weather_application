@@ -1,4 +1,4 @@
-// Runs every 15 minutes (pg_cron, see README.md). Checks the weather at each
+// Runs hourly (pg_cron, see README.md). Checks the weather at each
 // subscribed device's place and pushes the alerts whose rule fires and whose
 // cooldown has passed. Rules live in rules.ts.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     try {
       conditions = await fetchConditions(key);
     } catch (e) {
-      // One place failing shouldn't stop the others; it's retried in 15 min.
+      // One place failing shouldn't stop the others; it's retried next hour.
       console.error(`weather ${key}:`, e);
       continue;
     }
@@ -70,7 +70,7 @@ async function fetchConditions(cell: string): Promise<Conditions> {
   const [latitude, longitude] = cell.split(",");
   const place = new URLSearchParams({ latitude, longitude });
   const forecast = await getJson(
-    `https://api.open-meteo.com/v1/forecast?${place}&current=apparent_temperature,uv_index,is_day&minutely_15=precipitation&forecast_minutely_15=4&timezone=auto`,
+    `https://api.open-meteo.com/v1/forecast?${place}&current=apparent_temperature,uv_index,is_day&minutely_15=precipitation&forecast_minutely_15=5&timezone=auto`,
   );
   // Air quality is a separate API; without it only the AQI rule is skipped.
   const air = await getJson(

@@ -66,7 +66,13 @@ Future<void> setWeatherAlerts(
     );
   }
   await settings.setWeatherAlerts(true);
-  // Home may have loaded the GPS place already; don't wait for a refresh.
+  await resyncWeatherAlerts(ref);
+}
+
+/// After a setting the server words or filters alerts by (language, units,
+/// alert types): pushes it now instead of at the next GPS refresh. Uses the
+/// place Home already loaded; before that there's nothing to sync yet.
+Future<void> resyncWeatherAlerts(WidgetRef ref) async {
   if (ref.read(currentPlaceProvider).value case final place?) {
     await syncWeatherAlerts(ref, place);
   }
@@ -81,9 +87,7 @@ Future<void> setAlertType(WidgetRef ref, AlertType type, bool on) async {
             ? {...settings.alertTypes, type}
             : ({...settings.alertTypes}..remove(type)),
       );
-  if (ref.read(currentPlaceProvider).value case final place?) {
-    await syncWeatherAlerts(ref, place);
-  }
+  await resyncWeatherAlerts(ref);
 }
 
 /// Android shows nothing for a push that arrives while the app is open, so

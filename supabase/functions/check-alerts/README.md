@@ -2,7 +2,7 @@
 
 Push weather alerts (rain soon, very high UV, unhealthy air, extreme heat). The app
 writes one `alert_subscriptions` row per device (place, language, units, chosen
-alert types, FCM token). `pg_cron` calls this function every 15 minutes. It checks
+alert types, FCM token). `pg_cron` calls this function at the top of every hour. It checks
 Open-Meteo for each place and sends pushes through FCM HTTP v1.
 
 - Rules: `rules.ts` (tests: `deno test supabase/functions/check-alerts/`).
@@ -49,7 +49,7 @@ create extension if not exists pg_net;
 
 select vault.create_secret('<CRON_SECRET>', 'check_alerts_secret');
 
-select cron.schedule('check-alerts', '*/15 * * * *', $$
+select cron.schedule('check-alerts', '0 * * * *', $$
   select net.http_post(
     url := 'https://<project-ref>.supabase.co/functions/v1/check-alerts',
     headers := jsonb_build_object(
@@ -68,6 +68,6 @@ dashboard. Each run returns `{devices, cells, sent}`.
 ## Limits
 
 The free Supabase and Open-Meteo tiers are plenty for a few hundred devices:
-2 Open-Meteo calls per ~11 km cell, every 15 minutes. Places are processed one
+2 Open-Meteo calls per ~11 km cell, every hour. Places are processed one
 after another. At a few thousand cells, a run would get close to the Edge
 Function time limit, so the loop would need to fan out.
