@@ -39,8 +39,15 @@ enum ActivityLevel {
 typedef ActivityWindow = ({DateTime from, DateTime to, int score});
 
 /// How good hours[i] is for [a], 0–100. Takes the whole list because a car
-/// wash also depends on the day after.
-int scoreAt(Activity a, List<HourlyForecast> hours, int i, {AirQuality? air}) {
+/// wash also depends on the day after. [limits] makes smog and heat count
+/// earlier for sensitive users.
+int scoreAt(
+  Activity a,
+  List<HourlyForecast> hours,
+  int i, {
+  AirQuality? air,
+  Limits limits = const Limits(),
+}) {
   final h = hours[i];
   if (h.condition == WeatherCondition.thunderstorm || h.precipitation >= 0.5) {
     return 0;
@@ -51,16 +58,19 @@ int scoreAt(Activity a, List<HourlyForecast> hours, int i, {AirQuality? air}) {
   double under(num value, num limit, double perUnit) =>
       value < limit ? (limit - value) * perUnit : 0;
   final feels = h.apparentTemperature;
+  // Heat hits children and older people sooner, so the hot-side comfort
+  // limits sit lower by [Limits.heatMargin]; the cold side is untouched.
+  final hot = feels + limits.heatMargin;
   final rain = h.precipitationProbability;
   // There is no hourly AQI, so the current value stands in for the day.
-  final smog = air == null ? 0.0 : over(air.usAqi, 100, 0.8);
+  final smog = air == null ? 0.0 : over(air.usAqi, limits.aqi, 0.8);
   final penalty = switch (a) {
     // Even a drizzle soaks a rider.
     Activity.motorbike =>
       rain * 0.8 +
           h.precipitation * 150 +
           over(h.windSpeed, 40, 2) +
-          over(feels, 36, 5),
+          over(hot, 36, 5),
     Activity.laundry when !h.isDay || h.precipitation > 0 => 100.0,
     Activity.laundry =>
       rain +
@@ -71,14 +81,14 @@ int scoreAt(Activity a, List<HourlyForecast> hours, int i, {AirQuality? air}) {
               : 0),
     Activity.running =>
       rain * 0.4 +
-          over(feels, 27, 6) +
+          over(hot, 27, 6) +
           under(feels, 10, 4) +
           over(h.uvIndex, 5, 8) +
           over(h.windSpeed, 30, 2) +
           smog,
     Activity.cycling =>
       rain * 0.5 +
-          over(feels, 29, 5) +
+          over(hot, 29, 5) +
           under(feels, 10, 4) +
           over(h.uvIndex, 6, 6) +
           over(h.windSpeed, 20, 3) +
@@ -91,7 +101,7 @@ int scoreAt(Activity a, List<HourlyForecast> hours, int i, {AirQuality? air}) {
     Activity.picnic when !h.isDay => 100.0,
     Activity.picnic =>
       rain * 0.8 +
-          over(feels, 31, 6) +
+          over(hot, 31, 6) +
           under(feels, 18, 4) +
           over(h.uvIndex, 7, 6) +
           over(h.windSpeed, 25, 2),
@@ -108,6 +118,7 @@ ActivityWindow? bestWindow(
   List<HourlyForecast> hours, {
   required DateTime from,
   AirQuality? air,
+  Limits limits = const Limits(),
 }) {
   final start = DateTime(from.year, from.month, from.day, from.hour);
   final end = DateTime(from.year, from.month, from.day, 21);
@@ -118,7 +129,8 @@ ActivityWindow? bestWindow(
     final to = hours[i + a.hours - 1].time.add(const Duration(hours: 1));
     if (to.isAfter(end)) break;
     final score = [
-      for (var j = i; j < i + a.hours; j++) scoreAt(a, hours, j, air: air),
+      for (var j = i; j < i + a.hours; j++)
+        scoreAt(a, hours, j, air: air, limits: limits),
     ].reduce(math.min);
     if (best == null || score > best.score) {
       best = (from: t, to: to, score: score);

@@ -1,6 +1,12 @@
 // Run: deno test supabase/functions/check-alerts/
 import { assertEquals } from "jsr:@std/assert@1";
-import { alertsFor, type Conditions, rainStartsIn, type Subscription } from "./rules.ts";
+import {
+  alertsFor,
+  type Conditions,
+  limitsFor,
+  rainStartsIn,
+  type Subscription,
+} from "./rules.ts";
 
 const now = new Date("2026-09-30T05:00:00Z");
 
@@ -82,4 +88,19 @@ Deno.test("text follows the subscriber's language and units", () => {
   const en = alertsFor(sub({ locale: "en", fahrenheit: true }), hot, now)[0];
   assertEquals(en.title, "Extreme heat");
   assertEquals(en.body.includes("104°"), true);
+});
+
+Deno.test("health profiles lower the thresholds", () => {
+  assertEquals(limitsFor([]), { aqi: 150, feelsHot: 39, uv: 8 });
+  assertEquals(limitsFor(["respiratory"]), { aqi: 100, feelsHot: 39, uv: 8 });
+  assertEquals(limitsFor(["children"]), { aqi: 100, feelsHot: 37, uv: 6 });
+  assertEquals(limitsFor(["elderly"]), { aqi: 100, feelsHot: 37, uv: 8 });
+
+  const smoggy: Conditions = { ...calm, aqi: 120, feelsLike: 37.5, uv: 6.5 };
+  // sub() has no `health`, like rows written before the column existed.
+  assertEquals(alertsFor(sub(), smoggy, now), []);
+  assertEquals(
+    alertsFor(sub({ health: ["children"] }), smoggy, now).map((a) => a.type),
+    ["uv", "air", "heat"],
+  );
 });

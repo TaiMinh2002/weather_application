@@ -31,6 +31,7 @@ Future<void> syncWeatherAlerts(WidgetRef ref, Place place) async {
       locale: settings.effectiveLocale.languageCode,
       fahrenheit: settings.units.temp == TempUnit.fahrenheit,
       types: settings.alertTypes,
+      health: {for (final p in settings.health) p.name},
     ),
   );
 }

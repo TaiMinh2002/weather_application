@@ -35,6 +35,7 @@ class ActivitiesCard extends ConsumerWidget {
     final l10n = context.l10n;
     final text = context.textTheme;
     final selected = ref.watch(settingsProvider.select((s) => s.activities));
+    final limits = ref.watch(settingsProvider.select((s) => s.limits));
     final place = this.place;
     final air = place == null
         ? null
@@ -70,7 +71,12 @@ class ActivitiesCard extends ConsumerWidget {
           else
             for (final a in Activity.values)
               if (selected.contains(a))
-                _ActivityRow(activity: a, weather: weather, air: air),
+                _ActivityRow(
+                  activity: a,
+                  weather: weather,
+                  air: air,
+                  limits: limits,
+                ),
         ],
       ),
     );
@@ -82,11 +88,13 @@ class _ActivityRow extends StatelessWidget {
     required this.activity,
     required this.weather,
     required this.air,
+    required this.limits,
   });
 
   final Activity activity;
   final Weather weather;
   final AirQuality? air;
+  final Limits limits;
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +102,13 @@ class _ActivityRow extends StatelessWidget {
     final text = context.textTheme;
     final hm = DateFormat.Hm(Localizations.localeOf(context).toString());
     final now = weather.current.time;
-    final today = bestWindow(activity, weather.hourly, from: now, air: air);
+    final today = bestWindow(
+      activity,
+      weather.hourly,
+      from: now,
+      air: air,
+      limits: limits,
+    );
     // Today's AQI says little about tomorrow, so it's left out there.
     final window =
         today ??
@@ -102,6 +116,7 @@ class _ActivityRow extends StatelessWidget {
           activity,
           weather.hourly,
           from: DateTime(now.year, now.month, now.day + 1),
+          limits: limits,
         );
     final level = ActivityLevel.fromScore(window?.score ?? 0);
     final String when;

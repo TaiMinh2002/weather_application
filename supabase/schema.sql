@@ -36,6 +36,8 @@ create table if not exists public.alert_subscriptions (
   fahrenheit boolean not null default false,
   -- AlertType names: rain, uv, air, heat.
   types text[] not null default '{rain,uv,air,heat}',
+  -- HealthProfile names (respiratory, children, elderly): lower thresholds.
+  health text[] not null default '{}',
   -- Alert type → last time it was sent, for the per-type cooldown.
   last_sent jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
@@ -53,3 +55,7 @@ create policy "own row: update" on public.alert_subscriptions
   with check (user_id = (select auth.uid()));
 create policy "own row: delete" on public.alert_subscriptions
   for delete to authenticated using (user_id = (select auth.uid()));
+
+-- Added with health profiles; a no-op on tables created from this file.
+alter table public.alert_subscriptions
+  add column if not exists health text[] not null default '{}';

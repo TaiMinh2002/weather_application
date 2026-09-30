@@ -105,6 +105,25 @@ void main() {
       );
     });
 
+    test('health limits make heat and smog count sooner', () {
+      final hours = _hours(edit: (i, h) => i == 9 ? _with(h, feels: 28) : h);
+      final sensitive = Limits.of({HealthProfile.children});
+      // 6 × (28 − 27), then 6 × (28 + 2 − 27).
+      expect(scoreAt(Activity.running, hours, 9), 94);
+      expect(scoreAt(Activity.running, hours, 9, limits: sensitive), 82);
+      // Cold side unchanged: 10 − 8 = 2° under, 4 points each.
+      final cold = _hours(edit: (i, h) => i == 9 ? _with(h, feels: 8) : h);
+      expect(scoreAt(Activity.running, cold, 9, limits: sensitive), 92);
+      const air = AirQuality(usAqi: 80);
+      final lungs = Limits.of({HealthProfile.respiratory});
+      expect(scoreAt(Activity.running, _hours(), 9, air: air), 100);
+      // 0.8 × (80 − 50)
+      expect(
+        scoreAt(Activity.running, _hours(), 9, air: air, limits: lungs),
+        76,
+      );
+    });
+
     test('drizzle soaks a rider and the laundry', () {
       final hours = _hours(edit: (i, h) => i == 9 ? _with(h, mm: 0.3) : h);
       expect(scoreAt(Activity.motorbike, hours, 9), 55);

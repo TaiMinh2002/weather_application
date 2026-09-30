@@ -4,6 +4,9 @@
 /** Same names as the app's `AlertType` enum. */
 export type AlertType = "rain" | "uv" | "air" | "heat";
 
+/** Same names as the app's `HealthProfile` enum. */
+export type HealthProfile = "respiratory" | "children" | "elderly";
+
 export interface Subscription {
   user_id: string;
   fcm_token: string;
@@ -12,6 +15,8 @@ export interface Subscription {
   locale: string;
   fahrenheit: boolean;
   types: AlertType[];
+  /** Missing on rows written before health profiles existed. */
+  health?: HealthProfile[];
   /** Alert type → ISO time it was last sent. */
   last_sent: Partial<Record<AlertType, string>>;
 }
@@ -59,6 +64,22 @@ export function rainStartsIn(mm: (number | null)[]): number | null {
   return i > 0 && i <= 4 ? i * 15 : null;
 }
 
+/**
+ * Push thresholds: worth interrupting someone for, so a notch above the
+ * app's own tips (Limits in weather.dart). EPA counts children, older adults
+ * and people with lung disease as sensitive to air from AQI 100; for
+ * everyone else it's "unhealthy" from 150.
+ */
+export function limitsFor(health: HealthProfile[]) {
+  const young = health.includes("children");
+  const old = health.includes("elderly");
+  return {
+    aqi: health.length > 0 ? 100 : 150,
+    feelsHot: young || old ? 37 : 39,
+    uv: young ? 6 : 8,
+  };
+}
+
 export function alertsFor(
   sub: Subscription,
   c: Conditions,
@@ -72,6 +93,7 @@ export function alertsFor(
     return last === undefined || now.getTime() - Date.parse(last) >= cooldown[t];
   };
   const vi = sub.locale === "vi";
+  const limits = limitsFor(sub.health ?? []);
   const temp = (celsius: number) =>
     `${Math.round(sub.fahrenheit ? celsius * 9 / 5 + 32 : celsius)}°`;
   const alerts: Alert[] = [];
@@ -86,7 +108,7 @@ export function alertsFor(
         : `Rain may start in about ${minutes} min where you are.`,
     });
   }
-  if (c.isDay && c.uv >= 8 && due("uv")) {
+  if (c.isDay && c.uv >= limits.uv && due("uv")) {
     const uv = Math.round(c.uv);
     alerts.push({
       type: "uv",
@@ -96,8 +118,7 @@ export function alertsFor(
         : `The UV index is ${uv}. Limit time in the sun and wear sunscreen.`,
     });
   }
-  // Above 150 is "unhealthy" for everyone, not only sensitive groups.
-  if (c.aqi !== null && c.aqi > 150 && due("air")) {
+  if (c.aqi !== null && c.aqi > limits.aqi && due("air")) {
     alerts.push({
       type: "air",
       title: vi ? "Không khí xấu" : "Unhealthy air",
@@ -106,7 +127,7 @@ export function alertsFor(
         : `The AQI is ${c.aqi}, unhealthy. Consider a mask outdoors.`,
     });
   }
-  if (c.feelsLike >= 39 && due("heat")) {
+  if (c.feelsLike >= limits.feelsHot && due("heat")) {
     alerts.push({
       type: "heat",
       title: vi ? "Nắng nóng gay gắt" : "Extreme heat",

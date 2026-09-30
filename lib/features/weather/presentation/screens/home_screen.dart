@@ -22,7 +22,7 @@ import '../../../location/domain/entities/place.dart';
 import '../../../notifications/presentation/morning_forecast.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
-import '../../../share/presentation/share_card.dart';
+import '../../../share/presentation/share_sheet.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/forecast_cards.dart';

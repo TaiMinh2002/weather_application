@@ -254,5 +254,15 @@
   },
   "share": "Share",
   "shareRain": "Rain",
-  "shareNext12h": "Next 12 hours"
+  "shareNext12h": "Next 12 hours",
+  "health": "Health",
+  "healthHint": "Tips, best times and alerts get stricter for:",
+  "healthProfile": "{profile, select, respiratory{Asthma or lung condition} children{Young children} other{Older adults}}",
+  "@healthProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      }
+    }
+  }
 }
