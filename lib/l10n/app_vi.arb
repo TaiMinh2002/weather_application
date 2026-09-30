@@ -101,5 +101,8 @@
   "alertType": "{type, select, rain{Sắp mưa} uv{UV rất cao} air{Không khí xấu} other{Nắng nóng gay gắt}}",
   "share": "Chia sẻ",
   "shareRain": "Mưa",
-  "shareNext12h": "12 giờ tới"
+  "shareNext12h": "12 giờ tới",
+  "health": "Sức khỏe",
+  "healthHint": "Gợi ý, giờ đẹp và cảnh báo sẽ khắt khe hơn cho:",
+  "healthProfile": "{profile, select, respiratory{Hen suyễn, bệnh hô hấp} children{Có trẻ nhỏ} other{Người cao tuổi}}"
 }

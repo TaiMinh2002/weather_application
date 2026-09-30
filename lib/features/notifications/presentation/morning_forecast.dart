@@ -29,7 +29,12 @@ Future<void> scheduleMorningForecast(
       .firstOrNull;
   String activityLine(DateTime day) {
     if (activity == null) return '';
-    final w = bestWindow(activity, weather.hourly, from: day);
+    final w = bestWindow(
+      activity,
+      weather.hourly,
+      from: day,
+      limits: settings.limits,
+    );
     if (w == null || w.score < 60) return '';
     final time = '${hm.format(w.from)}–${hm.format(w.to)}';
     return '\n${l10n.morningActivity(l10n.activityName(activity.name), time)}';

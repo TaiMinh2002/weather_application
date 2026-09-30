@@ -37,6 +37,7 @@ class AlertsSyncDataSource {
     required String locale,
     required bool fahrenheit,
     required Set<AlertType> types,
+    required Set<String> health,
   }) async {
     // On iOS the FCM token needs the APNs token, which arrives a moment after
     // permission is granted; without the wait, turning alerts on would only
@@ -56,6 +57,7 @@ class AlertsSyncDataSource {
       'locale': locale,
       'fahrenheit': fahrenheit,
       'types': [for (final t in types) t.name],
+      'health': [...health],
       'updated_at': DateTime.now().toUtc().toIso8601String(),
     });
   }

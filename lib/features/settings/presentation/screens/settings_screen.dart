@@ -11,6 +11,7 @@ import '../../../alerts/presentation/weather_alerts.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../notifications/data/morning_notifications.dart';
 import '../../../notifications/presentation/morning_forecast.dart';
+import '../../../weather/domain/entities/weather.dart';
 import '../../../weather/presentation/providers/weather_provider.dart';
 import '../providers/settings_provider.dart';
 
@@ -99,6 +100,47 @@ class SettingsScreen extends ConsumerWidget {
                   options: const [
                     ('vi', 'Tiếng Việt', null),
                     ('en', 'English', null),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _Group(
+            title: l10n.health,
+            rows: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 12,
+                  children: [
+                    Text(
+                      l10n.healthHint,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.textMuted,
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final p in HealthProfile.values)
+                          FilterChip(
+                            label: Text(l10n.healthProfile(p.name)),
+                            selected: settings.health.contains(p),
+                            onSelected: (on) async {
+                              await notifier.setHealth(
+                                on
+                                    ? {...settings.health, p}
+                                    : ({...settings.health}..remove(p)),
+                              );
+                              // The server's alert thresholds follow it too.
+                              await resyncWeatherAlerts(ref);
+                            },
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),

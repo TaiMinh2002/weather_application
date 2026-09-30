@@ -8,6 +8,12 @@ Open-Meteo for each place and sends pushes through FCM HTTP v1.
 - Rules: `rules.ts` (tests: `deno test supabase/functions/check-alerts/`).
 - Quiet hours: 22:00–6:00, in each place's local time.
 - Cooldowns: rain alerts at most once every 3 hours; the other types once a day.
+- Thresholds drop for users with health profiles (`limitsFor` in `rules.ts`).
+
+**Upgrading an existing project:** before shipping an app build with health
+profiles, run the `alter table … add column if not exists health` line at the
+end of `schema.sql`, then redeploy the function. Without the column, the app's
+subscription upserts fail and the server keeps the old place and settings.
 
 ## Setup (once)
 

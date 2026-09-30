@@ -203,6 +203,40 @@ enum AqiLevel {
   };
 }
 
+/// Who the forecast is for, beyond a healthy adult. Pollen isn't here:
+/// Open-Meteo only models it for Europe.
+enum HealthProfile { respiratory, children, elderly }
+
+/// Where "too much" starts, tightened by the user's [HealthProfile]s (the
+/// strictest one wins). Defaults are for a healthy adult; the sensitive
+/// values follow EPA's AQI guidance and WHO's UV and heat advice.
+class Limits {
+  const Limits({this.aqi = 100, this.feelsHot = 35, this.uv = 6});
+
+  factory Limits.of(Set<HealthProfile> health) => Limits(
+    aqi: health.contains(HealthProfile.respiratory) ? 50 : 100,
+    feelsHot:
+        health.contains(HealthProfile.children) ||
+            health.contains(HealthProfile.elderly)
+        ? 33
+        : 35,
+    uv: health.contains(HealthProfile.children) ? 3 : 6,
+  );
+
+  /// US AQI above which to mask up and avoid hard exercise outdoors.
+  final int aqi;
+
+  /// Feels-like °C from which to warn about heat.
+  final double feelsHot;
+
+  /// UV index from which to warn about sun.
+  final double uv;
+
+  /// How much a hot hour counts against outdoor activities: the comfort
+  /// limits in `scoreAt` drop by this many degrees for sensitive people.
+  double get heatMargin => 35 - feelsHot;
+}
+
 /// Rule-based advice for the day, most important first.
 enum WeatherTip {
   storm,
@@ -217,8 +251,14 @@ enum WeatherTip {
   niceDay,
 }
 
-/// Up to [max] tips from the next 12 hours, current conditions and [air].
-List<WeatherTip> tipsFor(Weather weather, AirQuality? air, {int max = 3}) {
+/// Up to [max] tips from the next 12 hours, current conditions and [air],
+/// with thresholds from [limits].
+List<WeatherTip> tipsFor(
+  Weather weather,
+  AirQuality? air, {
+  int max = 3,
+  Limits limits = const Limits(),
+}) {
   final c = weather.current;
   final next = weather.next24Hours.take(12);
   const wet = {
@@ -233,9 +273,10 @@ List<WeatherTip> tipsFor(Weather weather, AirQuality? air, {int max = 3}) {
     if (wet.contains(c.condition) ||
         next.any((h) => h.precipitationProbability >= 50))
       WeatherTip.umbrella,
-    if (air != null && air.usAqi > 100) WeatherTip.mask,
-    if (c.apparentTemperature >= 35) WeatherTip.hydrate,
-    if (c.isDay && (today?.uvIndexMax ?? c.uvIndex) >= 6) WeatherTip.sunscreen,
+    if (air != null && air.usAqi > limits.aqi) WeatherTip.mask,
+    if (c.apparentTemperature >= limits.feelsHot) WeatherTip.hydrate,
+    if (c.isDay && (today?.uvIndexMax ?? c.uvIndex) >= limits.uv)
+      WeatherTip.sunscreen,
     if (c.apparentTemperature <= 12) WeatherTip.jacket,
     if (c.windSpeed >= 40) WeatherTip.wind,
   ];

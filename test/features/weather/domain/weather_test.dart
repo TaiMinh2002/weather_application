@@ -82,6 +82,29 @@ void main() {
     });
   });
 
+  test('Limits.of: the strictest profile wins', () {
+    const adult = Limits();
+    final all = Limits.of({...HealthProfile.values});
+    expect((adult.aqi, adult.feelsHot, adult.uv), (100, 35, 6));
+    expect(Limits.of({}).aqi, adult.aqi);
+    expect(Limits.of({HealthProfile.respiratory}).aqi, 50);
+    expect(Limits.of({HealthProfile.elderly}).feelsHot, 33);
+    expect(Limits.of({HealthProfile.elderly}).uv, 6);
+    expect((all.aqi, all.feelsHot, all.uv), (50, 33, 3));
+    expect(all.heatMargin, 2);
+  });
+
+  test('tipsFor uses the health limits', () {
+    final mild = _weather(feelsLike: 34, uvMax: 4);
+    const air = AirQuality(usAqi: 80);
+    expect(tipsFor(mild, air), [WeatherTip.niceDay]);
+    expect(tipsFor(mild, air, limits: Limits.of({...HealthProfile.values})), [
+      WeatherTip.mask,
+      WeatherTip.hydrate,
+      WeatherTip.sunscreen,
+    ]);
+  });
+
   test('highVsYesterday ignores small gaps and missing data', () {
     final today = _weather();
     final day = today.daily.first;

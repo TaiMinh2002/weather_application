@@ -8,6 +8,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../location/domain/entities/place.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
 import 'forecast_cards.dart';
@@ -254,7 +255,11 @@ class TipsCard extends ConsumerWidget {
               ),
             ],
           ),
-          for (final tip in tipsFor(weather, air))
+          for (final tip in tipsFor(
+            weather,
+            air,
+            limits: ref.watch(settingsProvider.select((s) => s.limits)),
+          ))
             Row(
               spacing: 12,
               children: [

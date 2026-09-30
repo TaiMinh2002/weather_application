@@ -92,7 +92,9 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã l�
 
 **Thẻ chia sẻ dạng ảnh (đã làm):** nút chia sẻ cạnh tên địa điểm trên Home → bottom sheet xem trước thẻ 4:5 (gradient theo thời tiết, nhiệt độ, cao/thấp, tối đa 2 điểm nổi bật: mưa sắp tới, giờ tốt nhất cho hoạt động đã chọn khi điểm ≥ 60, dòng ghi nguồn Open-Meteo) → chụp bằng `RepaintBoundary` (1080 px) → menu chia sẻ của máy qua `share_plus` (package duy nhất thêm vào; không cần `path_provider` vì `XFile.fromData`). Code: `features/share/presentation/share_card.dart`.
 
-Để sau: hồ sơ sức khỏe (hen suyễn, phấn hoa), theo dõi bão VN (cần nguồn NCHMF), Live Activity, Wear OS.
+**Hồ sơ sức khỏe (đã làm):** Cài đặt → Sức khỏe, chọn nhiều: hen suyễn/bệnh hô hấp, có trẻ nhỏ, người cao tuổi. `Limits.of(health)` (trong `weather.dart`, ngưỡng khắt khe nhất thắng) đổi ngưỡng của gợi ý (khẩu trang AQI > 50 cho hô hấp; nóng từ 33° và UV từ 3 cho trẻ nhỏ/người già) và của chấm điểm hoạt động (khói bụi tính từ `limits.aqi`; ngưỡng nóng hạ 2°, ngưỡng lạnh giữ nguyên). Cảnh báo đẩy dùng `limitsFor` trong `rules.ts` (AQI > 100 thay vì 150; nóng 37° thay vì 39°; UV 6 thay vì 8 cho trẻ nhỏ), gửi lên qua cột `alert_subscriptions.health`. Bỏ phấn hoa: Open-Meteo chỉ có dữ liệu phấn hoa cho châu Âu (Hà Nội trả `null`).
+
+Để sau: theo dõi bão VN (cần nguồn NCHMF), Live Activity, Wear OS.
 
 ---
 
@@ -543,6 +545,7 @@ README nên có đủ các mục:
 ### Khác biệt (mục 1.3)
 - [x] GĐ 1: So sánh hôm qua + mưa 2 giờ tới *(`highVsYesterday`, `rainOutlook` trong `weather.dart`; `NowcastCard` trong `insight_cards.dart`)*
 - [x] Thẻ chia sẻ dạng ảnh *(`features/share/`)*
+- [x] Hồ sơ sức khỏe *(`HealthProfile` + `Limits` trong `weather.dart`, `limitsFor` trong `rules.ts`)*
 - [ ] ~~GĐ 2: Radar mưa~~ *(bỏ: điều khoản RainViewer, xem mục 1.3)*
 - [x] GĐ 3: Thẻ hoạt động *(`features/activities/`: `scoreAt`, `bestWindow`, `ActivitiesCard`)*
 - [x] GĐ 4: Cảnh báo đẩy *(`features/alerts/`, `supabase/functions/check-alerts/`)*

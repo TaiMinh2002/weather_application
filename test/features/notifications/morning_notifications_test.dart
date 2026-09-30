@@ -105,6 +105,8 @@ void main() {
       final container = await pump(tester);
       when(notifications.requestPermission).thenAnswer((_) async => true);
 
+      // Below the health group, so off the test viewport at first.
+      await tester.scrollUntilVisible(find.byType(Switch), 200);
       await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
 
@@ -116,6 +118,8 @@ void main() {
       final container = await pump(tester);
       when(notifications.requestPermission).thenAnswer((_) async => false);
 
+      // Below the health group, so off the test viewport at first.
+      await tester.scrollUntilVisible(find.byType(Switch), 200);
       await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
 

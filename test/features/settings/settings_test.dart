@@ -8,6 +8,7 @@ import 'package:weather_application/core/utils/unit_converter.dart';
 import 'package:weather_application/features/activities/domain/activity.dart';
 import 'package:weather_application/features/alerts/data/alerts_sync_ds.dart';
 import 'package:weather_application/features/settings/presentation/providers/settings_provider.dart';
+import 'package:weather_application/features/weather/domain/entities/weather.dart';
 import 'package:weather_application/features/settings/presentation/screens/settings_screen.dart';
 import 'package:weather_application/l10n/app_localizations.dart';
 
@@ -44,6 +45,20 @@ void main() {
 
     await container.read(settingsProvider.notifier).setActivities({});
     expect(container.read(settingsProvider).activities, isEmpty);
+  });
+
+  test('health: empty by default, persisted, drives limits', () async {
+    final container = await _container();
+    expect(container.read(settingsProvider).health, isEmpty);
+    expect(container.read(settingsProvider).limits.aqi, 100);
+
+    await container.read(settingsProvider.notifier).setHealth({
+      HealthProfile.respiratory,
+    });
+    expect(container.read(settingsProvider).health, {
+      HealthProfile.respiratory,
+    });
+    expect(container.read(settingsProvider).limits.aqi, 50);
   });
 
   test('weather alerts: off by default, all types until changed', () async {

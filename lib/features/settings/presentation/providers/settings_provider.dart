@@ -8,6 +8,7 @@ import '../../../../core/storage/prefs.dart';
 import '../../../../core/utils/unit_converter.dart';
 import '../../../activities/domain/activity.dart';
 import '../../../alerts/data/alerts_sync_ds.dart';
+import '../../../weather/domain/entities/weather.dart';
 
 part 'settings_provider.g.dart';
 
@@ -20,6 +21,7 @@ class AppSettings {
     this.activities = Activity.defaults,
     this.weatherAlerts = false,
     this.alertTypes = const {...AlertType.values},
+    this.health = const {},
   });
 
   final Units units;
@@ -38,6 +40,12 @@ class AppSettings {
   /// builds with Firebase keys.
   final bool weatherAlerts;
   final Set<AlertType> alertTypes;
+
+  /// Tightens tips, activity scores and push alerts; empty for a healthy
+  /// adult.
+  final Set<HealthProfile> health;
+
+  Limits get limits => Limits.of(health);
 
   /// Language for API calls (place and city names).
   Locale get effectiveLocale => locale ?? PlatformDispatcher.instance.locale;
@@ -79,6 +87,7 @@ class Settings extends _$Settings {
       alertTypes: readSet(AlertType.values, PrefKeys.alertTypes, {
         ...AlertType.values,
       }),
+      health: readSet(HealthProfile.values, PrefKeys.health, {}),
     );
   }
 
@@ -87,6 +96,9 @@ class Settings extends _$Settings {
 
   Future<void> setAlertTypes(Set<AlertType> types) =>
       _saveSet(PrefKeys.alertTypes, types);
+
+  Future<void> setHealth(Set<HealthProfile> health) =>
+      _saveSet(PrefKeys.health, health);
 
   Future<void> setWeatherAlerts(bool on) {
     final saved = _prefs.setBool(PrefKeys.weatherAlerts, on);
