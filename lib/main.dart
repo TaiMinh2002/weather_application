@@ -1,3 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +21,24 @@ Future<void> main() async {
       url: ApiConstants.supabaseUrl,
       publishableKey: ApiConstants.supabaseAnonKey,
     );
+  }
+  if (ApiConstants.hasFirebase) {
+    final ios = defaultTargetPlatform == TargetPlatform.iOS;
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: ios
+            ? ApiConstants.firebaseIosApiKey
+            : ApiConstants.firebaseAndroidApiKey,
+        appId: ios
+            ? ApiConstants.firebaseIosAppId
+            : ApiConstants.firebaseAndroidAppId,
+        messagingSenderId: ApiConstants.firebaseSenderId,
+        projectId: ApiConstants.firebaseProjectId,
+      ),
+    );
+    // iOS hides pushes that arrive while the app is open unless told not to.
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(alert: true, sound: true);
   }
   runApp(
     ProviderScope(

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +15,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/weather_code_mapper.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../activities/presentation/activities_card.dart';
+import '../../../alerts/presentation/weather_alerts.dart';
 import '../../../cities/presentation/providers/cities_provider.dart';
 import '../../../home_widget/presentation/widget_data.dart';
 import '../../../location/domain/entities/place.dart';
@@ -33,9 +37,22 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _pages = PageController();
+  StreamSubscription<RemoteMessage>? _alerts;
+
+  @override
+  void initState() {
+    super.initState();
+    // Home stays at the bottom of the stack while the app is open, so it's
+    // where foreground pushes are caught. After the first frame, because the
+    // channel name needs l10n.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _alerts = showForegroundAlerts(context, ref);
+    });
+  }
 
   @override
   void dispose() {
+    _alerts?.cancel();
     _pages.dispose();
     super.dispose();
   }
@@ -125,6 +142,7 @@ class _PlaceWeather extends ConsumerWidget {
           final name = place.name ?? context.l10n.currentLocation;
           scheduleMorningForecast(context, ref, value, name);
           updateHomeScreenWidget(context, ref, value, name);
+          syncWeatherAlerts(ref, place);
         }
       });
     }

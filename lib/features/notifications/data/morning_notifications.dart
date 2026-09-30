@@ -91,6 +91,44 @@ class MorningNotifications {
     }
   }
 
+  /// A push alert that arrived while the app was open: Android doesn't show
+  /// those itself. [channelId] matches the one the server sends to.
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required String channelId,
+    required String channelName,
+  }) async {
+    await _ready;
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelId,
+          channelName,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
+  }
+
+  /// Created up front so pushes that arrive in the background land in a
+  /// named, high-importance channel instead of Android's default one.
+  Future<void> createChannel(String id, String name) async {
+    await _ready;
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(
+          AndroidNotificationChannel(id, name, importance: Importance.high),
+        );
+  }
+
   Future<void> cancel() async {
     await _ready;
     for (var i = 0; i < _slots; i++) {

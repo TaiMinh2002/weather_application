@@ -96,5 +96,7 @@
   "activityLevel": "{level, select, great{Rất tốt} good{Tốt} fair{Tạm được} other{Không nên}}",
   "activityTomorrow": "Ngày mai {time}",
   "activityNoGoodTime": "Không có giờ phù hợp",
-  "morningActivity": "{activity}: tốt nhất {time}"
+  "morningActivity": "{activity}: tốt nhất {time}",
+  "weatherAlerts": "Cảnh báo thời tiết",
+  "alertType": "{type, select, rain{Sắp mưa} uv{UV rất cao} air{Không khí xấu} other{Nắng nóng gay gắt}}"
 }

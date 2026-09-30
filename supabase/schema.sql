@@ -20,3 +20,36 @@ create policy "own row: update" on public.saved_cities
   for update to authenticated
   using (user_id = (select auth.uid()))
   with check (user_id = (select auth.uid()));
+
+-- Push alerts: one row per anonymous user, written by the app
+-- (alerts_sync_ds.dart) and read by the check-alerts Edge Function with the
+-- service role. Setup steps: supabase/functions/check-alerts/README.md.
+create table if not exists public.alert_subscriptions (
+  user_id uuid primary key default auth.uid()
+    references auth.users (id) on delete cascade,
+  fcm_token text not null,
+  -- Rounded to 2 decimals (~1 km) by the app.
+  lat double precision not null,
+  lon double precision not null,
+  -- 'vi' or 'en', for the notification text.
+  locale text not null default 'vi',
+  fahrenheit boolean not null default false,
+  -- AlertType names: rain, uv, air, heat.
+  types text[] not null default '{rain,uv,air,heat}',
+  -- Alert type → last time it was sent, for the per-type cooldown.
+  last_sent jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.alert_subscriptions enable row level security;
+
+create policy "own row: select" on public.alert_subscriptions
+  for select to authenticated using (user_id = (select auth.uid()));
+create policy "own row: insert" on public.alert_subscriptions
+  for insert to authenticated with check (user_id = (select auth.uid()));
+create policy "own row: update" on public.alert_subscriptions
+  for update to authenticated
+  using (user_id = (select auth.uid()))
+  with check (user_id = (select auth.uid()));
+create policy "own row: delete" on public.alert_subscriptions
+  for delete to authenticated using (user_id = (select auth.uid()));

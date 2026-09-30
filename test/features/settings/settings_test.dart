@@ -6,6 +6,7 @@ import 'package:weather_application/core/storage/prefs.dart';
 import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/core/utils/unit_converter.dart';
 import 'package:weather_application/features/activities/domain/activity.dart';
+import 'package:weather_application/features/alerts/data/alerts_sync_ds.dart';
 import 'package:weather_application/features/settings/presentation/providers/settings_provider.dart';
 import 'package:weather_application/features/settings/presentation/screens/settings_screen.dart';
 import 'package:weather_application/l10n/app_localizations.dart';
@@ -43,6 +44,19 @@ void main() {
 
     await container.read(settingsProvider.notifier).setActivities({});
     expect(container.read(settingsProvider).activities, isEmpty);
+  });
+
+  test('weather alerts: off by default, all types until changed', () async {
+    final container = await _container();
+    final settings = container.read(settingsProvider);
+    expect(settings.weatherAlerts, isFalse);
+    expect(settings.alertTypes, AlertType.values.toSet());
+
+    final notifier = container.read(settingsProvider.notifier);
+    await notifier.setWeatherAlerts(true);
+    await notifier.setAlertTypes({AlertType.rain});
+    expect(container.read(settingsProvider).weatherAlerts, isTrue);
+    expect(container.read(settingsProvider).alertTypes, {AlertType.rain});
   });
 
   test(

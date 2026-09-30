@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/errors.dart';
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/utils/unit_converter.dart';
+import '../../../alerts/data/alerts_sync_ds.dart';
+import '../../../alerts/presentation/weather_alerts.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../notifications/data/morning_notifications.dart';
 import '../../../notifications/presentation/morning_forecast.dart';
@@ -105,6 +108,31 @@ class SettingsScreen extends ConsumerWidget {
                   onChanged: (on) => _setMorningForecast(context, ref, on),
                 ),
               ),
+              if (ApiConstants.hasFirebase) ...[
+                _Row(
+                  label: l10n.weatherAlerts,
+                  trailing: Switch(
+                    value: settings.weatherAlerts,
+                    onChanged: (on) => setWeatherAlerts(context, ref, on),
+                  ),
+                ),
+                if (settings.weatherAlerts)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final type in AlertType.values)
+                          FilterChip(
+                            label: Text(l10n.alertType(type.name)),
+                            selected: settings.alertTypes.contains(type),
+                            onSelected: (on) => setAlertType(ref, type, on),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
             ],
           ),
           const SizedBox(height: 24),
