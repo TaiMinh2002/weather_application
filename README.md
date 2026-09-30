@@ -27,7 +27,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 
 - **Mưa 2 giờ tới**: "Mưa bắt đầu sau khoảng 30 phút" / "tạnh sau…", kèm biểu đồ 15 phút một cột; chỉ hiện khi sắp có mưa
 - **Giờ đẹp cho bạn**: khung giờ tốt nhất hôm nay cho đi xe máy, phơi đồ, chạy bộ, đạp xe, rửa xe, dã ngoại (chấm điểm từng giờ theo mưa, nhiệt, UV, gió, độ ẩm, AQI; tự chọn hoạt động ngay trên thẻ)
-- **Cảnh báo thời tiết** (push, iOS + Android): sắp mưa, UV rất cao, không khí xấu, nắng nóng gay gắt; server kiểm tra 15 phút một lần, không làm phiền 22:00–6:00
+- **Cảnh báo thời tiết** (push, iOS + Android): sắp mưa, UV rất cao, không khí xấu, nắng nóng gay gắt; server kiểm tra mỗi giờ, không làm phiền 22:00–6:00
 - **Thời tiết hiện tại theo GPS**: nhiệt độ, cảm giác như, cao/thấp, so với hôm qua ("Nóng hơn hôm qua 3°"), nền gradient đổi theo thời tiết và ngày/đêm
 - **Dự báo 24 giờ và 7 ngày**, kèm % khả năng mưa
 - **Thông số chi tiết**: độ ẩm và điểm sương, gió và hướng gió, UV, áp suất, tầm nhìn, bình minh/hoàng hôn
