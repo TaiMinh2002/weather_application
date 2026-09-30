@@ -53,7 +53,6 @@ class _ShareSheetState extends ConsumerState<_ShareSheet> {
 
   Future<void> _share() async {
     setState(() => _sharing = true);
-    final text = context.l10n.shareText(widget.name);
     // iPad anchors the share popover to this rect; phones ignore it.
     final button = _button.currentContext!.findRenderObject()! as RenderBox;
     final origin = button.localToGlobal(Offset.zero) & button.size;
@@ -73,7 +72,8 @@ class _ShareSheetState extends ConsumerState<_ShareSheet> {
             XFile.fromData(png!.buffer.asUint8List(), mimeType: 'image/png'),
           ],
           fileNameOverrides: const ['skycast.png'],
-          text: text,
+          // Image only: Messenger, Facebook and Instagram hide themselves
+          // from the share sheet when text comes along with it.
           sharePositionOrigin: origin,
         ),
       ),

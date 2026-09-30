@@ -253,14 +253,6 @@
     }
   },
   "share": "Share",
-  "shareText": "Weather in {place} today, from Skycast",
-  "@shareText": {
-    "placeholders": {
-      "place": {
-        "type": "String"
-      }
-    }
-  },
   "shareRain": "Rain",
   "shareNext12h": "Next 12 hours"
 }
