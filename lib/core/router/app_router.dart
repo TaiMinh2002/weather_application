@@ -7,6 +7,7 @@ import '../../features/cities/presentation/screens/map_pick_screen.dart';
 import '../../features/location/domain/entities/place.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/storms/presentation/screens/storm_screen.dart';
 import '../../features/weather/presentation/screens/day_detail_screen.dart';
 import '../../features/weather/presentation/screens/home_screen.dart';
 import '../storage/prefs.dart';
@@ -20,6 +21,13 @@ abstract final class Routes {
   static const settings = '/settings';
   static const day = '/day/:index';
   static const map = '/map';
+  static const storm = '/storm/:id';
+
+  /// Storm [id]'s track and forecast, with distances from [place].
+  static String stormOf(String id, Place place) => Uri(
+    path: '/storm/$id',
+    queryParameters: {'lat': '${place.lat}', 'lon': '${place.lon}'},
+  ).toString();
 
   /// Day Detail for forecast day [index] (0 = today) at [place].
   static String dayOf(int index, Place place) => Uri(
@@ -40,6 +48,14 @@ abstract final class Routes {
   final lon = double.tryParse(q['lon'] ?? '');
   if (index == null || index < 0 || lat == null || lon == null) return null;
   return (index, Place(lat: lat, lon: lon, name: q['name']));
+}
+
+/// Null when a storm link is missing its place.
+Place? _stormPlace(GoRouterState state) {
+  final q = state.uri.queryParameters;
+  final lat = double.tryParse(q['lat'] ?? '');
+  final lon = double.tryParse(q['lon'] ?? '');
+  return lat == null || lon == null ? null : Place(lat: lat, lon: lon);
 }
 
 /// Pure so it can be unit-tested without a widget tree.
@@ -65,6 +81,14 @@ GoRouter appRouter(Ref ref) {
       GoRoute(path: Routes.cities, builder: (_, _) => const CitiesScreen()),
       GoRoute(path: Routes.map, builder: (_, _) => const MapPickScreen()),
       GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen()),
+      GoRoute(
+        path: Routes.storm,
+        redirect: (_, state) => _stormPlace(state) == null ? Routes.home : null,
+        builder: (_, state) => StormScreen(
+          id: state.pathParameters['id']!,
+          place: _stormPlace(state)!,
+        ),
+      ),
       GoRoute(
         path: Routes.day,
         redirect: (_, state) => _dayArgs(state) == null ? Routes.home : null,

@@ -104,5 +104,14 @@
   "shareNext12h": "12 giờ tới",
   "health": "Sức khỏe",
   "healthHint": "Gợi ý, giờ đẹp và cảnh báo sẽ khắt khe hơn cho:",
-  "healthProfile": "{profile, select, respiratory{Hen suyễn, bệnh hô hấp} children{Có trẻ nhỏ} other{Người cao tuổi}}"
+  "healthProfile": "{profile, select, respiratory{Hen suyễn, bệnh hô hấp} children{Có trẻ nhỏ} other{Người cao tuổi}}",
+  "stormWatch": "Theo dõi bão",
+  "stormStrength": "{strength, select, depression{Áp thấp nhiệt đới} storm{Bão} severe{Bão mạnh} veryStrong{Bão rất mạnh} other{Siêu bão}}",
+  "stormWind": "Gió cấp {force} ({speed}), giật cấp {gust}",
+  "stormWindNoGust": "Gió cấp {force} ({speed})",
+  "stormDistance": "Cách bạn {km} km",
+  "stormClosest": "gần nhất ~{km} km sau {hours} giờ",
+  "stormLow": "Suy yếu thành vùng áp thấp",
+  "stormGone": "Cơn bão này không còn được theo dõi.",
+  "stormSource": "Nguồn: Cơ quan Khí tượng Nhật Bản (jma.go.jp), phát lúc {time}"
 }
