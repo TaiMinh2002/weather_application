@@ -54,3 +54,7 @@ lib/l10n/app_localizations*.dart
 
 # Supabase keys for --dart-define-from-file (see supabase.example.json)
 supabase.json
+# Firebase configs, kept locally only as the source of the FIREBASE_* values
+# in supabase.json; the app reads options from --dart-define instead.
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist

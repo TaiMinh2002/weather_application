@@ -4,7 +4,7 @@
     <!-- Morning forecast: re-arm scheduled notifications after a reboot. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
-        android:label="weather_application"
+        android:label="Skycast"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <receiver android:name=".SkycastWidgetProvider" android:exported="true">
