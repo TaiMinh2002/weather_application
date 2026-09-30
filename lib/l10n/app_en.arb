@@ -251,5 +251,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "share": "Share",
+  "shareRain": "Rain",
+  "shareNext12h": "Next 12 hours"
 }

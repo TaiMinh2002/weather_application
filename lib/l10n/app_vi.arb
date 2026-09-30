@@ -98,5 +98,8 @@
   "activityNoGoodTime": "Không có giờ phù hợp",
   "morningActivity": "{activity}: tốt nhất {time}",
   "weatherAlerts": "Cảnh báo thời tiết",
-  "alertType": "{type, select, rain{Sắp mưa} uv{UV rất cao} air{Không khí xấu} other{Nắng nóng gay gắt}}"
+  "alertType": "{type, select, rain{Sắp mưa} uv{UV rất cao} air{Không khí xấu} other{Nắng nóng gay gắt}}",
+  "share": "Chia sẻ",
+  "shareRain": "Mưa",
+  "shareNext12h": "12 giờ tới"
 }

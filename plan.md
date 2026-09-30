@@ -90,7 +90,9 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã l�
 - Android: app đang mở thì hiện lại bằng `flutter_local_notifications` (FCM không tự hiện); kênh `weather_alerts`. iOS: `aps-environment` + `UIBackgroundModes: remote-notification`; foreground dùng `setForegroundNotificationPresentationOptions`.
 - Làm cả iOS và Android (đã có tài khoản Apple Developer). Hướng dẫn cài đặt: `supabase/functions/check-alerts/README.md`.
 
-Để sau: hồ sơ sức khỏe (hen suyễn, phấn hoa), theo dõi bão VN (cần nguồn NCHMF), thẻ chia sẻ dạng ảnh, Live Activity, Wear OS.
+**Thẻ chia sẻ dạng ảnh (đã làm):** nút chia sẻ cạnh tên địa điểm trên Home → bottom sheet xem trước thẻ 4:5 (gradient theo thời tiết, nhiệt độ, cao/thấp, tối đa 2 điểm nổi bật: mưa sắp tới, giờ tốt nhất cho hoạt động đã chọn khi điểm ≥ 60, dòng ghi nguồn Open-Meteo) → chụp bằng `RepaintBoundary` (1080 px) → menu chia sẻ của máy qua `share_plus` (package duy nhất thêm vào; không cần `path_provider` vì `XFile.fromData`). Code: `features/share/presentation/share_card.dart`.
+
+Để sau: hồ sơ sức khỏe (hen suyễn, phấn hoa), theo dõi bão VN (cần nguồn NCHMF), Live Activity, Wear OS.
 
 ---
 
@@ -540,6 +542,7 @@ README nên có đủ các mục:
 
 ### Khác biệt (mục 1.3)
 - [x] GĐ 1: So sánh hôm qua + mưa 2 giờ tới *(`highVsYesterday`, `rainOutlook` trong `weather.dart`; `NowcastCard` trong `insight_cards.dart`)*
+- [x] Thẻ chia sẻ dạng ảnh *(`features/share/`)*
 - [ ] ~~GĐ 2: Radar mưa~~ *(bỏ: điều khoản RainViewer, xem mục 1.3)*
 - [x] GĐ 3: Thẻ hoạt động *(`features/activities/`: `scoreAt`, `bestWindow`, `ActivitiesCard`)*
 - [x] GĐ 4: Cảnh báo đẩy *(`features/alerts/`, `supabase/functions/check-alerts/`)*

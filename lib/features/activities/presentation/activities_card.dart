@@ -11,7 +11,7 @@ import '../../weather/presentation/providers/weather_provider.dart';
 import '../../weather/presentation/widgets/forecast_cards.dart';
 import '../domain/activity.dart';
 
-IconData _icon(Activity a) => switch (a) {
+IconData activityIcon(Activity a) => switch (a) {
   Activity.motorbike => Symbols.two_wheeler_rounded,
   Activity.laundry => Symbols.local_laundry_service_rounded,
   Activity.running => Symbols.directions_run_rounded,
@@ -116,7 +116,7 @@ class _ActivityRow extends StatelessWidget {
       child: Row(
         spacing: 12,
         children: [
-          Icon(_icon(activity), size: 22),
+          Icon(activityIcon(activity), size: 22),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +160,7 @@ Future<void> _pickActivities(BuildContext context) => showModalBottomSheet(
                 children: [
                   for (final a in Activity.values)
                     FilterChip(
-                      avatar: Icon(_icon(a), size: 18),
+                      avatar: Icon(activityIcon(a), size: 18),
                       label: Text(context.l10n.activityName(a.name)),
                       selected: selected.contains(a),
                       onSelected: (on) => ref

@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Skycast",
+      "request": "launch",
+      "type": "dart",
+      // Keys for cloud backup and push alerts (gitignored; see
+      // supabase.example.json). Without the file the app still runs,
+      // with those features off.
+      "args": ["--dart-define-from-file=supabase.json"]
+    },
+    {
+      "name": "Skycast (no keys)",
+      "request": "launch",
+      "type": "dart"
+    }
+  ]
+}
