@@ -14,6 +14,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The check-alerts Edge Function runs on Supabase's Deno, not Flutter, so
+  # its rules are tested here; nobody needs Deno installed locally.
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - run: deno test supabase/functions/check-alerts/
+      # Type-checks the network half too, which has no tests.
+      - run: deno check supabase/functions/check-alerts/index.ts
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
