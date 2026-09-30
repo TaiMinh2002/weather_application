@@ -25,13 +25,14 @@ const calm: Conditions = {
   aqi: 60,
 };
 
-Deno.test("rainStartsIn: dry now, wet within 45 minutes", () => {
+Deno.test("rainStartsIn: dry now, wet within the hour", () => {
   assertEquals(rainStartsIn([0, 0, 0.2, 1]), 30);
   assertEquals(rainStartsIn([0, 0.5]), 15);
   assertEquals(rainStartsIn([0, 0, 0, 0.3]), 45);
+  assertEquals(rainStartsIn([0, 0, 0, 0, 0.3]), 60);
   assertEquals(rainStartsIn([0.3, 0.3]), null, "already raining");
   assertEquals(rainStartsIn([0, 0.1, null, 0.19]), null, "only drizzle");
-  assertEquals(rainStartsIn([0, 0, 0, 0, 1]), null, "too far out");
+  assertEquals(rainStartsIn([0, 0, 0, 0, 0, 1]), null, "next run's job");
   assertEquals(rainStartsIn([]), null);
 });
 

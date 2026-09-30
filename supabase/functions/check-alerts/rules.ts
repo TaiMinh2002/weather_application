@@ -49,14 +49,14 @@ const cooldown: Record<AlertType, number> = {
 
 /**
  * Minutes until rain starts, when it's dry now and the first wet slot
- * (≥ 0.2 mm, the app's rainOutlook threshold) is within 45 minutes. Further
- * out, the 15-minute model is too unsure to wake someone for.
+ * (≥ 0.2 mm, the app's rainOutlook threshold) is within the hour: the
+ * function runs hourly, so rain starting later is caught by the next run.
  */
 export function rainStartsIn(mm: (number | null)[]): number | null {
   const wet = mm.map((v) => (v ?? 0) >= 0.2);
   if (wet.length === 0 || wet[0]) return null;
   const i = wet.indexOf(true);
-  return i > 0 && i <= 3 ? i * 15 : null;
+  return i > 0 && i <= 4 ? i * 15 : null;
 }
 
 export function alertsFor(

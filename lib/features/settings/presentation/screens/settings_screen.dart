@@ -35,7 +35,10 @@ class SettingsScreen extends ConsumerWidget {
                 label: l10n.temperature,
                 trailing: _Segmented(
                   selected: settings.units.temp,
-                  onSelected: notifier.setTempUnit,
+                  onSelected: (unit) async {
+                    await notifier.setTempUnit(unit);
+                    await resyncWeatherAlerts(ref);
+                  },
                   options: const [
                     (TempUnit.celsius, '°C', null),
                     (TempUnit.fahrenheit, '°F', null),
@@ -86,7 +89,11 @@ class SettingsScreen extends ConsumerWidget {
                   selected:
                       settings.locale?.languageCode ??
                       Localizations.localeOf(context).languageCode,
-                  onSelected: notifier.setLanguage,
+                  // Alerts are worded on the server in this language.
+                  onSelected: (code) async {
+                    await notifier.setLanguage(code);
+                    await resyncWeatherAlerts(ref);
+                  },
                   // Language names are written in their own language, so a
                   // user can find theirs whatever the UI language is.
                   options: const [
