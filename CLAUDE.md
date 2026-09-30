@@ -28,7 +28,7 @@ flutter test tool/screenshots_test.dart --update-goldens    # regenerate README 
 flutter run --dart-define-from-file=supabase.json           # with cloud backup (supabase.json is gitignored)
 ```
 
-CI (`.github/workflows/ci.yml`) runs analyze + test + release APK on pushes/PRs to `dev`/`main`; pushing a `v*` tag also publishes a GitHub Release with the APK.
+CI (`.github/workflows/ci.yml`) runs analyze + test + release APK on pushes/PRs to `dev`/`main`, plus a `server` job that runs `deno test` and `deno check` for the check-alerts Edge Function; pushing a `v*` tag also publishes a GitHub Release with the APK.
 
 Lint uses `flutter_lints` (see `analysis_options.yaml`; platform folders are excluded).
 
