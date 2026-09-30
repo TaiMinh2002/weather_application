@@ -251,5 +251,14 @@
         "type": "String"
       }
     }
+  },
+  "share": "Share",
+  "shareText": "Weather in {place} today, from Skycast",
+  "@shareText": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
   }
 }

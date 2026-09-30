@@ -22,6 +22,7 @@ import '../../../location/domain/entities/place.dart';
 import '../../../notifications/presentation/morning_forecast.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
+import '../../../share/presentation/share_card.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/forecast_cards.dart';
@@ -432,7 +433,20 @@ class _WeatherBody extends StatelessWidget {
         _OfflineBanner(cachedAt: cachedAt),
         const SizedBox(height: 20),
       ],
-      _Header(name: name, weather: weather, showPin: showPin),
+      _Header(
+        name: name,
+        weather: weather,
+        showPin: showPin,
+        onShare: switch (place) {
+          final p? => () => showShareCard(
+            context,
+            weather: weather,
+            place: p,
+            name: name,
+          ),
+          null => null,
+        },
+      ),
       const SizedBox(height: 20),
       // An offline copy's "rain in 15 min" is already wrong, so it's hidden.
       if (weather.cachedAt == null)
@@ -499,11 +513,15 @@ class _Header extends ConsumerWidget {
     required this.name,
     required this.weather,
     required this.showPin,
+    this.onShare,
   });
 
   final String name;
   final bool showPin;
   final Weather weather;
+
+  /// Null in the skeleton.
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -530,6 +548,12 @@ class _Header extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (onShare case final onShare?)
+              IconButton(
+                onPressed: onShare,
+                tooltip: l10n.share,
+                icon: const Icon(Symbols.ios_share_rounded, size: 20),
+              ),
           ],
         ),
         Padding(

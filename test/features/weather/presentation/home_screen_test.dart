@@ -7,6 +7,7 @@ import 'package:weather_application/core/storage/prefs.dart';
 import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/features/location/domain/entities/place.dart';
 import 'package:weather_application/features/location/presentation/providers/location_provider.dart';
+import 'package:weather_application/features/share/presentation/share_card.dart';
 import 'package:weather_application/features/weather/data/models/weather_dto.dart';
 import 'package:weather_application/features/weather/domain/entities/weather.dart';
 import 'package:weather_application/features/weather/presentation/providers/weather_provider.dart';
@@ -88,6 +89,27 @@ void main() {
       200,
       scrollable: _pageList,
     );
+  });
+
+  testWidgets('the share button opens the card preview', (tester) async {
+    final weather = WeatherDto.fromJson(weatherJson()).toEntity();
+    await tester.pumpWidget(
+      await _app([
+        currentPlaceProvider.overrideWith((ref) async => _place),
+        weatherProvider(
+          _place.lat,
+          _place.lon,
+        ).overrideWith((ref) async => weather),
+      ]),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Chia sẻ'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShareCard), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Chia sẻ'), findsOneWidget);
   });
 
   testWidgets('the activities sheet adds and removes rows', (tester) async {
