@@ -94,7 +94,9 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã l�
 
 **Hồ sơ sức khỏe (đã làm):** Cài đặt → Sức khỏe, chọn nhiều: hen suyễn/bệnh hô hấp, có trẻ nhỏ, người cao tuổi. `Limits.of(health)` (trong `weather.dart`, ngưỡng khắt khe nhất thắng) đổi ngưỡng của gợi ý (khẩu trang AQI > 50 cho hô hấp; nóng từ 33° và UV từ 3 cho trẻ nhỏ/người già) và của chấm điểm hoạt động (khói bụi tính từ `limits.aqi`; ngưỡng nóng hạ 2°, ngưỡng lạnh giữ nguyên). Cảnh báo đẩy dùng `limitsFor` trong `rules.ts` (AQI > 100 thay vì 150; nóng 37° thay vì 39°; UV 6 thay vì 8 cho trẻ nhỏ), gửi lên qua cột `alert_subscriptions.health`. Bỏ phấn hoa: Open-Meteo chỉ có dữ liệu phấn hoa cho châu Âu (Hà Nội trả `null`).
 
-Để sau: theo dõi bão VN (cần nguồn NCHMF), Live Activity, Wear OS.
+**Theo dõi bão (đã làm, phần trong app):** nguồn là JMA / RSMC Tokyo (trung tâm WMO cho Tây Bắc Thái Bình Dương và Biển Đông), JSON công khai tại `jma.go.jp/bosai/typhoon/data/` (`targetTc.json`, rồi mỗi bão `specifications.json` + `forecast.json`), dùng lại được theo Public Data License của JMA (tương thích CC BY 4.0, phải ghi nguồn). NCHMF chỉ có bài viết HTML nên không dùng; GDACS (có API) để dự phòng nếu JMA đổi định dạng (endpoint JMA không có tài liệu, nên DTO đọc từng trường theo đường dẫn nullable, lỗi chỉ ẩn giá trị). Thẻ trên Home chỉ hiện khi bão đang/sẽ vào phạm vi 1500 km (`stormsNear`); màn `/storm/:id` có bản đồ đường đi, vòng xác suất 70%, bảng diễn biến. Cấp gió theo Beaufort, phân loại theo QĐ 18/2021/QĐ-TTg (áp thấp nhiệt đới đến siêu bão). Còn lại: cảnh báo đẩy khi bão tiến gần (server đọc JMA một lần mỗi lần chạy).
+
+Để sau: cảnh báo đẩy khi có bão (cần nguồn NCHMF), Live Activity, Wear OS.
 
 ---
 
@@ -545,6 +547,7 @@ README nên có đủ các mục:
 ### Khác biệt (mục 1.3)
 - [x] GĐ 1: So sánh hôm qua + mưa 2 giờ tới *(`highVsYesterday`, `rainOutlook` trong `weather.dart`; `NowcastCard` trong `insight_cards.dart`)*
 - [x] Thẻ chia sẻ dạng ảnh *(`features/share/`)*
+- [x] Theo dõi bão *(`features/storms/`, dữ liệu JMA)*
 - [x] Hồ sơ sức khỏe *(`HealthProfile` + `Limits` trong `weather.dart`, `limitsFor` trong `rules.ts`)*
 - [ ] ~~GĐ 2: Radar mưa~~ *(bỏ: điều khoản RainViewer, xem mục 1.3)*
 - [x] GĐ 3: Thẻ hoạt động *(`features/activities/`: `scoreAt`, `bestWindow`, `ActivitiesCard`)*
