@@ -217,7 +217,7 @@ class TipsCard extends ConsumerWidget {
   /// Where to read air quality from; null (the skeleton) skips it.
   final Place? place;
 
-  static IconData _icon(WeatherTip tip) => switch (tip) {
+  static IconData iconFor(WeatherTip tip) => switch (tip) {
     WeatherTip.storm => Symbols.thunderstorm_rounded,
     WeatherTip.umbrella => Symbols.umbrella_rounded,
     WeatherTip.mask => Symbols.masks_rounded,
@@ -258,7 +258,7 @@ class TipsCard extends ConsumerWidget {
             Row(
               spacing: 12,
               children: [
-                Icon(_icon(tip), size: 20),
+                Icon(iconFor(tip), size: 20),
                 Expanded(
                   child: Text(
                     l10n.weatherTip(tip.name),

@@ -26,6 +26,7 @@ import 'package:weather_application/features/location/domain/entities/place.dart
 import 'package:weather_application/features/location/presentation/providers/location_provider.dart';
 import 'package:weather_application/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:weather_application/features/settings/presentation/screens/settings_screen.dart';
+import 'package:weather_application/features/share/presentation/share_card.dart';
 import 'package:weather_application/features/weather/domain/entities/weather.dart';
 import 'package:weather_application/features/weather/presentation/providers/weather_provider.dart';
 import 'package:weather_application/features/weather/presentation/screens/day_detail_screen.dart';
@@ -206,6 +207,34 @@ void main() {
     await _shoot(tester, 'cities', const CitiesScreen());
     await _shoot(tester, 'settings', const SettingsScreen());
     await _shoot(tester, 'onboarding', const OnboardingScreen());
+
+    // The share image at its real export size (360×640 at 3×).
+    tester.view.physicalSize = ShareCard.size * 3;
+    tester.view.devicePixelRatio = 3;
+    SharedPreferences.setMockInitialValues({});
+    final sp = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(sp)],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          locale: const Locale('vi'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: ShareCard(
+            weather: _weather(31, WeatherCondition.clear),
+            name: 'Hà Nội',
+            air: const AirQuality(usAqi: 74, pm25: 23, pm10: 31),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await expectLater(
+      find.byType(ShareCard),
+      matchesGoldenFile('../docs/screenshots/share.png'),
+    );
     debugDisableShadows = true;
   });
 }
