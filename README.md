@@ -17,6 +17,10 @@ Kế hoạch: [plan.md](plan.md) · Quy tắc code: [rule.md](rule.md) · Design
 | Sáng | <img src="docs/screenshots/home_light.png" width="160"> | <img src="docs/screenshots/day_detail_light.png" width="160"> | <img src="docs/screenshots/cities_light.png" width="160"> | <img src="docs/screenshots/settings_light.png" width="160"> | <img src="docs/screenshots/onboarding_light.png" width="160"> |
 | Tối | <img src="docs/screenshots/home_dark.png" width="160"> | <img src="docs/screenshots/day_detail_dark.png" width="160"> | <img src="docs/screenshots/cities_dark.png" width="160"> | <img src="docs/screenshots/settings_dark.png" width="160"> | <img src="docs/screenshots/onboarding_dark.png" width="160"> |
 
+**Thẻ chia sẻ** (ảnh 1080×1920 gửi qua Zalo, Messenger, story…):
+
+<img src="docs/screenshots/share.png" width="200">
+
 Ảnh được dựng từ code với dữ liệu mẫu (không cần simulator). Sau khi đổi UI, chạy lại:
 
 ```bash
@@ -27,6 +31,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 
 - **Mưa 2 giờ tới**: "Mưa bắt đầu sau khoảng 30 phút" / "tạnh sau…", kèm biểu đồ 15 phút một cột; chỉ hiện khi sắp có mưa
 - **Giờ đẹp cho bạn**: khung giờ tốt nhất hôm nay cho đi xe máy, phơi đồ, chạy bộ, đạp xe, rửa xe, dã ngoại (chấm điểm từng giờ theo mưa, nhiệt, UV, gió, độ ẩm, AQI; tự chọn hoạt động ngay trên thẻ)
+- **Thẻ chia sẻ**: nút chia sẻ cạnh tên địa điểm tạo ảnh khổ story (lời khuyên hôm nay, mưa/UV/AQI/gió, 12 giờ tới, giờ đẹp cho hoạt động) rồi mở menu chia sẻ của máy
 - **Cảnh báo thời tiết** (push, iOS + Android): sắp mưa, UV rất cao, không khí xấu, nắng nóng gay gắt; server kiểm tra mỗi giờ, không làm phiền 22:00–6:00
 - **Thời tiết hiện tại theo GPS**: nhiệt độ, cảm giác như, cao/thấp, so với hôm qua ("Nóng hơn hôm qua 3°"), nền gradient đổi theo thời tiết và ngày/đêm
 - **Dự báo 24 giờ và 7 ngày**, kèm % khả năng mưa
@@ -42,7 +47,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 - **Đủ trạng thái**: skeleton khi tải, lỗi mạng/máy chủ có nút thử lại, từ chối quyền vị trí, GPS tắt
 - Onboarding giải thích quyền vị trí trước khi hệ thống hỏi, splash native, dark mode từ đầu
 
-**Hướng phát triển tiếp:** thẻ chia sẻ dạng ảnh, hồ sơ sức khỏe (hen suyễn, dị ứng, trẻ nhỏ), chọn giờ nhận thông báo, widget cỡ vừa với dự báo theo giờ.
+**Hướng phát triển tiếp:** hồ sơ sức khỏe (hen suyễn, dị ứng, trẻ nhỏ), chọn giờ nhận thông báo, widget cỡ vừa với dự báo theo giờ.
 
 ## Công nghệ
 
@@ -86,6 +91,7 @@ lib/
 │   ├── alerts/         # đăng ký cảnh báo đẩy (FCM token + vị trí lên Supabase)
 │   ├── notifications/  # dự báo 7:00 mỗi sáng
 │   ├── home_widget/    # widget màn hình chính
+│   ├── share/          # thẻ chia sẻ dạng ảnh
 │   ├── location/       # GPS, quyền vị trí, tên địa điểm
 │   ├── cities/         # tìm kiếm và quản lý thành phố
 │   ├── settings/       # đơn vị, theme, ngôn ngữ, hoạt động, cảnh báo
