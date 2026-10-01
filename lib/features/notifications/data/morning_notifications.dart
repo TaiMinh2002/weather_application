@@ -8,16 +8,18 @@ part 'morning_notifications.g.dart';
 typedef MorningSlot = ({DateTime at, int day});
 
 /// Morning slots still ahead of [now], one per forecast day (index into
-/// `Weather.daily`). Each notification shows its own day's forecast, so
-/// scheduling a week at once needs no background refresh.
+/// `Weather.daily`), at [minutes] past midnight. Each notification shows its
+/// own day's forecast, so scheduling a week at once needs no background
+/// refresh.
 List<MorningSlot> morningSlots(
   List<DateTime> days,
   DateTime now, {
-  int hour = 7,
+  int minutes = 7 * 60,
 }) => [
   for (final (i, d) in days.indexed)
-    if (DateTime(d.year, d.month, d.day, hour).isAfter(now))
-      (at: DateTime(d.year, d.month, d.day, hour), day: i),
+    if (DateTime(d.year, d.month, d.day, 0, minutes) case final at
+        when at.isAfter(now))
+      (at: at, day: i),
 ];
 
 /// Wraps the notification plugin for the morning forecast.

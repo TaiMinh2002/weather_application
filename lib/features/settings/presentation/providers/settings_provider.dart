@@ -18,6 +18,7 @@ class AppSettings {
     this.themeMode = ThemeMode.system,
     this.locale,
     this.morningForecast = false,
+    this.morningMinutes = 7 * 60,
     this.activities = Activity.defaults,
     this.weatherAlerts = false,
     this.alertTypes = const {...AlertType.values},
@@ -32,6 +33,13 @@ class AppSettings {
 
   /// Daily 7:00 forecast notification (opt-in; asks for permission).
   final bool morningForecast;
+
+  /// When it fires, in minutes past midnight; one of [morningTimes].
+  final int morningMinutes;
+
+  /// Every half hour from 5:00 to 10:00: it's the day's forecast, so the
+  /// morning is when it's useful.
+  static final morningTimes = [for (var m = 5 * 60; m <= 10 * 60; m += 30) m];
 
   /// Scored on Home's activities card; may be empty.
   final Set<Activity> activities;
@@ -78,6 +86,10 @@ class Settings extends _$Settings {
       themeMode: read(ThemeMode.values, PrefKeys.themeMode) ?? ThemeMode.system,
       locale: language == null ? null : Locale(language),
       morningForecast: prefs.getBool(PrefKeys.morningForecast) ?? false,
+      morningMinutes: switch (prefs.getInt(PrefKeys.morningMinutes)) {
+        final m? when AppSettings.morningTimes.contains(m) => m,
+        _ => 7 * 60,
+      },
       activities: readSet(
         Activity.values,
         PrefKeys.activities,
@@ -139,6 +151,12 @@ class Settings extends _$Settings {
 
   Future<void> setMorningForecast(bool on) {
     final saved = _prefs.setBool(PrefKeys.morningForecast, on);
+    ref.invalidateSelf();
+    return saved;
+  }
+
+  Future<void> setMorningMinutes(int minutes) {
+    final saved = _prefs.setInt(PrefKeys.morningMinutes, minutes);
     ref.invalidateSelf();
     return saved;
   }

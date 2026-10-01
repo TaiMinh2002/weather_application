@@ -27,12 +27,13 @@ Future<void> scheduleMorningForecast(
   final activity = Activity.values
       .where(settings.activities.contains)
       .firstOrNull;
-  String activityLine(DateTime day) {
+  // From the notification's own time: at 9:00, a 5:00 window is no use.
+  String activityLine(DateTime at) {
     if (activity == null) return '';
     final w = bestWindow(
       activity,
       weather.hourly,
-      from: day,
+      from: at,
       limits: settings.limits,
     );
     if (w == null || w.score < 60) return '';
@@ -41,9 +42,11 @@ Future<void> scheduleMorningForecast(
   }
 
   final items = [
-    for (final slot in morningSlots([
-      for (final d in weather.daily) d.date,
-    ], DateTime.now()))
+    for (final slot in morningSlots(
+      [for (final d in weather.daily) d.date],
+      DateTime.now(),
+      minutes: settings.morningMinutes,
+    ))
       if (weather.daily[slot.day] case final d)
         (
           at: slot.at,
@@ -52,7 +55,7 @@ Future<void> scheduleMorningForecast(
               '${d.condition.label(l10n)} · '
               '${units.formatTemp(d.tempMin)} – ${units.formatTemp(d.tempMax)}'
               ' · ${l10n.rainChance('${d.precipitationProbabilityMax}%')}'
-              '${activityLine(d.date)}',
+              '${activityLine(slot.at)}',
         ),
   ];
   final notifications = ref.read(morningNotificationsProvider);

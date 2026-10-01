@@ -43,7 +43,7 @@ flutter test tool/screenshots_test.dart --update-goldens
 - **Nhiều thành phố**: tìm kiếm (debounce) hoặc chạm chọn trên bản đồ OpenStreetMap, lưu, kéo thả sắp xếp, vuốt để xóa (có hoàn tác), vuốt ngang giữa các thành phố ở Home
 - **Cài đặt**: °C/°F, km/h hoặc m/s, sáng/tối/theo hệ thống, Tiếng Việt/English
 - **Widget màn hình chính** (2×2): nhiệt độ, trạng thái, cao/thấp trên nền gradient theo thời tiết; trên iPhone thật cần chọn team ký app một lần ([hướng dẫn](ios/SkycastWidget/README.md))
-- **Dự báo mỗi sáng**: thông báo lúc 7:00 với dự báo của ngày đó, kèm giờ tốt nhất cho hoạt động bạn chọn (bật trong Cài đặt)
+- **Dự báo mỗi sáng**: thông báo vào giờ bạn chọn (5:00–10:00, mặc định 7:00) với dự báo của ngày đó, kèm giờ tốt nhất cho hoạt động bạn chọn (bật trong Cài đặt)
 - **Offline**: mất mạng vẫn hiện dữ liệu gần nhất, kèm "cập nhật lúc…"
 - **Đủ trạng thái**: skeleton khi tải, lỗi mạng/máy chủ có nút thử lại, từ chối quyền vị trí, GPS tắt
 - Onboarding giải thích quyền vị trí trước khi hệ thống hỏi, splash native, dark mode từ đầu

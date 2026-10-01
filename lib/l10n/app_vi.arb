@@ -82,7 +82,7 @@
   "mapHint": "Chạm vào bản đồ để chọn địa điểm",
   "saveCity": "Lưu thành phố",
   "notifications": "Thông báo",
-  "morningForecast": "Dự báo lúc 7:00 mỗi sáng",
+  "morningForecast": "Dự báo mỗi sáng",
   "morningChannel": "Dự báo buổi sáng",
   "morningTitle": "{place} hôm nay",
   "notificationsDenied": "Skycast chưa được phép gửi thông báo. Bật lại trong Cài đặt của máy.",
@@ -113,5 +113,6 @@
   "stormClosest": "gần nhất ~{km} km sau {hours} giờ",
   "stormLow": "Suy yếu thành vùng áp thấp",
   "stormGone": "Cơn bão này không còn được theo dõi.",
-  "stormSource": "Nguồn: Cơ quan Khí tượng Nhật Bản (jma.go.jp), phát lúc {time}"
+  "stormSource": "Nguồn: Cơ quan Khí tượng Nhật Bản (jma.go.jp), phát lúc {time}",
+  "morningTime": "Giờ nhận"
 }
