@@ -14,6 +14,7 @@ abstract final class PrefKeys {
   static const activities = 'activities';
   static const weatherAlerts = 'weather_alerts';
   static const alertTypes = 'alert_types';
+  static const alertTypesKnown = 'alert_types_known';
   static const health = 'health';
 }
 
