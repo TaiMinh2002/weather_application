@@ -170,7 +170,7 @@
   "mapHint": "Tap the map to choose a place",
   "saveCity": "Save city",
   "notifications": "Notifications",
-  "morningForecast": "Forecast every morning at 7:00",
+  "morningForecast": "Morning forecast",
   "morningChannel": "Morning forecast",
   "morningTitle": "{place} today",
   "@morningTitle": {
@@ -327,5 +327,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "morningTime": "Time"
 }

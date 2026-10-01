@@ -29,6 +29,19 @@ void main() {
     expect(before.length, 7);
   });
 
+  test('morningSlots fires at the chosen time, half hours included', () {
+    final slots = morningSlots(
+      week,
+      DateTime(2026, 9, 26, 6),
+      minutes: 6 * 60 + 30,
+    );
+    expect(slots.first, (at: DateTime(2026, 9, 26, 6, 30), day: 0));
+    expect(
+      morningSlots(week, DateTime(2026, 9, 26, 9), minutes: 9 * 60).first.day,
+      1,
+    );
+  });
+
   test('schedule clears the old week, then arms one id per morning', () async {
     final plugin = _MockPlugin();
     registerFallbackValue(const InitializationSettings());
@@ -112,6 +125,24 @@ void main() {
 
       expect(container.read(settingsProvider).morningForecast, isTrue);
       expect(prefs.getBool(PrefKeys.morningForecast), isTrue);
+    });
+
+    testWidgets('once on, the time can be changed and is kept', (tester) async {
+      final container = await pump(tester);
+      when(notifications.requestPermission).thenAnswer((_) async => true);
+      expect(find.text('Giờ nhận'), findsNothing);
+
+      await tester.scrollUntilVisible(find.byType(Switch), 200);
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Giờ nhận'), 100);
+      await tester.tap(find.text('7:00'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('6:30').last);
+      await tester.pumpAndSettle();
+
+      expect(container.read(settingsProvider).morningMinutes, 6 * 60 + 30);
+      expect(prefs.getInt(PrefKeys.morningMinutes), 6 * 60 + 30);
     });
 
     testWidgets('denied permission keeps it off and explains', (tester) async {

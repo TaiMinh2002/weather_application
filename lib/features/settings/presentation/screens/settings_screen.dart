@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/error/errors.dart';
@@ -156,6 +157,32 @@ class SettingsScreen extends ConsumerWidget {
                   onChanged: (on) => _setMorningForecast(context, ref, on),
                 ),
               ),
+              if (settings.morningForecast)
+                _Row(
+                  label: l10n.morningTime,
+                  trailing: DropdownButton<int>(
+                    value: settings.morningMinutes,
+                    underline: const SizedBox.shrink(),
+                    items: [
+                      for (final m in AppSettings.morningTimes)
+                        DropdownMenuItem(
+                          value: m,
+                          child: Text(
+                            DateFormat.Hm(
+                              Localizations.localeOf(context).toString(),
+                            ).format(DateTime(2026, 1, 1, 0, m)),
+                          ),
+                        ),
+                    ],
+                    onChanged: (m) async {
+                      if (m == null) return;
+                      await notifier.setMorningMinutes(m);
+                      if (context.mounted) {
+                        await _rescheduleMorning(context, ref);
+                      }
+                    },
+                  ),
+                ),
               if (ref.watch(alertsSyncDataSourceProvider) != null) ...[
                 _Row(
                   label: l10n.weatherAlerts,
@@ -205,8 +232,7 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-/// Asks for permission on the way on; schedules straight away from the GPS
-/// forecast Home already loaded, instead of waiting for the next refresh.
+/// Asks for permission on the way on, then schedules the coming mornings.
 Future<void> _setMorningForecast(
   BuildContext context,
   WidgetRef ref,
@@ -228,6 +254,12 @@ Future<void> _setMorningForecast(
     return;
   }
   await settings.setMorningForecast(true);
+  if (context.mounted) await _rescheduleMorning(context, ref);
+}
+
+/// Schedules straight away from the GPS forecast Home already loaded,
+/// instead of waiting for the next refresh.
+Future<void> _rescheduleMorning(BuildContext context, WidgetRef ref) async {
   final place = ref.read(currentPlaceProvider).value;
   final weather = place == null
       ? null

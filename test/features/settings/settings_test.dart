@@ -80,6 +80,14 @@ void main() {
     expect(container.read(settingsProvider).alertTypes, {AlertType.rain});
   });
 
+  test('morning time: 7:00 by default, only the offered times kept', () async {
+    expect((await _container()).read(settingsProvider).morningMinutes, 420);
+    final odd = await _container({PrefKeys.morningMinutes: 13 * 60});
+    expect(odd.read(settingsProvider).morningMinutes, 420);
+    await odd.read(settingsProvider.notifier).setMorningMinutes(330);
+    expect(odd.read(settingsProvider).morningMinutes, 330);
+  });
+
   test('weather alerts: off by default, all types until changed', () async {
     final container = await _container();
     final settings = container.read(settingsProvider);

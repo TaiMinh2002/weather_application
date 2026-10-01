@@ -98,7 +98,9 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã l�
 
 **Bão khi offline (đã làm):** lần tải thành công gần nhất được lưu (JSON gốc của JMA, cả danh sách rỗng) trong shared_preferences; mất mạng thì hiện lại kèm "Đang offline · cập nhật lúc…" nếu bản lưu dưới 12 giờ (JMA phát lại 3–6 giờ/lần, bão đi hàng trăm km/ngày). Lỗi máy chủ vẫn báo lỗi, giống chính sách dữ liệu thời tiết.
 
-Để sau: Live Activity, Wear OS, widget cỡ vừa, chọn giờ nhận dự báo buổi sáng.
+**Chọn giờ nhận dự báo buổi sáng (đã làm):** Cài đặt → Giờ nhận, nửa tiếng một lựa chọn từ 5:00 đến 10:00 (mặc định 7:00); đổi là lên lịch lại ngay. Dòng giờ đẹp trong thông báo tính từ giờ nhận, không còn từ nửa đêm.
+
+Để sau: Live Activity, Wear OS, widget cỡ vừa.
 
 ---
 

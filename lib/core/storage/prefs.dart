@@ -11,6 +11,7 @@ abstract final class PrefKeys {
   static const themeMode = 'theme_mode';
   static const language = 'language';
   static const morningForecast = 'morning_forecast';
+  static const morningMinutes = 'morning_minutes';
   static const activities = 'activities';
   static const weatherAlerts = 'weather_alerts';
   static const alertTypes = 'alert_types';
