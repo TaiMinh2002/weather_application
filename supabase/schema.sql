@@ -34,8 +34,8 @@ create table if not exists public.alert_subscriptions (
   -- 'vi' or 'en', for the notification text.
   locale text not null default 'vi',
   fahrenheit boolean not null default false,
-  -- AlertType names: rain, uv, air, heat.
-  types text[] not null default '{rain,uv,air,heat}',
+  -- AlertType names: rain, uv, air, heat, storm.
+  types text[] not null default '{rain,uv,air,heat,storm}',
   -- HealthProfile names (respiratory, children, elderly): lower thresholds.
   health text[] not null default '{}',
   -- Alert type → last time it was sent, for the per-type cooldown.

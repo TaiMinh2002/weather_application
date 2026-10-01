@@ -2,7 +2,7 @@
 // (rules_test.ts) without network or secrets.
 
 /** Same names as the app's `AlertType` enum. */
-export type AlertType = "rain" | "uv" | "air" | "heat";
+export type AlertType = "rain" | "uv" | "air" | "heat" | "storm";
 
 /** Same names as the app's `HealthProfile` enum. */
 export type HealthProfile = "respiratory" | "children" | "elderly";
@@ -17,8 +17,8 @@ export interface Subscription {
   types: AlertType[];
   /** Missing on rows written before health profiles existed. */
   health?: HealthProfile[];
-  /** Alert type → ISO time it was last sent. */
-  last_sent: Partial<Record<AlertType, string>>;
+  /** Alert key (the type, or "storm:<JMA id>") → ISO time last sent. */
+  last_sent: Partial<Record<string, string>>;
 }
 
 /** What one forecast + air-quality request says about a place right now. */
@@ -39,6 +39,8 @@ export interface Alert {
   type: AlertType;
   title: string;
   body: string;
+  /** Cooldown key in last_sent; the type unless one type has several. */
+  key?: string;
 }
 
 const hour = 3_600_000;
@@ -50,6 +52,8 @@ const cooldown: Record<AlertType, number> = {
   uv: 20 * hour,
   air: 20 * hour,
   heat: 20 * hour,
+  // Per storm: often enough to follow a change of track, not every run.
+  storm: 12 * hour,
 };
 
 /**
@@ -134,6 +138,133 @@ export function alertsFor(
       body: vi
         ? `Cảm giác như ${temp(c.feelsLike)}. Uống đủ nước và tránh ra ngoài giờ trưa.`
         : `Feels like ${temp(c.feelsLike)}. Drink water and avoid the midday sun.`,
+    });
+  }
+  return alerts;
+}
+
+/** One JMA forecast time for a storm, as used by [stormAlertsFor]. */
+export interface StormPoint {
+  hoursAhead: number;
+  lat: number;
+  lon: number;
+  /** 10-minute sustained wind, m/s. */
+  windMs: number | null;
+  gustMs: number | null;
+  /** Forecast to have become an ordinary low. */
+  isLow: boolean;
+}
+
+export interface Storm {
+  id: string;
+  name: string | null;
+  points: StormPoint[];
+}
+
+/**
+ * JMA's undocumented specifications.json, read the same defensive way as
+ * the app's storm_dto.dart: a part without a usable position is skipped,
+ * and a storm with none is null.
+ */
+// deno-lint-ignore no-explicit-any
+export function parseJmaSpecs(id: string, parts: any[]): Storm | null {
+  const num = (v: unknown) => {
+    const n = typeof v === "number" ? v : Number.parseFloat(String(v));
+    return Number.isFinite(n) ? n : null;
+  };
+  const points: StormPoint[] = [];
+  for (const p of parts.slice(1)) {
+    const [lat, lon] = p?.position?.deg ?? [];
+    if (typeof lat !== "number" || typeof lon !== "number") continue;
+    if (typeof p?.advancedHours !== "number") continue;
+    points.push({
+      hoursAhead: p.advancedHours,
+      lat,
+      lon,
+      windMs: num(p?.maximumWind?.sustained?.["m/s"]),
+      gustMs: num(p?.maximumWind?.gust?.["m/s"]),
+      isLow: p?.category?.en === "LOW",
+    });
+  }
+  if (points.length === 0) return null;
+  return { id, name: parts[0]?.name?.en ?? null, points };
+}
+
+/** Beaufort force; keep in step with `beaufort` in the app's storm.dart. */
+export function beaufort(ms: number): number {
+  const upper = [
+    0.2, 1.5, 3.3, 5.4, 7.9, 10.7, 13.8, 17.1, 20.7, 24.4, 28.4, 32.6,
+    36.9, 41.4, 46.1, 50.9, 56.0,
+  ];
+  const i = upper.findIndex((u) => ms <= u);
+  return i === -1 ? 17 : i;
+}
+
+/** Vietnam's cyclone classes (Decision 18/2021/QĐ-TTg); see StormStrength. */
+function stormClass(force: number, vi: boolean): string {
+  if (force <= 7) return vi ? "Áp thấp nhiệt đới" : "Tropical depression";
+  if (force <= 9) return vi ? "Bão" : "Tropical storm";
+  if (force <= 11) return vi ? "Bão mạnh" : "Severe tropical storm";
+  if (force <= 15) return vi ? "Bão rất mạnh" : "Typhoon";
+  return vi ? "Siêu bão" : "Super typhoon";
+}
+
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const a = Math.sin(rad(lat2 - lat1) / 2) ** 2 +
+    Math.cos(rad(lat1)) * Math.cos(rad(lat2)) *
+      Math.sin(rad(lon2 - lon1) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+/** Closer than this within [stormHorizonHours] is worth a push. */
+export const stormRadiusKm = 500;
+export const stormHorizonHours = 72;
+
+/**
+ * A push per storm forecast to pass within [stormRadiusKm] of the device in
+ * the next [stormHorizonHours], still a cyclone (force 6+, not yet a low)
+ * when it does. No quiet hours: a storm is a safety matter.
+ */
+export function stormAlertsFor(
+  sub: Subscription,
+  storms: Storm[],
+  now: Date,
+): Alert[] {
+  if (!sub.types.includes("storm")) return [];
+  const vi = sub.locale === "vi";
+  const alerts: Alert[] = [];
+  for (const storm of storms) {
+    const key = `storm:${storm.id}`;
+    const last = sub.last_sent[key];
+    if (last !== undefined && now.getTime() - Date.parse(last) < cooldown.storm) {
+      continue;
+    }
+    const near = storm.points
+      .filter((p) => p.hoursAhead <= stormHorizonHours && !p.isLow)
+      .filter((p) => p.windMs !== null && beaufort(p.windMs) >= 6)
+      .map((p) => ({ p, km: distanceKm(p.lat, p.lon, sub.lat, sub.lon) }))
+      .filter((n) => n.km <= stormRadiusKm)
+      .sort((a, b) => a.km - b.km)[0];
+    if (near === undefined) continue;
+    const force = beaufort(near.p.windMs!);
+    const what = [stormClass(force, vi), storm.name].filter(Boolean).join(" ");
+    const km = Math.round(near.km / 10) * 10;
+    const when = near.p.hoursAhead === 0
+      ? (vi ? `đang cách bạn khoảng ${km} km` : `is about ${km} km from you`)
+      : vi
+      ? `dự kiến cách bạn khoảng ${km} km sau ${near.p.hoursAhead} giờ`
+      : `is forecast to pass about ${km} km from you in ${near.p.hoursAhead} h`;
+    const gust = near.p.gustMs === null ? null : beaufort(near.p.gustMs);
+    const wind = vi
+      ? `Gió cấp ${force}${gust === null ? "" : `, giật cấp ${gust}`}.`
+      : `Force ${force} winds${gust === null ? "" : `, gusts force ${gust}`}.`;
+    alerts.push({
+      type: "storm",
+      key,
+      // Same name as the app's storm card.
+      title: vi ? "Theo dõi bão" : "Storm watch",
+      body: `${what} ${when}. ${wind}`,
     });
   }
   return alerts;

@@ -1,9 +1,18 @@
 // Runs hourly (pg_cron, see README.md). Checks the weather at each
-// subscribed device's place and pushes the alerts whose rule fires and whose
-// cooldown has passed. Rules live in rules.ts.
+// subscribed device's place, and JMA's active storms once for everyone, and
+// pushes the alerts whose rule fires and whose cooldown has passed. Rules
+// live in rules.ts.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { importPKCS8, SignJWT } from "npm:jose@5";
-import { type Alert, alertsFor, type Conditions, type Subscription } from "./rules.ts";
+import {
+  type Alert,
+  alertsFor,
+  type Conditions,
+  parseJmaSpecs,
+  type Storm,
+  stormAlertsFor,
+  type Subscription,
+} from "./rules.ts";
 
 const table = "alert_subscriptions";
 const supabase = createClient(
@@ -29,19 +38,27 @@ Deno.serve(async (req) => {
   }
 
   const now = new Date();
+  // Once per run for everyone; without it only storm alerts are skipped.
+  const storms = await fetchStorms().catch((e) => {
+    console.error("storms:", e);
+    return [] as Storm[];
+  });
   let fcm: Promise<FcmAuth> | undefined;
   let sent = 0;
   for (const [key, group] of cells) {
-    let conditions: Conditions;
+    let conditions: Conditions | null = null;
     try {
       conditions = await fetchConditions(key);
     } catch (e) {
-      // One place failing shouldn't stop the others; it's retried next hour.
+      // One place failing shouldn't stop the others, nor its storm alerts;
+      // the weather is retried next hour.
       console.error(`weather ${key}:`, e);
-      continue;
     }
     for (const sub of group) {
-      const alerts = alertsFor(sub, conditions, now);
+      const alerts = [
+        ...(conditions === null ? [] : alertsFor(sub, conditions, now)),
+        ...stormAlertsFor(sub, storms, now),
+      ];
       if (alerts.length === 0) continue;
       fcm ??= fcmAuth();
       const lastSent = { ...sub.last_sent };
@@ -53,7 +70,7 @@ Deno.serve(async (req) => {
           break;
         }
         if (result === "ok") {
-          lastSent[alert.type] = now.toISOString();
+          lastSent[alert.key ?? alert.type] = now.toISOString();
           sent++;
         }
       }
@@ -63,7 +80,12 @@ Deno.serve(async (req) => {
         : supabase.from(table).update({ last_sent: lastSent }).eq("user_id", sub.user_id));
     }
   }
-  return Response.json({ devices: subs.length, cells: cells.size, sent });
+  return Response.json({
+    devices: subs.length,
+    cells: cells.size,
+    storms: storms.length,
+    sent,
+  });
 });
 
 async function fetchConditions(cell: string): Promise<Conditions> {
@@ -86,6 +108,24 @@ async function fetchConditions(cell: string): Promise<Conditions> {
     rainMm: forecast.minutely_15?.precipitation ?? [],
     aqi: air?.current?.us_aqi ?? null,
   };
+}
+
+/** Every cyclone JMA tracks now (jma.go.jp/bosai/typhoon/data/). */
+async function fetchStorms(): Promise<Storm[]> {
+  const base = "https://www.jma.go.jp/bosai/typhoon/data";
+  const active = await getJson(`${base}/targetTc.json`);
+  const storms = await Promise.all(
+    // deno-lint-ignore no-explicit-any
+    (active as any[]).map(async (t) => {
+      const id = String(t?.tropicalCyclone ?? "");
+      if (id === "") return null;
+      // One storm's file failing drops that storm, not the run.
+      const specs = await getJson(`${base}/${id}/specifications.json`)
+        .catch(() => null);
+      return Array.isArray(specs) ? parseJmaSpecs(id, specs) : null;
+    }),
+  );
+  return storms.filter((s): s is Storm => s !== null);
 }
 
 async function getJson(url: string) {
@@ -145,11 +185,16 @@ async function sendPush(
           android: {
             priority: "high",
             // Same channel the app creates (alertsChannelId); the tag makes a
-            // newer alert of a type replace the older one.
-            notification: { channel_id: "weather_alerts", tag: alert.type },
+            // newer alert of a type (or of the same storm) replace the older.
+            notification: {
+              channel_id: "weather_alerts",
+              tag: alert.key ?? alert.type,
+            },
           },
           apns: {
-            payload: { aps: { sound: "default", "thread-id": alert.type } },
+            payload: {
+              aps: { sound: "default", "thread-id": alert.key ?? alert.type },
+            },
           },
         },
       }),
