@@ -96,6 +96,8 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã l�
 
 **Theo dõi bão (đã làm, phần trong app):** nguồn là JMA / RSMC Tokyo (trung tâm WMO cho Tây Bắc Thái Bình Dương và Biển Đông), JSON công khai tại `jma.go.jp/bosai/typhoon/data/` (`targetTc.json`, rồi mỗi bão `specifications.json` + `forecast.json`), dùng lại được theo Public Data License của JMA (tương thích CC BY 4.0, phải ghi nguồn). NCHMF chỉ có bài viết HTML nên không dùng; GDACS (có API) để dự phòng nếu JMA đổi định dạng (endpoint JMA không có tài liệu, nên DTO đọc từng trường theo đường dẫn nullable, lỗi chỉ ẩn giá trị). Thẻ trên Home chỉ hiện khi bão đang/sẽ vào phạm vi 1500 km (`stormsNear`); màn `/storm/:id` có bản đồ đường đi, vòng xác suất 70%, bảng diễn biến. Cấp gió theo Beaufort, phân loại theo QĐ 18/2021/QĐ-TTg (áp thấp nhiệt đới đến siêu bão). **Cảnh báo đẩy khi có bão (đã làm):** loại `storm` mới; mỗi lần chạy server đọc JMA một lần (`fetchStorms`, `parseJmaSpecs`), gửi khi bão (vẫn từ cấp 6, chưa thành vùng áp thấp) dự báo vào phạm vi 500 km trong 72 giờ tới (`stormAlertsFor`). Chống lặp theo từng cơn bão (`last_sent["storm:<id>"]`, 12 giờ), không áp giờ yên lặng vì là chuyện an toàn. Không cần SQL mới; chỉ deploy lại function.
 
+**Bão khi offline (đã làm):** lần tải thành công gần nhất được lưu (JSON gốc của JMA, cả danh sách rỗng) trong shared_preferences; mất mạng thì hiện lại kèm "Đang offline · cập nhật lúc…" nếu bản lưu dưới 12 giờ (JMA phát lại 3–6 giờ/lần, bão đi hàng trăm km/ngày). Lỗi máy chủ vẫn báo lỗi, giống chính sách dữ liệu thời tiết.
+
 Để sau: Live Activity, Wear OS, widget cỡ vừa, chọn giờ nhận dự báo buổi sáng.
 
 ---

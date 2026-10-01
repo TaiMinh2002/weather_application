@@ -16,6 +16,7 @@ abstract final class PrefKeys {
   static const alertTypes = 'alert_types';
   static const alertTypesKnown = 'alert_types_known';
   static const health = 'health';
+  static const storms = 'storms';
 }
 
 /// Loaded once in `main()` and injected via `overrideWithValue`.

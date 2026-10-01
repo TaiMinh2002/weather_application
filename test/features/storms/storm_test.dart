@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_application/core/error/errors.dart';
+import 'package:weather_application/features/storms/data/datasources/storms_local_ds.dart';
 import 'package:weather_application/features/storms/data/datasources/storms_remote_ds.dart';
 import 'package:weather_application/features/storms/data/models/storm_dto.dart';
 import 'package:weather_application/features/storms/data/repositories/storms_repository_impl.dart';
@@ -15,18 +17,16 @@ class _MockRemote extends Mock implements StormsRemoteDataSource {}
 
 StormDto _surigae() => StormDto(
   id: 'TC2632',
-  specs: [
-    for (final p in (jsonDecode(
-      specificationsJson,
-    ) as List).cast<Map<String, dynamic>>())
-      JmaSpecDto.fromJson(p),
-  ],
-  forecast: [
-    for (final p
-        in (jsonDecode(forecastJson) as List).cast<Map<String, dynamic>>())
-      JmaForecastDto.fromJson(p),
-  ],
+  specs: (jsonDecode(specificationsJson) as List).cast<Map<String, dynamic>>(),
+  forecast: (jsonDecode(forecastJson) as List).cast<Map<String, dynamic>>(),
 );
+
+Future<StormsLocalDataSource> _local([
+  Map<String, Object> values = const {},
+]) async {
+  SharedPreferences.setMockInitialValues(values);
+  return StormsLocalDataSource(await SharedPreferences.getInstance());
+}
 
 Storm _storm(List<(double, double)> positions) => Storm(
   id: 'TC',
@@ -112,8 +112,8 @@ void main() {
     test('unusable files give null instead of throwing', () {
       final broken = StormDto(
         id: 'TC',
-        specs: [
-          JmaSpecDto.fromJson(const {'part': 'title'}),
+        specs: const [
+          {'part': 'title'},
         ],
         forecast: const [],
       );
@@ -121,6 +121,20 @@ void main() {
       expect(JmaSpecDto.fromJson(const {'maximumWind': 'odd'}).windMs, isNull);
     });
   });
+
+  test(
+    'the local copy reads back what was saved, raw JMA JSON included',
+    () async {
+      final local = await _local();
+      final savedAt = DateTime(2026, 9, 30, 14);
+      await local.save([_surigae()], savedAt);
+      final (dtos, at) = local.read()!;
+      expect(at, savedAt);
+      expect(dtos, [_surigae()]);
+      expect(dtos.single.toEntity()?.name, 'Surigae');
+      expect((await _local({'storms': 'not json'})).read(), isNull);
+    },
+  );
 
   group('StormsRepositoryImpl', () {
     late _MockRemote remote;
@@ -134,15 +148,66 @@ void main() {
           const StormDto(id: 'TC0', specs: [], forecast: []),
         ],
       );
-      final result = await StormsRepositoryImpl(remote).getActiveStorms();
-      expect((result as Ok<List<Storm>>).data.map((s) => s.id), ['TC2632']);
+      final repo = StormsRepositoryImpl(remote, await _local());
+      final result = await repo.getActiveStorms();
+      final storms = (result as Ok<List<Storm>>).data;
+      expect(storms.map((s) => s.id), ['TC2632']);
+      expect(storms.single.cachedAt, isNull);
     });
 
-    test('network errors become a NetworkFailure', () async {
+    test('offline: the last list, marked with when it was fetched', () async {
+      final local = await _local();
+      final savedAt = DateTime.now().subtract(const Duration(hours: 3));
+      await local.save([_surigae()], savedAt);
       when(remote.getActiveStorms).thenThrow(const NetworkException());
-      final result = await StormsRepositoryImpl(remote).getActiveStorms();
-      expect((result as Err).failure, isA<NetworkFailure>());
+
+      final result = await StormsRepositoryImpl(
+        remote,
+        local,
+      ).getActiveStorms();
+      final storm = (result as Ok<List<Storm>>).data.single;
+      expect(storm.id, 'TC2632');
+      expect(storm.cachedAt, savedAt);
     });
+
+    test('online fetches are what gets saved for later', () async {
+      final local = await _local();
+      when(remote.getActiveStorms).thenAnswer((_) async => [_surigae()]);
+      await StormsRepositoryImpl(remote, local).getActiveStorms();
+      expect(local.read()?.$1, [_surigae()]);
+    });
+
+    test(
+      'a copy older than 12 h, no copy, or a server error: the failure',
+      () async {
+        final stale = await _local();
+        await stale.save([
+          _surigae(),
+        ], DateTime.now().subtract(const Duration(hours: 13)));
+        when(remote.getActiveStorms).thenThrow(const NetworkException());
+        expect(
+          (await StormsRepositoryImpl(remote, stale).getActiveStorms() as Err)
+              .failure,
+          isA<NetworkFailure>(),
+        );
+        expect(
+          (await StormsRepositoryImpl(remote, await _local()).getActiveStorms()
+                  as Err)
+              .failure,
+          isA<NetworkFailure>(),
+        );
+
+        // Only a lost connection falls back; a server error is reported.
+        final fresh = await _local();
+        await fresh.save([_surigae()], DateTime.now());
+        when(remote.getActiveStorms).thenThrow(const ServerException(500));
+        expect(
+          (await StormsRepositoryImpl(remote, fresh).getActiveStorms() as Err)
+              .failure,
+          isA<ServerFailure>(),
+        );
+      },
+    );
   });
 
   test('the datasource asks JMA for each active storm', () async {

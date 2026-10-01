@@ -83,6 +83,15 @@ class StormCard extends ConsumerWidget {
                       opacity: 0.85,
                       child: Text(distance, style: text.bodyMedium),
                     ),
+                    // Where the storm was, not where it is: say how old.
+                    if (storm.cachedAt case final cachedAt?)
+                      Opacity(
+                        opacity: 0.85,
+                        child: Text(
+                          context.offlineSince(cachedAt),
+                          style: text.labelMedium,
+                        ),
+                      ),
                   ],
                 ),
               ),

@@ -252,6 +252,13 @@ class _Timeline extends ConsumerWidget {
               ),
             ),
           const SizedBox(height: 8),
+          if (storm.cachedAt case final cachedAt?)
+            Text(
+              context.offlineSince(cachedAt),
+              style: text.labelMedium?.copyWith(
+                color: context.colorScheme.error,
+              ),
+            ),
           Text(
             l10n.stormSource(
               DateFormat.MMMd(locale).add_Hm().format(storm.issuedAt.toLocal()),

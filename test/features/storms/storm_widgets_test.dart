@@ -86,6 +86,23 @@ void main() {
     );
   });
 
+  testWidgets('an offline copy says when it was fetched', (tester) async {
+    final today = DateTime.now();
+    final cached = Storm(
+      id: _storm.id,
+      name: _storm.name,
+      issuedAt: _storm.issuedAt,
+      points: _storm.points,
+      track: _storm.track,
+      cachedAt: DateTime(today.year, today.month, today.day, 8, 15),
+    );
+    await _pump(tester, const StormCard(place: _daNang), () async => [cached]);
+    expect(find.text('Đang offline · cập nhật lúc 8:15'), findsOneWidget);
+
+    await _pump(tester, const StormCard(place: _daNang), () async => [_storm]);
+    expect(find.textContaining('offline'), findsNothing);
+  });
+
   testWidgets('the card stays out of the way when no storm is near', (
     tester,
   ) async {
