@@ -70,19 +70,28 @@ abstract class JmaForecastDto with _$JmaForecastDto {
       _$JmaForecastDtoFromJson(json);
 }
 
-/// One storm from its two JMA files.
+/// One storm from its two JMA files, kept as JMA sent them. The parts are
+/// parsed in [toEntity], not here: [JmaSpecDto] reads nested paths but
+/// writes flat keys, so caching parsed parts wouldn't read back.
 @freezed
 abstract class StormDto with _$StormDto {
   const StormDto._();
 
   const factory StormDto({
     required String id,
-    required List<JmaSpecDto> specs,
-    required List<JmaForecastDto> forecast,
+    required List<Map<String, dynamic>> specs,
+    required List<Map<String, dynamic>> forecast,
   }) = _StormDto;
 
+  factory StormDto.fromJson(Map<String, dynamic> json) =>
+      _$StormDtoFromJson(json);
+
   /// Null when JMA's files hold no usable position, i.e. the format moved.
-  Storm? toEntity() {
+  Storm? toEntity({DateTime? cachedAt}) {
+    final specs = [for (final p in this.specs) JmaSpecDto.fromJson(p)];
+    final forecast = [
+      for (final p in this.forecast) JmaForecastDto.fromJson(p),
+    ];
     final title = specs.firstOrNull;
     final points = [
       for (final s in specs.skip(1))
@@ -107,6 +116,7 @@ abstract class StormDto with _$StormDto {
     return Storm(
       id: id,
       name: title?.name,
+      cachedAt: cachedAt,
       issuedAt: DateTime.tryParse(title?.issue ?? '') ?? points.first.time,
       points: points,
       track: [

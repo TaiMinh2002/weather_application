@@ -31,14 +31,8 @@ class StormsRemoteDataSource {
           ]).then(
             (files) => StormDto(
               id: id,
-              specs: [
-                for (final p in files[0].cast<Map<String, dynamic>>())
-                  JmaSpecDto.fromJson(p),
-              ],
-              forecast: [
-                for (final p in files[1].cast<Map<String, dynamic>>())
-                  JmaForecastDto.fromJson(p),
-              ],
+              specs: files[0].cast<Map<String, dynamic>>(),
+              forecast: files[1].cast<Map<String, dynamic>>(),
             ),
           ),
       ]);

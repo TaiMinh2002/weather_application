@@ -9,7 +9,11 @@ class Storm {
     required this.issuedAt,
     required this.points,
     required this.track,
+    this.cachedAt,
   });
+
+  /// Set when the network failed and this came from the offline copy.
+  final DateTime? cachedAt;
 
   /// JMA's id, e.g. "TC2632"; stable for the storm's life.
   final String id;

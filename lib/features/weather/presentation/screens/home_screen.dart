@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -479,12 +478,6 @@ class _OfflineBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context).toString();
-    final now = DateTime.now();
-    final sameDay = DateUtils.isSameDay(cachedAt, now);
-    final time =
-        (sameDay ? DateFormat.Hm(locale) : DateFormat.Md(locale).add_Hm())
-            .format(cachedAt);
     return Container(
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -498,7 +491,7 @@ class _OfflineBanner extends StatelessWidget {
           const Icon(Symbols.wifi_off_rounded, size: 18),
           Expanded(
             child: Text(
-              context.l10n.offlineUpdatedAt(time),
+              context.offlineSince(cachedAt),
               style: context.textTheme.labelMedium,
               overflow: TextOverflow.ellipsis,
             ),
