@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,6 +22,11 @@ class HomeScreenWidget {
       androidName: 'SkycastWidgetProvider',
       iOSName: 'SkycastWidget',
     );
+    // iOS has one widget in two sizes; Android has a provider per size (and
+    // iOS rejects a call without an iOS name).
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await HomeWidget.updateWidget(androidName: 'SkycastWidgetMediumProvider');
+    }
   }
 }
 

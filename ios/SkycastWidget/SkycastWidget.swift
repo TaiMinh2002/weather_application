@@ -1,8 +1,10 @@
 import SwiftUI
 import WidgetKit
 
-// 2×2 current-weather widget. The Flutter app writes already-formatted text
-// (lib/features/home_widget/) into the shared App Group; this only draws it.
+// Current-weather widget in two sizes: small (2×2) and medium (4×2, plus the
+// best activity time and the next six hours). The Flutter app writes
+// already-formatted text (widgetData() in lib/features/home_widget/) into the
+// shared App Group; this only draws it.
 
 private let appGroup = "group.com.minhpt.skycast"
 
@@ -22,6 +24,12 @@ private let skies: [String: [UInt32]] = [
     "storm_night": [0x231B3D, 0x09081A],
 ]
 
+struct Hour {
+    let time: String
+    let icon: String
+    let temp: String
+}
+
 struct WeatherEntry: TimelineEntry {
     let date: Date
     let city: String
@@ -29,7 +37,13 @@ struct WeatherEntry: TimelineEntry {
     let condition: String
     let hilo: String
     let sky: String
+    /// Best time for the user's first activity; empty when none is good.
+    let activity: String
+    let hours: [Hour]
 }
+
+/// Hourly columns on the medium widget; matches widgetHours in Dart.
+private let hourCount = 6
 
 struct Provider: TimelineProvider {
     private func read() -> WeatherEntry {
@@ -40,7 +54,16 @@ struct Provider: TimelineProvider {
             temp: d?.string(forKey: "temp") ?? "--°",
             condition: d?.string(forKey: "condition") ?? "",
             hilo: d?.string(forKey: "hilo") ?? "",
-            sky: d?.string(forKey: "sky") ?? "clear_day"
+            sky: d?.string(forKey: "sky") ?? "clear_day",
+            activity: d?.string(forKey: "activity") ?? "",
+            hours: (0..<hourCount).compactMap { i in
+                guard let time = d?.string(forKey: "h\(i)_time") else { return nil }
+                return Hour(
+                    time: time,
+                    icon: d?.string(forKey: "h\(i)_icon") ?? "",
+                    temp: d?.string(forKey: "h\(i)_temp") ?? ""
+                )
+            }
         )
     }
 
@@ -67,8 +90,25 @@ private extension Color {
     }
 }
 
+/// SF Symbol for a `<WeatherCondition>_<day|night>` key from Dart.
+private func symbol(_ key: String) -> String {
+    let night = key.hasSuffix("_night")
+    switch key.split(separator: "_").first.map(String.init) ?? "" {
+    case "clear", "mainlyClear": return night ? "moon.stars.fill" : "sun.max.fill"
+    case "partlyCloudy": return night ? "cloud.moon.fill" : "cloud.sun.fill"
+    case "fog": return "cloud.fog.fill"
+    case "drizzle": return "cloud.drizzle.fill"
+    case "rain": return "cloud.rain.fill"
+    case "showers": return "cloud.heavyrain.fill"
+    case "snow": return "cloud.snow.fill"
+    case "thunderstorm": return "cloud.bolt.rain.fill"
+    default: return "cloud.fill"
+    }
+}
+
 struct SkycastWidgetView: View {
     let entry: WeatherEntry
+    @Environment(\.widgetFamily) private var family
 
     private var gradient: LinearGradient {
         let stops = skies[entry.sky] ?? skies["clear_day"]!
@@ -80,6 +120,15 @@ struct SkycastWidgetView: View {
     }
 
     var body: some View {
+        Group {
+            if family == .systemMedium { medium } else { small }
+        }
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(gradient, for: .widget)
+    }
+
+    private var small: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(entry.city).font(.subheadline.bold()).lineLimit(1)
             Spacer(minLength: 0)
@@ -87,9 +136,38 @@ struct SkycastWidgetView: View {
             Text(entry.condition).font(.caption).lineLimit(1)
             Text(entry.hilo).font(.caption2).opacity(0.85)
         }
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(gradient, for: .widget)
+    }
+
+    private var medium: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(entry.city).font(.subheadline.bold()).lineLimit(1)
+                    Text([entry.condition, entry.hilo].filter { !$0.isEmpty }
+                        .joined(separator: " · "))
+                        .font(.caption).opacity(0.9).lineLimit(1)
+                }
+                Spacer(minLength: 8)
+                Text(entry.temp).font(.system(size: 36, weight: .light))
+            }
+            if !entry.activity.isEmpty {
+                Text(entry.activity).font(.caption).opacity(0.9).lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            HStack(spacing: 0) {
+                ForEach(Array(entry.hours.enumerated()), id: \.offset) { _, hour in
+                    VStack(spacing: 3) {
+                        Text(hour.time).font(.caption2).opacity(0.8)
+                        Image(systemName: symbol(hour.icon))
+                            .symbolRenderingMode(.multicolor)
+                            .font(.system(size: 16))
+                            .frame(height: 18)
+                        Text(hour.temp).font(.caption.bold())
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
     }
 }
 
@@ -104,6 +182,6 @@ struct SkycastWidget: Widget {
         }
         .configurationDisplayName("Skycast")
         .description("Current weather where you are")
-        .supportedFamilies([.systemSmall])
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

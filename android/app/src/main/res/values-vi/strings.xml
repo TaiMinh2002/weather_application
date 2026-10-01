@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Thời tiết hiện tại nơi bạn ở</string>
+    <string name="widget_medium_description">Thời tiết và các giờ tới</string>
     <string name="widget_empty">Mở Skycast để tải thời tiết</string>
 </resources>
