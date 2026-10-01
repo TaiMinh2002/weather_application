@@ -23,6 +23,7 @@ import '../../../notifications/presentation/morning_forecast.dart';
 import '../../../location/presentation/providers/location_provider.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../../share/presentation/share_sheet.dart';
+import '../../../storms/presentation/widgets/storm_card.dart';
 import '../../domain/entities/weather.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/forecast_cards.dart';
@@ -448,6 +449,7 @@ class _WeatherBody extends StatelessWidget {
         },
       ),
       const SizedBox(height: 20),
+      if (place case final place?) StormCard(place: place),
       // An offline copy's "rain in 15 min" is already wrong, so it's hidden.
       if (weather.cachedAt == null)
         if (rainOutlook(weather.nowcast) case final outlook?) ...[

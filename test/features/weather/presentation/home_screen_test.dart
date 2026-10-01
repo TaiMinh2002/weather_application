@@ -8,6 +8,7 @@ import 'package:weather_application/core/theme/app_theme.dart';
 import 'package:weather_application/features/location/domain/entities/place.dart';
 import 'package:weather_application/features/location/presentation/providers/location_provider.dart';
 import 'package:weather_application/features/share/presentation/share_card.dart';
+import 'package:weather_application/features/storms/presentation/providers/storms_provider.dart';
 import 'package:weather_application/features/weather/data/models/weather_dto.dart';
 import 'package:weather_application/features/weather/domain/entities/weather.dart';
 import 'package:weather_application/features/weather/presentation/providers/weather_provider.dart';
@@ -34,6 +35,7 @@ Future<Widget> _app(List overrides, {AirQuality? airQuality}) async {
         _place.lat,
         _place.lon,
       ).overrideWith((ref) async => airQuality),
+      activeStormsProvider.overrideWith((ref) async => const []),
       ...overrides,
     ],
     child: MaterialApp(

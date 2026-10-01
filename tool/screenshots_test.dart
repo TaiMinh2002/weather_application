@@ -27,6 +27,7 @@ import 'package:weather_application/features/location/presentation/providers/loc
 import 'package:weather_application/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:weather_application/features/settings/presentation/screens/settings_screen.dart';
 import 'package:weather_application/features/share/presentation/share_card.dart';
+import 'package:weather_application/features/storms/presentation/providers/storms_provider.dart';
 import 'package:weather_application/features/weather/domain/entities/weather.dart';
 import 'package:weather_application/features/weather/presentation/providers/weather_provider.dart';
 import 'package:weather_application/features/weather/presentation/screens/day_detail_screen.dart';
@@ -145,6 +146,7 @@ Future<void> _shoot(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(sp),
           currentPlaceProvider.overrideWith((ref) async => _hanoi),
+          activeStormsProvider.overrideWith((ref) async => const []),
           weatherProvider(
             _hanoi.lat,
             _hanoi.lon,

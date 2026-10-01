@@ -264,5 +264,68 @@
         "type": "String"
       }
     }
+  },
+  "stormWatch": "Storm watch",
+  "stormStrength": "{strength, select, depression{Tropical depression} storm{Tropical storm} severe{Severe tropical storm} veryStrong{Typhoon} other{Super typhoon}}",
+  "@stormStrength": {
+    "placeholders": {
+      "strength": {
+        "type": "String"
+      }
+    }
+  },
+  "stormWind": "Force {force} winds ({speed}), gusts force {gust}",
+  "@stormWind": {
+    "placeholders": {
+      "force": {
+        "type": "int"
+      },
+      "speed": {
+        "type": "String"
+      },
+      "gust": {
+        "type": "int"
+      }
+    }
+  },
+  "stormWindNoGust": "Force {force} winds ({speed})",
+  "@stormWindNoGust": {
+    "placeholders": {
+      "force": {
+        "type": "int"
+      },
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "stormDistance": "{km} km from you",
+  "@stormDistance": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
+  "stormClosest": "closest ~{km} km in {hours} h",
+  "@stormClosest": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "stormLow": "Weakening into a low",
+  "stormGone": "This storm is no longer being tracked.",
+  "stormSource": "Source: Japan Meteorological Agency (jma.go.jp), issued {time}",
+  "@stormSource": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }
