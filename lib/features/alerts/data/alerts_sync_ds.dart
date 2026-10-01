@@ -10,7 +10,7 @@ part 'alerts_sync_ds.g.dart';
 
 /// What the `check-alerts` Edge Function can push. Names are stored in the
 /// `alert_subscriptions.types` column, so renaming one needs a migration.
-enum AlertType { rain, uv, air, heat }
+enum AlertType { rain, uv, air, heat, storm }
 
 /// One `alert_subscriptions` row per anonymous user: where the device is and
 /// what to alert about. The server does the checking (supabase/functions/

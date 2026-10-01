@@ -1,6 +1,6 @@
 # check-alerts
 
-Push weather alerts (rain soon, very high UV, unhealthy air, extreme heat). The app
+Push weather alerts (rain soon, very high UV, unhealthy air, extreme heat, storm nearby). The app
 writes one `alert_subscriptions` row per device (place, language, units, chosen
 alert types, FCM token). `pg_cron` calls this function at the top of every hour. It checks
 Open-Meteo for each place and sends pushes through FCM HTTP v1.
@@ -9,6 +9,7 @@ Open-Meteo for each place and sends pushes through FCM HTTP v1.
 - Quiet hours: 22:00–6:00, in each place's local time.
 - Cooldowns: rain alerts at most once every 3 hours; the other types once a day.
 - Thresholds drop for users with health profiles (`limitsFor` in `rules.ts`).
+- Storms: JMA's active cyclones are fetched once per run; a device gets a push when one is forecast within 500 km in the next 72 h, at most every 12 h per storm, and at any hour.
 
 **Upgrading an existing project:** before shipping an app build with health
 profiles, run the `alter table … add column if not exists health` line at the

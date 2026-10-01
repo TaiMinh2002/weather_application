@@ -2,9 +2,13 @@
 import { assertEquals } from "jsr:@std/assert@1";
 import {
   alertsFor,
+  beaufort,
   type Conditions,
   limitsFor,
+  parseJmaSpecs,
   rainStartsIn,
+  type Storm,
+  stormAlertsFor,
   type Subscription,
 } from "./rules.ts";
 
@@ -103,4 +107,102 @@ Deno.test("health profiles lower the thresholds", () => {
     alertsFor(sub({ health: ["children"] }), smoggy, now).map((a) => a.type),
     ["uv", "air", "heat"],
   );
+});
+
+Deno.test("beaufort matches the app's bands", () => {
+  const cases: [number, number][] = [
+    [0, 0], [10.8, 6], [17.1, 7], [17.2, 8], [25, 10], [32.7, 12], [51, 16],
+    [70, 17],
+  ];
+  for (const [ms, force] of cases) assertEquals(beaufort(ms), force, `${ms}`);
+});
+
+Deno.test("parseJmaSpecs reads JMA's shape and skips what it can't", () => {
+  // Trimmed from a real specifications.json (Tropical Storm Surigae).
+  const parts = [
+    { part: "title", name: { en: "Surigae" }, category: { en: "TS" } },
+    {
+      advancedHours: 0,
+      position: { deg: [31.7, 138.8] },
+      maximumWind: { sustained: { "m/s": "18" }, gust: { "m/s": "25" } },
+      category: { en: "TS" },
+    },
+    { advancedHours: 12, position: { deg: "moved" } },
+    {
+      advancedHours: 45,
+      position: { deg: [40.9, 156.4] },
+      maximumWind: { sustained: { "m/s": "-" } },
+      category: { en: "LOW" },
+    },
+  ];
+  assertEquals(parseJmaSpecs("TC2632", parts), {
+    id: "TC2632",
+    name: "Surigae",
+    points: [
+      { hoursAhead: 0, lat: 31.7, lon: 138.8, windMs: 18, gustMs: 25, isLow: false },
+      { hoursAhead: 45, lat: 40.9, lon: 156.4, windMs: null, gustMs: null, isLow: true },
+    ],
+  });
+  assertEquals(parseJmaSpecs("TC0", [{ part: "title" }]), null);
+});
+
+// Heading west across the South China Sea for Da Nang (16.05, 108.2).
+const kajiki: Storm = {
+  id: "TC2640",
+  name: "Kajiki",
+  points: [
+    { hoursAhead: 0, lat: 15, lon: 118, windMs: 26, gustMs: 35, isLow: false },
+    { hoursAhead: 24, lat: 15.8, lon: 111, windMs: 33, gustMs: 45, isLow: false },
+    { hoursAhead: 96, lat: 16, lon: 108.3, windMs: 20, gustMs: null, isLow: false },
+  ],
+};
+const daNang = sub({ lat: 16.05, lon: 108.2, types: ["storm"] });
+
+Deno.test("a storm forecast to pass within 500 km gets one push", () => {
+  const [alert, ...rest] = stormAlertsFor(daNang, [kajiki], now);
+  assertEquals(rest, []);
+  assertEquals(alert.key, "storm:TC2640");
+  assertEquals(alert.title, "Theo dõi bão");
+  assertEquals(
+    alert.body,
+    "Bão rất mạnh Kajiki dự kiến cách bạn khoảng 300 km sau 24 giờ. " +
+      "Gió cấp 12, giật cấp 14.",
+  );
+  const en = stormAlertsFor({ ...daNang, locale: "en" }, [kajiki], now)[0];
+  assertEquals(
+    en.body,
+    "Typhoon Kajiki is forecast to pass about 300 km from you in 24 h. " +
+      "Force 12 winds, gusts force 14.",
+  );
+});
+
+Deno.test("far, late, weak or opted-out storms send nothing", () => {
+  const hanoi = sub({ types: ["storm"] }); // ~800 km from the 24 h point
+  assertEquals(stormAlertsFor(hanoi, [kajiki], now), []);
+  // Only the 96 h point reaches Da Nang: past the 72 h horizon.
+  const late = { ...kajiki, points: [kajiki.points[0], kajiki.points[2]] };
+  assertEquals(stormAlertsFor(daNang, [late], now), []);
+  const weak: Storm = {
+    ...kajiki,
+    points: kajiki.points.map((p) => ({ ...p, windMs: 10 })),
+  };
+  assertEquals(stormAlertsFor(daNang, [weak], now), []);
+  const low: Storm = {
+    ...kajiki,
+    points: kajiki.points.map((p) => ({ ...p, isLow: true })),
+  };
+  assertEquals(stormAlertsFor(daNang, [low], now), []);
+  assertEquals(stormAlertsFor({ ...daNang, types: ["rain"] }, [kajiki], now), []);
+});
+
+Deno.test("each storm has its own 12-hour cooldown", () => {
+  const ago = (h: number) => new Date(now.getTime() - h * 3_600_000).toISOString();
+  const other: Storm = { ...kajiki, id: "TC2641", name: "Nongfa" };
+  const recently = { ...daNang, last_sent: { "storm:TC2640": ago(11) } };
+  assertEquals(
+    stormAlertsFor(recently, [kajiki, other], now).map((a) => a.key),
+    ["storm:TC2641"],
+  );
+  const earlier = { ...daNang, last_sent: { "storm:TC2640": ago(12) } };
+  assertEquals(stormAlertsFor(earlier, [kajiki], now).length, 1);
 });

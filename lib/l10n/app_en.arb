@@ -244,7 +244,7 @@
     }
   },
   "weatherAlerts": "Weather alerts",
-  "alertType": "{type, select, rain{Rain soon} uv{Very high UV} air{Unhealthy air} other{Extreme heat}}",
+  "alertType": "{type, select, rain{Rain soon} uv{Very high UV} air{Unhealthy air} heat{Extreme heat} other{Storm nearby}}",
   "@alertType": {
     "placeholders": {
       "type": {
