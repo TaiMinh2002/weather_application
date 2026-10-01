@@ -61,6 +61,25 @@ void main() {
     expect(container.read(settingsProvider).limits.aqi, 50);
   });
 
+  test('alert types added later start on; ones turned off stay off', () async {
+    // Saved before storm alerts existed, with UV turned off.
+    final container = await _container({
+      PrefKeys.alertTypes: ['rain', 'air', 'heat'],
+    });
+    expect(container.read(settingsProvider).alertTypes, {
+      AlertType.rain,
+      AlertType.air,
+      AlertType.heat,
+      AlertType.storm,
+    });
+
+    // Once the user turns storm off with storm on screen, it stays off.
+    await container.read(settingsProvider.notifier).setAlertTypes({
+      AlertType.rain,
+    });
+    expect(container.read(settingsProvider).alertTypes, {AlertType.rain});
+  });
+
   test('weather alerts: off by default, all types until changed', () async {
     final container = await _container();
     final settings = container.read(settingsProvider);

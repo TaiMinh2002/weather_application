@@ -84,9 +84,7 @@ class Settings extends _$Settings {
         Activity.defaults,
       ),
       weatherAlerts: prefs.getBool(PrefKeys.weatherAlerts) ?? false,
-      alertTypes: readSet(AlertType.values, PrefKeys.alertTypes, {
-        ...AlertType.values,
-      }),
+      alertTypes: _alertTypes(prefs),
       health: readSet(HealthProfile.values, PrefKeys.health, {}),
     );
   }
@@ -94,8 +92,29 @@ class Settings extends _$Settings {
   Future<void> setActivities(Set<Activity> activities) =>
       _saveSet(PrefKeys.activities, activities);
 
-  Future<void> setAlertTypes(Set<AlertType> types) =>
-      _saveSet(PrefKeys.alertTypes, types);
+  /// Also records which types existed when the user chose, so a type added
+  /// in a later version starts on instead of looking switched off.
+  Future<void> setAlertTypes(Set<AlertType> types) async {
+    await _prefs.setStringList(PrefKeys.alertTypesKnown, [
+      for (final t in AlertType.values) t.name,
+    ]);
+    await _saveSet(PrefKeys.alertTypes, types);
+  }
+
+  /// The user's picks plus every type they never saw (all of them until they
+  /// first pick). Lists saved before storm alerts existed knew only the
+  /// first four types, which is what the fallback below says.
+  static Set<AlertType> _alertTypes(SharedPreferences prefs) {
+    final picked = prefs.getStringList(PrefKeys.alertTypes);
+    if (picked == null) return {...AlertType.values};
+    final known =
+        prefs.getStringList(PrefKeys.alertTypesKnown) ??
+        const ['rain', 'uv', 'air', 'heat'];
+    return {
+      for (final t in AlertType.values)
+        if (picked.contains(t.name) || !known.contains(t.name)) t,
+    };
+  }
 
   Future<void> setHealth(Set<HealthProfile> health) =>
       _saveSet(PrefKeys.health, health);
