@@ -100,7 +100,9 @@ Thứ tự làm: 1 → 3 → 2 (chỉ khi radar phủ tốt VN) → 4. **Đã l�
 
 **Chọn giờ nhận dự báo buổi sáng (đã làm):** Cài đặt → Giờ nhận, nửa tiếng một lựa chọn từ 5:00 đến 10:00 (mặc định 7:00); đổi là lên lịch lại ngay. Dòng giờ đẹp trong thông báo tính từ giờ nhận, không còn từ nửa đêm.
 
-Để sau: Live Activity, Wear OS, widget cỡ vừa.
+**Widget cỡ vừa 4×2 (đã làm):** thêm giờ đẹp cho hoạt động đầu tiên đã chọn (chỉ khi từ mức Tốt) và 6 giờ tới (giờ theo đồng hồ, không ghi "Bây giờ" vì widget chỉ cập nhật khi mở app). Dart gửi khoá icon `<WeatherCondition>_<day|night>`; iOS đổi sang SF Symbols, Android sang emoji (RemoteViews chỉ vẽ drawable hoặc chữ, emoji không cần thêm asset). Android là provider riêng (lựa chọn mới trong danh sách widget), iOS là thêm cỡ `systemMedium` cho widget sẵn có. Đã xem trên iOS simulator; Android mới build, chưa xem trên máy.
+
+Để sau: Live Activity, Wear OS.
 
 ---
 
@@ -545,7 +547,7 @@ README nên có đủ các mục:
 - [x] Nền động *(bản nhẹ: `AnimatedContainer` + `AnimatedSwitcher`; Lottie/hạt mưa để sau nếu cần)*
 - [x] Đồng bộ Supabase *(anonymous ngầm, không màn login; sao lưu danh sách thành phố, khôi phục khi máy trống; key qua `--dart-define-from-file`)*
 - [x] Biểu đồ nhiệt độ *(màn Chi tiết ngày)*
-- [x] Widget màn hình chính *(2×2: Android native xong; iOS có target WidgetKit `SkycastWidget`, iOS 17+)*
+- [x] Widget màn hình chính *(2×2 và 4×2: Android `SkycastWidgetProvider` + `SkycastWidgetMediumProvider`; iOS target WidgetKit `SkycastWidget` cỡ small + medium, iOS 17+)*
 - [x] Thông báo mỗi sáng *(bật trong Cài đặt; mỗi lần có dự báo GPS mới thì lên lịch sẵn 7 thông báo 7:00, mỗi cái mang dự báo của đúng ngày đó → không cần `workmanager`/chạy nền)*
 
 ### Khác biệt (mục 1.3)

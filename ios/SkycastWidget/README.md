@@ -4,7 +4,8 @@ The `SkycastWidget` Widget Extension target is part of `Runner.xcodeproj`
 (iOS 17+, embedded into the app by Runner's *Embed Foundation Extensions*
 phase, which sits before *Thin Binary* to avoid Xcode's build-cycle error).
 
-- `SkycastWidget.swift`: the widget (SwiftUI + WidgetKit). It reads the text the
+- `SkycastWidget.swift`: the widget (SwiftUI + WidgetKit), in small and medium
+  sizes. It reads the text the
   Flutter app writes (`lib/features/home_widget/`) from the App Group and only
   draws it. Sky colours mirror `Sky` in `lib/core/theme/app_theme.dart`.
 - `Info.plist`, `SkycastWidget.entitlements`: extension metadata and the App
