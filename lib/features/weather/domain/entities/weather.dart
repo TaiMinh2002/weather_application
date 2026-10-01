@@ -235,6 +235,18 @@ class Limits {
   /// How much a hot hour counts against outdoor activities: the comfort
   /// limits in `scoreAt` drop by this many degrees for sensitive people.
   double get heatMargin => 35 - feelsHot;
+
+  // Value equality, so `settingsProvider.select((s) => s.limits)` only
+  // rebuilds when the limits change, not on every settings change.
+  @override
+  bool operator ==(Object other) =>
+      other is Limits &&
+      other.aqi == aqi &&
+      other.feelsHot == feelsHot &&
+      other.uv == uv;
+
+  @override
+  int get hashCode => Object.hash(aqi, feelsHot, uv);
 }
 
 /// Rule-based advice for the day, most important first.

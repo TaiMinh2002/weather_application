@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,22 +38,22 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _pages = PageController();
-  StreamSubscription<RemoteMessage>? _alerts;
+  VoidCallback? _stopAlerts;
 
   @override
   void initState() {
     super.initState();
     // Home stays at the bottom of the stack while the app is open, so it's
-    // where foreground pushes are caught. After the first frame, because the
+    // where push events are caught. After the first frame, because the
     // channel name needs l10n.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _alerts = showForegroundAlerts(context, ref);
+      if (mounted) _stopAlerts = listenForAlerts(context, ref);
     });
   }
 
   @override
   void dispose() {
-    _alerts?.cancel();
+    _stopAlerts?.call();
     _pages.dispose();
     super.dispose();
   }

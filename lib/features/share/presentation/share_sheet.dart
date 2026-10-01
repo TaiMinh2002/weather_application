@@ -53,26 +53,29 @@ class _ShareSheetState extends ConsumerState<_ShareSheet> {
     final origin = button.localToGlobal(Offset.zero) & button.size;
     final boundary =
         _card.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    // ShareCard lays out at a fixed logical size, so this is always
-    // 1080×1920, the story size social apps expect.
-    final image = await boundary.toImage(
-      pixelRatio: 1080 / ShareCard.size.width,
-    );
-    final png = await image.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
-    await runQuietly(
-      () => SharePlus.instance.share(
+    // Capture is inside too: if it fails (e.g. the sheet closing mid-way)
+    // the button must still come back.
+    await runQuietly(() async {
+      // ShareCard lays out at a fixed logical size, so this is always
+      // 1080×1920, the story size social apps expect.
+      final image = await boundary.toImage(
+        pixelRatio: 1080 / ShareCard.size.width,
+      );
+      final png = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
+      if (png == null) throw StateError('Share card did not encode');
+      await SharePlus.instance.share(
         ShareParams(
           files: [
-            XFile.fromData(png!.buffer.asUint8List(), mimeType: 'image/png'),
+            XFile.fromData(png.buffer.asUint8List(), mimeType: 'image/png'),
           ],
           fileNameOverrides: const ['skycast.png'],
           // Image only: Messenger, Facebook and Instagram hide themselves
           // from the share sheet when text comes along with it.
           sharePositionOrigin: origin,
         ),
-      ),
-    );
+      );
+    });
     if (mounted) setState(() => _sharing = false);
   }
 

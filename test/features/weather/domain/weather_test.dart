@@ -92,6 +92,13 @@ void main() {
     expect(Limits.of({HealthProfile.elderly}).uv, 6);
     expect((all.aqi, all.feelsHot, all.uv), (50, 33, 3));
     expect(all.heatMargin, 2);
+    // Compared by value, so a settings rebuild with the same profiles is
+    // no change for `select`.
+    expect(
+      Limits.of({HealthProfile.elderly}),
+      Limits.of({HealthProfile.elderly}),
+    );
+    expect(Limits.of({}), isNot(all));
   });
 
   test('tipsFor uses the health limits', () {

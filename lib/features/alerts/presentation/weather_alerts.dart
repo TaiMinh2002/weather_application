@@ -91,31 +91,42 @@ Future<void> setAlertType(WidgetRef ref, AlertType type, bool on) async {
   await resyncWeatherAlerts(ref);
 }
 
-/// Android shows nothing for a push that arrives while the app is open, so
-/// it's re-posted locally. iOS shows it itself (see main.dart). Null when
-/// alerts aren't built in.
-StreamSubscription<RemoteMessage>? showForegroundAlerts(
-  BuildContext context,
-  WidgetRef ref,
-) {
-  if (ref.read(alertsSyncDataSourceProvider) == null ||
-      defaultTargetPlatform != TargetPlatform.android) {
-    return null;
-  }
+/// For as long as the app is open: re-sends the subscription when FCM
+/// rotates the token (otherwise the server keeps pushing to a dead one and
+/// drops the row), and on Android re-posts pushes that arrive in the
+/// foreground, which it doesn't show itself (iOS does, see main.dart).
+/// Returns the stop function; null when alerts aren't available.
+VoidCallback? listenForAlerts(BuildContext context, WidgetRef ref) {
+  if (ref.read(alertsSyncDataSourceProvider) == null) return null;
   final channelName = context.l10n.weatherAlerts;
-  return FirebaseMessaging.onMessage.listen((message) {
-    final n = message.notification;
-    if (n == null) return;
-    runQuietly(
-      () => ref
-          .read(morningNotificationsProvider)
-          .show(
-            id: message.messageId.hashCode,
-            title: n.title ?? '',
-            body: n.body ?? '',
-            channelId: alertsChannelId,
-            channelName: channelName,
-          ),
-    );
-  });
+  final tokens = FirebaseMessaging.instance.onTokenRefresh.listen(
+    (_) => resyncWeatherAlerts(ref),
+  );
+  final messages = defaultTargetPlatform == TargetPlatform.android
+      ? FirebaseMessaging.onMessage.listen((message) {
+          final n = message.notification;
+          if (n == null) return;
+          // A distinct id per push, so one doesn't replace another; masked
+          // to the 32 bits Android notification ids allow.
+          final id =
+              (message.messageId ?? '${DateTime.now().microsecondsSinceEpoch}')
+                  .hashCode &
+              0x7fffffff;
+          runQuietly(
+            () => ref
+                .read(morningNotificationsProvider)
+                .show(
+                  id: id,
+                  title: n.title ?? '',
+                  body: n.body ?? '',
+                  channelId: alertsChannelId,
+                  channelName: channelName,
+                ),
+          );
+        })
+      : null;
+  return () {
+    tokens.cancel();
+    messages?.cancel();
+  };
 }

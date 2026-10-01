@@ -74,7 +74,8 @@ dashboard. Each run returns `{devices, cells, sent}`.
 
 ## Limits
 
-The free Supabase and Open-Meteo tiers are plenty for a few hundred devices:
-2 Open-Meteo calls per ~11 km cell, every hour. Places are processed one
-after another. At a few thousand cells, a run would get close to the Edge
-Function time limit, so the loop would need to fan out.
+The free Supabase and Open-Meteo tiers are plenty for a few thousand
+devices: 2 Open-Meteo calls per ~11 km cell, every hour, 8 cells at a time.
+Subscriptions are read 1000 rows per page, so there's no row cap. Past
+roughly 10,000 cells a run would near Open-Meteo's free daily limit and the
+Edge Function time limit; split the run by region then.

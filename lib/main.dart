@@ -10,6 +10,7 @@ import 'app.dart';
 import 'core/constants/api_constants.dart';
 import 'core/error/errors.dart';
 import 'core/storage/prefs.dart';
+import 'features/alerts/data/alerts_sync_ds.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +23,24 @@ Future<void> main() async {
       publishableKey: ApiConstants.supabaseAnonKey,
     );
   }
-  if (ApiConstants.hasFirebase) {
-    final ios = defaultTargetPlatform == TargetPlatform.iOS;
+  final pushReady = ApiConstants.hasFirebase && await _initFirebase();
+  runApp(
+    ProviderScope(
+      retry: noAutoRetry,
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        if (!pushReady) alertsSyncDataSourceProvider.overrideWithValue(null),
+      ],
+      child: const App(),
+    ),
+  );
+}
+
+/// False when this platform's keys are missing or wrong: push alerts are
+/// then hidden, rather than the whole app failing to start.
+Future<bool> _initFirebase() async {
+  final ios = defaultTargetPlatform == TargetPlatform.iOS;
+  try {
     await Firebase.initializeApp(
       options: FirebaseOptions(
         apiKey: ios
@@ -39,12 +56,9 @@ Future<void> main() async {
     // iOS hides pushes that arrive while the app is open unless told not to.
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(alert: true, sound: true);
+    return true;
+  } catch (e) {
+    debugPrint('Push alerts off, Firebase failed to start: $e');
+    return false;
   }
-  runApp(
-    ProviderScope(
-      retry: noAutoRetry,
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-      child: const App(),
-    ),
-  );
 }

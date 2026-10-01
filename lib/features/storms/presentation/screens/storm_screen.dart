@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/widgets/state_views.dart';
@@ -12,6 +13,26 @@ import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../domain/entities/storm.dart';
 import '../providers/storms_provider.dart';
 import '../widgets/storm_card.dart';
+
+/// Shapes the loading skeleton; never shown as data.
+final _placeholder = Storm(
+  id: '',
+  name: 'Placeholder',
+  issuedAt: DateTime.utc(2026),
+  track: const [],
+  points: [
+    for (var i = 0; i < 4; i++)
+      StormPoint(
+        time: DateTime.utc(2026, 1, 1, i * 12),
+        hoursAhead: i * 12,
+        lat: 16,
+        lon: 112,
+        windMs: 25,
+        gustMs: 33,
+        pressure: 980,
+      ),
+  ],
+);
 
 /// Track map plus the forecast, time by time, for one storm.
 class StormScreen extends ConsumerWidget {
@@ -34,7 +55,20 @@ class StormScreen extends ConsumerWidget {
         ),
       ),
       body: storms.when(
-        loading: () => const AppLoading(),
+        // The real layout over placeholder data, so nothing jumps when the
+        // storm arrives. The map area stays plain: tiles aren't content.
+        loading: () => Column(
+          children: [
+            Expanded(
+              child: ColoredBox(
+                color: context.colorScheme.surfaceContainerHighest,
+              ),
+            ),
+            Skeletonizer(
+              child: _Timeline(storm: _placeholder, place: place),
+            ),
+          ],
+        ),
         error: (e, _) => AppErrorView(
           error: e,
           onRetry: () => ref.invalidate(activeStormsProvider),
