@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:weather_application/core/error/errors.dart';
 import 'package:weather_application/core/storage/prefs.dart';
 import 'package:weather_application/core/theme/app_theme.dart';
@@ -117,6 +120,19 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('Cơ quan Khí tượng Nhật Bản'), findsOneWidget);
+  });
+
+  testWidgets('the storm screen shows a skeleton while loading', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      const StormScreen(id: 'TC2640', place: _daNang),
+      () => Completer<List<Storm>>().future,
+    );
+    // Skeletonizer is abstract; the widget in the tree is a private subclass.
+    expect(find.byWidgetPredicate((w) => w is Skeletonizer), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
   testWidgets('a storm that has ended says so; errors offer a retry', (

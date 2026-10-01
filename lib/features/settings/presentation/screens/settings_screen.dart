@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/errors.dart';
 import '../../../../core/extensions/context_ext.dart';
 import '../../../../core/utils/unit_converter.dart';
@@ -157,7 +156,7 @@ class SettingsScreen extends ConsumerWidget {
                   onChanged: (on) => _setMorningForecast(context, ref, on),
                 ),
               ),
-              if (ApiConstants.hasFirebase) ...[
+              if (ref.watch(alertsSyncDataSourceProvider) != null) ...[
                 _Row(
                   label: l10n.weatherAlerts,
                   trailing: Switch(

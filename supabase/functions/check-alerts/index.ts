@@ -26,9 +26,12 @@ Deno.serve(async (req) => {
   if (req.headers.get("x-cron-secret") !== Deno.env.get("CRON_SECRET")) {
     return new Response("forbidden", { status: 403 });
   }
-  const { data, error } = await supabase.from(table).select("*");
-  if (error) return new Response(error.message, { status: 500 });
-  const subs = data as Subscription[];
+  let subs: Subscription[];
+  try {
+    subs = await readSubscriptions();
+  } catch (e) {
+    return new Response(String(e), { status: 500 });
+  }
 
   // Devices within the same ~11 km cell share one pair of requests.
   const cells = new Map<string, Subscription[]>();
@@ -45,7 +48,10 @@ Deno.serve(async (req) => {
   });
   let fcm: Promise<FcmAuth> | undefined;
   let sent = 0;
-  for (const [key, group] of cells) {
+  // A few cells at a time: one after another would run past the function's
+  // time limit at a few hundred cells, all at once would hit Open-Meteo's
+  // rate limit.
+  await forEachLimit([...cells], 8, async ([key, group]) => {
     let conditions: Conditions | null = null;
     try {
       conditions = await fetchConditions(key);
@@ -79,7 +85,7 @@ Deno.serve(async (req) => {
         ? supabase.from(table).delete().eq("user_id", sub.user_id)
         : supabase.from(table).update({ last_sent: lastSent }).eq("user_id", sub.user_id));
     }
-  }
+  });
   return Response.json({
     devices: subs.length,
     cells: cells.size,
@@ -108,6 +114,41 @@ async function fetchConditions(cell: string): Promise<Conditions> {
     rainMm: forecast.minutely_15?.precipitation ?? [],
     aqi: air?.current?.us_aqi ?? null,
   };
+}
+
+/**
+ * Every row, a page at a time: PostgREST caps one response at 1000 rows by
+ * default, which would silently skip everyone after that.
+ */
+async function readSubscriptions(): Promise<Subscription[]> {
+  const page = 1000;
+  const all: Subscription[] = [];
+  for (let from = 0; ; from += page) {
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      // A stable order, so pages neither overlap nor skip rows.
+      .order("user_id")
+      .range(from, from + page - 1);
+    if (error) throw new Error(error.message);
+    all.push(...(data as Subscription[]));
+    if (data.length < page) return all;
+  }
+}
+
+/** Runs [fn] over [items] with at most [limit] in flight. */
+async function forEachLimit<T>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<void>,
+): Promise<void> {
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) await fn(items[next++]);
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, worker),
+  );
 }
 
 /** Every cyclone JMA tracks now (jma.go.jp/bosai/typhoon/data/). */
